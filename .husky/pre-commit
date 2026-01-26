@@ -1,0 +1,23 @@
+#!/bin/sh
+# Abort on errors
+set -e
+
+# Format files with prettier
+echo "Running Prettier on modified files..."
+git status --short | grep -E '(\.ts|\.tsx)$' | awk '{print $2}' | while read -r file; do
+  # Check if the file still exists before running prettier
+  if [ -f "$file" ]; then
+    echo "Formatting $file..."
+    npx prettier --write "$file"
+  else
+    echo "Skipping $file (file no longer exists)"
+  fi
+done
+
+# Check if there are staged changes in the migrations folder
+if git status --short | grep -q 'prisma/migrations/'; then
+  echo "Changes detected in migrations folder. Running build..."
+  npm run build
+else
+  echo "No changes in migrations folder. Skipping build."
+fi

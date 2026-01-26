@@ -1,0 +1,32 @@
+{
+    "editor.formatOnSave": true,
+    "[prisma]": {
+      "editor.defaultFormatter": "Prisma.prisma"
+    },
+    "workbench.colorCustomizations": {
+      "commandCenter.border": "#e7e7e799",
+      "sash.hoverBorder": "#ab90ef",
+      "statusBar.background": "#8964e8",
+      "statusBar.foreground": "#e7e7e7",
+      "statusBarItem.hoverBackground": "#ab90ef",
+      "statusBarItem.remoteBackground": "#8964e8",
+      "statusBarItem.remoteForeground": "#e7e7e7",
+      "titleBar.activeBackground": "#8964e8",
+      "titleBar.activeForeground": "#e7e7e7",
+      "titleBar.inactiveBackground": "#8964e899",
+      "titleBar.inactiveForeground": "#e7e7e799",
+      "list.activeSelectionBorder": "#ff9800",
+      "list.focusOutline": "#ff9800",
+      "tree.indentGuidesStroke": "#b0bec5",
+      "activityBar.activeBackground": "#ab90ef",
+      "activityBar.background": "#ab90ef",
+      "activityBar.foreground": "#15202b",
+      "activityBar.inactiveForeground": "#15202b99",
+      "activityBarBadge.background": "#fbeae3",
+      "activityBarBadge.foreground": "#15202b"
+    },
+    "peacock.color": "#8964e8",
+    "css.lint.unknownAtRules": "ignore",
+    "scss.lint.unknownAtRules": "ignore",
+    "less.lint.unknownAtRules": "ignore"
+  }
