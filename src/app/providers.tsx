@@ -3,6 +3,7 @@
 import { CustomDialogProvider } from "@/components/dialog/dialog_context";
 import { CancellableApiProvider } from "@/context/use_cancellable_api_context";
 import { LanguageProvider } from "@/dictionary/context/language_context";
+import { ThemeProvider } from "@/styles/theme_context";
 import CustomThemeProvider from "@/styles/custom_theme_provider";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -14,17 +15,19 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <Provider>
       <CustomDialogProvider>
-        <CustomThemeProvider>
-          <LanguageProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <SnackbarProvider maxSnack={4}>
-                <CancellableApiProvider options={{ autoCleanup: true }}>
-                  {children}
-                </CancellableApiProvider>
-              </SnackbarProvider>
-            </LocalizationProvider>
-          </LanguageProvider>
-        </CustomThemeProvider>
+        <ThemeProvider>
+          <CustomThemeProvider>
+            <LanguageProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <SnackbarProvider maxSnack={4}>
+                  <CancellableApiProvider options={{ autoCleanup: true }}>
+                    {children}
+                  </CancellableApiProvider>
+                </SnackbarProvider>
+              </LocalizationProvider>
+            </LanguageProvider>
+          </CustomThemeProvider>
+        </ThemeProvider>
       </CustomDialogProvider>
     </Provider>
   );
