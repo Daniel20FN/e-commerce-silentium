@@ -16,20 +16,28 @@ enum Language {
 }
 
 enum UserRole {
-  SUPER_ADMIN
-  COMPANY_ADMIN
-  COMPANY_USER
+  admin
+  manager
+  user
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      UserRole @default(COMPANY_USER)
+  id         String   @id @default(cuid())
+  firstNames String
+  lastNames  String
+  fullName   String
+  email      String   @unique
+  password   String
+  role       UserRole @default(user)
+
+  phoneNumber             String?
+  allowCommercialMessages Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([fullName])
+  @@index([phoneNumber])
   @@index([email])
   @@index([role])
 }
