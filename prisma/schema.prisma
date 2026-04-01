@@ -16,28 +16,106 @@ enum Language {
 }
 
 enum UserRole {
+  super_admin
   admin
-  manager
-  user
+  support
+  customer
+}
+
+enum UserStatus {
+  active
+  inactive
+  blocked
+  pending_profile
+}
+
+enum DocumentType {
+  cc
+  ce
+  nit
+  pp
+  ti
+}
+
+enum Gender {
+  female
+  male
+  non_binary
+  prefer_not_to_say
 }
 
 model User {
-  id         String   @id @default(cuid())
-  firstNames String
-  lastNames  String
-  fullName   String
-  email      String   @unique
-  password   String
-  role       UserRole @default(user)
+  id                 String          @id @default(cuid())
+  supabaseAuthUserId String?         @unique
+  email              String          @unique
+  role               UserRole        @default(customer)
+  status             UserStatus      @default(pending_profile)
+  emailVerifiedAt    DateTime?
+  phoneVerifiedAt    DateTime?
+  lastLoginAt        DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  profile            UserProfile?
+  addresses          UserAddress[]
+  preferences        UserPreference?
 
-  phoneNumber             String?
-  allowCommercialMessages Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([fullName])
-  @@index([phoneNumber])
   @@index([email])
   @@index([role])
+  @@index([status])
+}
+
+model UserProfile {
+  userId         String       @id
+  firstName      String
+  lastName       String
+  phone          String?
+  documentType   DocumentType?
+  documentNumber String?
+  birthDate      DateTime?
+  gender         Gender?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([firstName, lastName])
+  @@index([phone])
+  @@index([documentType, documentNumber])
+}
+
+model UserAddress {
+  id                   String   @id @default(cuid())
+  userId               String
+  label                String?
+  recipientName        String
+  phone                String?
+  addressLine1         String
+  addressLine2         String?
+  neighborhood         String?
+  city                 String
+  department           String
+  country              String   @default("CO")
+  postalCode           String?
+  deliveryInstructions String?
+  isDefault            Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([city])
+  @@index([department])
+  @@index([isDefault])
+}
+
+model UserPreference {
+  userId                    String   @id
+  acceptsMarketingEmails    Boolean  @default(false)
+  acceptsWhatsAppMarketing  Boolean  @default(false)
+  acceptedTermsAt           DateTime?
+  acceptedPrivacyPolicyAt   DateTime?
+  preferredLanguage         Language @default(es)
+  preferredCurrency         String   @default("COP")
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
