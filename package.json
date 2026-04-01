@@ -9,9 +9,9 @@
     "prisma:studio": "dotenv -e .env.development -- npx prisma studio",
     "prisma:migrate:dev:development": "dotenv -e .env.development -- npx prisma migrate dev",
     "prisma:migrate:deploy:production": "dotenv -e .env -- npx prisma migrate deploy",
+    "db:seed": "dotenv -e .env.development -- tsx prisma/seed.ts",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "tsx prisma/seed.ts",
     "prepare": "husky"
   },
   "dependencies": {
