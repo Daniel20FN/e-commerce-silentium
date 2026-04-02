@@ -1,47 +1,43 @@
 "use client";
 
-import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
+import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { CompanyValues } from "@/values/app_values";
 import { ArrowForward } from "@mui/icons-material";
-import {
-  alpha,
-  Box,
-  Button,
-  Container,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { alpha, Box, Button, Container, Typography } from "@mui/material";
 
-export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
-  const theme = useTheme();
+export function HeroSection({
+  dictionary: _dictionary,
+}: {
+  dictionary: Dictionary;
+}) {
+  void _dictionary;
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         position: "relative",
         minHeight: { xs: "90vh", md: "85vh" },
         display: "flex",
         alignItems: "center",
         backgroundColor:
           theme.palette.mode === "dark"
-            ? AppColors.primaryDark
-            : AppColors.secondaryLight,
+            ? theme.palette.background.default
+            : theme.palette.secondary.light,
         overflow: "hidden",
-      }}
+      })}
     >
       {/* Background Pattern */}
       <Box
-        sx={{
+        sx={(theme) => ({
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
           opacity: 0.05,
-          backgroundImage: `radial-gradient(${AppColors.accent} 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(${theme.palette.info.main} 1px, transparent 1px)`,
           backgroundSize: "40px 40px",
-        }}
+        })}
       />
 
       <Container maxWidth="xl">
@@ -74,12 +70,7 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
             >
               Confort y elegancia
               <br />
-              <Box
-                component="span"
-                sx={{
-                  color: AppColors.accent,
-                }}
-              >
+              <Box component="span" sx={{ color: "info.main" }}>
                 para tu descanso
               </Box>
             </Typography>
@@ -112,35 +103,41 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
                 variant="contained"
                 size="large"
                 endIcon={<ArrowForward />}
-                sx={{
+                sx={(theme) => ({
                   px: 4,
                   py: 1.5,
                   fontSize: "1rem",
                   fontWeight: 600,
-                  backgroundColor: AppColors.primary,
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.background.paper
+                      : theme.palette.primary.main,
                   color: "#fff",
                   "&:hover": {
-                    backgroundColor: AppColors.primaryLight,
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? theme.palette.background.default
+                        : theme.palette.primary.light,
                   },
-                }}
+                })}
               >
                 Ver Coleccion
               </Button>
               <Button
                 variant="outlined"
                 size="large"
-                sx={{
+                sx={(theme) => ({
                   px: 4,
                   py: 1.5,
                   fontSize: "1rem",
                   fontWeight: 600,
-                  borderColor: AppColors.accent,
-                  color: AppColors.accent,
+                  borderColor: theme.palette.info.main,
+                  color: theme.palette.info.main,
                   "&:hover": {
-                    borderColor: AppColors.accentDark,
-                    backgroundColor: alpha(AppColors.accent, 0.08),
+                    borderColor: theme.palette.info.dark,
+                    backgroundColor: alpha(theme.palette.info.main, 0.08),
                   },
-                }}
+                })}
               >
                 Conoce Nuestra Historia
               </Button>
@@ -159,7 +156,7 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
                 <Box key={stat.label} sx={{ textAlign: "center" }}>
                   <Typography
                     variant="h4"
-                    sx={{ fontWeight: 700, color: AppColors.accent }}
+                    sx={{ fontWeight: 700, color: "info.main" }}
                   >
                     {stat.value}
                   </Typography>
@@ -193,7 +190,7 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
             >
               {/* Decorative Circle */}
               <Box
-                sx={{
+                sx={(theme) => ({
                   position: "absolute",
                   top: "50%",
                   left: "50%",
@@ -201,13 +198,18 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
                   width: "100%",
                   height: "100%",
                   borderRadius: "50%",
-                  backgroundColor: alpha(AppColors.secondary, 0.5),
-                }}
+                  backgroundColor: alpha(
+                    theme.palette.mode === "dark"
+                      ? theme.palette.primary.main
+                      : theme.palette.secondary.main,
+                    0.5,
+                  ),
+                })}
               />
 
               {/* Main Image Placeholder */}
               <Box
-                sx={{
+                sx={(theme) => ({
                   position: "absolute",
                   top: "50%",
                   left: "50%",
@@ -215,42 +217,61 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
                   width: "85%",
                   height: "85%",
                   borderRadius: "50%",
-                  backgroundColor: AppColors.secondary,
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.primary.main
+                      : theme.palette.secondary.main,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: `0 20px 60px ${alpha(AppColors.primary, 0.15)}`,
+                  boxShadow: `0 20px 60px ${alpha(
+                    theme.palette.mode === "dark"
+                      ? theme.palette.background.paper
+                      : theme.palette.primary.main,
+                    0.15,
+                  )}`,
                   overflow: "hidden",
-                }}
+                })}
               >
                 <Box
-                  sx={{
+                  sx={(theme) => ({
                     width: "100%",
                     height: "100%",
-                    background: `linear-gradient(135deg, ${AppColors.secondary} 0%, ${AppColors.secondaryDark} 100%)`,
+                    background: `linear-gradient(135deg, ${
+                      theme.palette.mode === "dark"
+                        ? theme.palette.primary.main
+                        : theme.palette.secondary.main
+                    } 0%, ${
+                      theme.palette.mode === "dark"
+                        ? theme.palette.primary.dark
+                        : theme.palette.secondary.dark
+                    } 100%)`,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     p: 4,
-                  }}
+                  })}
                 >
                   <Typography
                     variant="h2"
-                    sx={{
-                      color: AppColors.primary,
+                    sx={(theme) => ({
+                      color:
+                        theme.palette.mode === "dark"
+                          ? theme.palette.background.paper
+                          : theme.palette.primary.main,
                       fontWeight: 700,
                       textAlign: "center",
                       fontSize: { xs: "2rem", md: "3rem" },
-                    }}
+                    })}
                   >
                     Dulces
                   </Typography>
                   <Typography
                     variant="h2"
                     sx={{
-                      color: AppColors.accent,
+                      color: "info.main",
                       fontWeight: 700,
                       textAlign: "center",
                       fontSize: { xs: "2rem", md: "3rem" },
@@ -263,7 +284,7 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
 
               {/* Floating Elements */}
               <Box
-                sx={{
+                sx={(theme) => ({
                   position: "absolute",
                   top: "10%",
                   right: "-5%",
@@ -271,19 +292,24 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
                   py: 1,
                   backgroundColor: theme.palette.background.paper,
                   borderRadius: 2,
-                  boxShadow: `0 4px 20px ${alpha(AppColors.primary, 0.1)}`,
-                }}
+                  boxShadow: `0 4px 20px ${alpha(
+                    theme.palette.mode === "dark"
+                      ? theme.palette.background.paper
+                      : theme.palette.primary.main,
+                    0.1,
+                  )}`,
+                })}
               >
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: 600, color: AppColors.accent }}
+                  sx={{ fontWeight: 600, color: "info.main" }}
                 >
                   -30% OFF
                 </Typography>
               </Box>
 
               <Box
-                sx={{
+                sx={(theme) => ({
                   position: "absolute",
                   bottom: "15%",
                   left: "-10%",
@@ -291,8 +317,13 @@ export function HeroSection({ dictionary }: { dictionary: Dictionary }) {
                   py: 1,
                   backgroundColor: theme.palette.background.paper,
                   borderRadius: 2,
-                  boxShadow: `0 4px 20px ${alpha(AppColors.primary, 0.1)}`,
-                }}
+                  boxShadow: `0 4px 20px ${alpha(
+                    theme.palette.mode === "dark"
+                      ? theme.palette.background.paper
+                      : theme.palette.primary.main,
+                    0.1,
+                  )}`,
+                })}
               >
                 <Typography
                   variant="body2"

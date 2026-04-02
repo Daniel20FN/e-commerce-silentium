@@ -1,7 +1,6 @@
 "use client";
 
-import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
+import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { ChevronLeft, ChevronRight, FormatQuote } from "@mui/icons-material";
 import {
   alpha,
@@ -14,7 +13,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import * as React from "react";
+import { useState } from "react";
 
 const testimonials = [
   {
@@ -47,12 +46,18 @@ const testimonials = [
 ];
 
 export function TestimonialsSection({
-  dictionary,
+  dictionary: _dictionary,
 }: {
   dictionary: Dictionary;
 }) {
+  void _dictionary;
+
   const theme = useTheme();
-  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const baseShadowColor =
+    theme.palette.mode === "dark"
+      ? theme.palette.background.paper
+      : theme.palette.primary.main;
 
   const handlePrev = () => {
     setCurrentIndex((prev) =>
@@ -78,17 +83,17 @@ export function TestimonialsSection({
         <Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
           <Typography
             component="span"
-            sx={{
+            sx={(theme) => ({
               display: "inline-block",
               px: 2,
               py: 0.5,
               mb: 2,
               borderRadius: 5,
-              backgroundColor: alpha(AppColors.accent, 0.1),
-              color: AppColors.accent,
+              backgroundColor: alpha(theme.palette.info.main, 0.1),
+              color: theme.palette.info.main,
               fontWeight: 600,
               fontSize: "0.875rem",
-            }}
+            })}
           >
             Testimonios
           </Typography>
@@ -112,14 +117,14 @@ export function TestimonialsSection({
               maxWidth: 800,
               mx: "auto",
               border: `1px solid ${theme.palette.divider}`,
-              boxShadow: `0 10px 40px ${alpha(AppColors.primary, 0.08)}`,
+              boxShadow: `0 10px 40px ${alpha(baseShadowColor, 0.08)}`,
             }}
           >
             <CardContent sx={{ p: { xs: 4, md: 6 } }}>
               <FormatQuote
                 sx={{
                   fontSize: 48,
-                  color: AppColors.accent,
+                  color: "info.main",
                   opacity: 0.3,
                   mb: 2,
                 }}
@@ -140,12 +145,12 @@ export function TestimonialsSection({
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Avatar
-                  sx={{
+                  sx={(theme) => ({
                     width: 56,
                     height: 56,
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: theme.palette.info.main,
                     fontWeight: 600,
-                  }}
+                  })}
                 >
                   {testimonials[currentIndex].avatar}
                 </Avatar>
@@ -164,7 +169,7 @@ export function TestimonialsSection({
                   {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
                     <Typography
                       key={i}
-                      sx={{ color: AppColors.accent, fontSize: 20 }}
+                      sx={{ color: "info.main", fontSize: 20 }}
                     >
                       ★
                     </Typography>
@@ -186,13 +191,13 @@ export function TestimonialsSection({
           >
             <IconButton
               onClick={handlePrev}
-              sx={{
+              sx={(theme) => ({
                 border: `1px solid ${theme.palette.divider}`,
                 "&:hover": {
-                  backgroundColor: alpha(AppColors.accent, 0.08),
-                  borderColor: AppColors.accent,
+                  backgroundColor: alpha(theme.palette.info.main, 0.08),
+                  borderColor: theme.palette.info.main,
                 },
-              }}
+              })}
             >
               <ChevronLeft />
             </IconButton>
@@ -202,30 +207,30 @@ export function TestimonialsSection({
                 <Box
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  sx={{
+                  sx={(theme) => ({
                     width: index === currentIndex ? 24 : 8,
                     height: 8,
                     borderRadius: 4,
                     backgroundColor:
                       index === currentIndex
-                        ? AppColors.accent
-                        : alpha(AppColors.accent, 0.3),
+                        ? theme.palette.info.main
+                        : alpha(theme.palette.info.main, 0.3),
                     cursor: "pointer",
                     transition: "all 0.3s ease",
-                  }}
+                  })}
                 />
               ))}
             </Box>
 
             <IconButton
               onClick={handleNext}
-              sx={{
+              sx={(theme) => ({
                 border: `1px solid ${theme.palette.divider}`,
                 "&:hover": {
-                  backgroundColor: alpha(AppColors.accent, 0.08),
-                  borderColor: AppColors.accent,
+                  backgroundColor: alpha(theme.palette.info.main, 0.08),
+                  borderColor: theme.palette.info.main,
                 },
-              }}
+              })}
             >
               <ChevronRight />
             </IconButton>

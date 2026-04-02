@@ -1,7 +1,6 @@
 "use client";
 
 import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
 import { CompanyValues } from "@/values/app_values";
 import { Facebook, Instagram, Twitter, YouTube } from "@mui/icons-material";
 import {
@@ -12,7 +11,6 @@ import {
   IconButton,
   Link,
   Typography,
-  useTheme,
 } from "@mui/material";
 
 const footerLinks = {
@@ -43,16 +41,20 @@ const footerLinks = {
   ],
 };
 
-export function Footer({ dictionary }: { dictionary: Dictionary }) {
-  const theme = useTheme();
+export function Footer({
+  dictionary: _dictionary,
+}: {
+  dictionary: Dictionary;
+}) {
+  void _dictionary;
 
   return (
     <Box
       component="footer"
-      sx={{
+      sx={(theme) => ({
         backgroundColor: theme.palette.background.paper,
         borderTop: `1px solid ${theme.palette.divider}`,
-      }}
+      })}
     >
       <Container maxWidth="xl">
         <Box
@@ -70,18 +72,18 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
           <Box sx={{ gridColumn: { xs: "1 / -1", md: "span 1" } }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
               <Box
-                sx={{
+                sx={(theme) => ({
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  backgroundColor: AppColors.accent,
+                  backgroundColor: theme.palette.info.main,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "#fff",
                   fontSize: 14,
                   fontWeight: 700,
-                }}
+                })}
               >
                 {CompanyValues.name.slice(0, 2).toUpperCase()}
               </Box>
@@ -104,13 +106,13 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
                 <IconButton
                   key={index}
                   size="small"
-                  sx={{
+                  sx={(theme) => ({
                     color: "text.secondary",
                     "&:hover": {
-                      color: AppColors.accent,
-                      backgroundColor: alpha(AppColors.accent, 0.08),
+                      color: theme.palette.info.main,
+                      backgroundColor: alpha(theme.palette.info.main, 0.08),
                     },
-                  }}
+                  })}
                 >
                   <Icon fontSize="small" />
                 </IconButton>
@@ -138,14 +140,14 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
                     key={link.label}
                     href={link.href}
                     underline="none"
-                    sx={{
+                    sx={(theme) => ({
                       color: "text.secondary",
                       fontSize: "0.875rem",
                       transition: "color 0.2s ease",
                       "&:hover": {
-                        color: AppColors.accent,
+                        color: theme.palette.info.main,
                       },
-                    }}
+                    })}
                   >
                     {link.label}
                   </Link>

@@ -59,14 +59,11 @@
 
 ## Tests
 
-- There is currently no `test` script in `package.json`.
-- No Jest/Vitest/Playwright test config or `*.test.*` / `*.spec.*` files were found during analysis.
-- Do not claim tests were run unless you actually introduced a test runner and executed it.
-- “Run a single test” is currently not possible because no test framework is configured.
-- If you add tests, also add:
-  - a top-level `test` script
-  - a documented single-test command
-  - any required config files
+- Jest is configured through `jest.config.ts` with `next/jest` and `jest.setup.ts`.
+- Run the full test suite with `npm run test`.
+- Run a single test file with `npm run test:file -- src/path/to/file.test.ts`.
+- React Testing Library and `@testing-library/jest-dom` are available for component tests.
+- Do not claim tests were run unless you actually executed the relevant Jest command.
 
 ## Git Hooks
 
@@ -211,6 +208,5 @@
 
 ## Known Gaps
 
-- No automated test runner is configured yet.
 - No dedicated `typecheck` script exists yet.
 - Lint config is split between `eslint.config.mjs` and an older `.eslintrc.json`; prefer the flat config as the active modern setup, but do not delete the legacy file unless the user asks.
