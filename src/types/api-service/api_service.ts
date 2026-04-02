@@ -47,7 +47,7 @@ export class ApiService {
       const dataResponse = (await response.json()) as T;
 
       if (dataResponse.type) {
-        throw new Error(dataResponse.message);
+        throw new Error(dataResponse.message ?? dataResponse.type);
       }
 
       if (successMessage) {

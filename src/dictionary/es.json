@@ -4,7 +4,17 @@
     "deleteSearch": "Eliminar búsqueda",
     "export": "Exportar",
     "exportCSV": "Exportar CSV",
-    "print": "Imprimir"
+    "print": "Imprimir",
+    "backToHome": "Volver al inicio",
+    "loading": "Cargando"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "products": "Productos",
+    "collections": "Colecciones",
+    "offers": "Ofertas",
+    "about": "Nosotros",
+    "contact": "Contacto"
   },
   "grid": {
     "no_rows": "Sin registros",
@@ -78,5 +88,80 @@
     "searchColumns": "Buscar columnas",
     "addRow": "Añadir fila",
     "delete": "Eliminar"
+  },
+  "auth": {
+    "navbar": {
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta",
+      "account": "Mi cuenta",
+      "orders": "Mis pedidos",
+      "wishlist": "Lista de deseos",
+      "logout": "Cerrar sesión",
+      "hello": "Hola",
+      "authenticated": "Sesión iniciada"
+    },
+    "common": {
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "submit": "Continuar",
+      "acceptTerms": "Acepto los términos y la política de privacidad",
+      "requiredField": "Este campo es obligatorio",
+      "invalidEmail": "Ingresa un correo electrónico válido",
+      "passwordMinLength": "La contraseña debe tener al menos 8 caracteres"
+    },
+    "login": {
+      "title": "Ingresa a tu cuenta",
+      "subtitle": "Accede a tus pedidos, tu cuenta y el checkout seguro.",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "registerPrompt": "¿Todavía no tienes cuenta?",
+      "registerLink": "Créala aquí",
+      "confirmedSuccess": "Tu correo fue confirmado. Ya puedes iniciar sesión.",
+      "returningTo": "Después del ingreso te llevaremos a tu destino solicitado."
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Regístrate para guardar tus datos, ver pedidos y comprar más rápido.",
+      "submit": "Crear cuenta",
+      "submitting": "Creando cuenta...",
+      "loginPrompt": "¿Ya tienes cuenta?",
+      "loginLink": "Inicia sesión",
+      "successTitle": "Revisa tu correo",
+      "successDescription": "Te enviamos un enlace de confirmación a",
+      "successHint": "Confirma tu correo para activar la cuenta antes de iniciar sesión.",
+      "resendButton": "Reenviar correo de confirmación",
+      "resendSubmitting": "Reenviando correo...",
+      "resendCooldown": "Puedes solicitar otro correo en {seconds}s.",
+      "resendInitialCooldown": "Ya te enviamos un correo. Espera un momento antes de solicitar otro.",
+      "resendSuccess": "Listo. Te reenviamos el correo de confirmación."
+    },
+    "pendingConfirmation": {
+      "title": "Confirmación pendiente",
+      "description": "Necesitas confirmar tu correo electrónico antes de ingresar.",
+      "checkSpam": "Si no ves el mensaje, revisa spam o promociones."
+    },
+    "authCodeError": {
+      "title": "No pudimos confirmar tu acceso",
+      "description": "El enlace de confirmación es inválido, incompleto o ya venció.",
+      "guidance": "Vuelve a registrarte o solicita un nuevo correo desde ingreso si el problema continúa."
+    },
+    "errors": {
+      "validation_error": "Revisa los datos ingresados e inténtalo de nuevo.",
+      "conflict": "Ya existe una cuenta con esos datos.",
+      "unauthorized": "No pudimos autenticarte con esos datos.",
+      "internal_server_error": "Ocurrió un error inesperado. Inténtalo nuevamente.",
+      "invalid_credentials": "Correo o contraseña incorrectos.",
+      "email_confirmation_required": "Antes de ingresar debes confirmar tu correo.",
+      "email_already_registered": "Ese correo ya está registrado.",
+      "accept_terms_required": "Debes aceptar los términos para registrarte.",
+      "invalid_confirmation_link": "El enlace de confirmación no es válido o ya expiró.",
+      "email_confirmation_misconfigured": "La confirmación obligatoria no está bien configurada en Supabase.",
+      "resend_confirmation_rate_limited": "Ya enviamos un correo hace muy poco. Espera un minuto e inténtalo de nuevo.",
+      "resend_confirmation_user_not_found": "No encontramos una cuenta pendiente para ese correo.",
+      "email_already_confirmed": "Ese correo ya fue confirmado. Ya puedes iniciar sesión.",
+      "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez."
+    }
   }
 }

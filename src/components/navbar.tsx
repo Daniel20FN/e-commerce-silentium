@@ -1,7 +1,13 @@
 "use client";
 
-import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
+import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
+import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import {
+  currentUserAtom,
+  hasResolvedCurrentUserAtom,
+} from "@/domains/auth/states/current_user_atom";
+import type { LogoutApiParams } from "@/domains/auth/types/api_params";
+import type { LogoutApiResponse } from "@/domains/auth/types/api_responses";
 import { useThemeMode } from "@/styles/theme_context";
 import { CompanyValues } from "@/values/app_values";
 import {
@@ -10,16 +16,17 @@ import {
   Favorite,
   LightMode,
   Menu as MenuIcon,
-  Person,
   Search,
   ShoppingCart,
 } from "@mui/icons-material";
 import {
   alpha,
   AppBar,
+  Avatar,
   Badge,
   Box,
   Button,
+  CircularProgress,
   Container,
   Divider,
   Drawer,
@@ -31,43 +38,116 @@ import {
   Menu,
   MenuItem,
   Toolbar,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
-import * as React from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { MouseEvent } from "react";
+import { useState } from "react";
 
-const navItems = [
-  { label: "Inicio", href: "/" },
-  { label: "Productos", href: "/productos" },
-  { label: "Colecciones", href: "/colecciones" },
-  { label: "Ofertas", href: "/ofertas" },
-  { label: "Nosotros", href: "/nosotros" },
-  { label: "Contacto", href: "/contacto" },
-];
+const LOGOUT_REQUEST_ID = "auth-logout";
+
+interface NavItem {
+  href: string;
+  label: string;
+}
 
 export function Navbar({ dictionary }: { dictionary: Dictionary }) {
-  // Hooks
   const theme = useTheme();
+  const router = useRouter();
+  const { cancellableApi, isPending } = useCancellableApiContext();
   const { themeMode, setThemeMode } = useThemeMode();
-  // States
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const currentUser = useAtomValue(currentUserAtom);
+  const hasResolvedCurrentUser = useAtomValue(hasResolvedCurrentUserAtom);
+  const setCurrentUser = useSetAtom(currentUserAtom);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+  const navItems: NavItem[] = [
+    { label: dictionary.navigation.home, href: "/" },
+    { label: dictionary.navigation.products, href: "/productos" },
+    { label: dictionary.navigation.collections, href: "/colecciones" },
+    { label: dictionary.navigation.offers, href: "/ofertas" },
+    { label: dictionary.navigation.about, href: "/nosotros" },
+    { label: dictionary.navigation.contact, href: "/contacto" },
+  ];
+
+  const handleDrawerToggle = (): void => {
+    setMobileOpen((currentValue) => !currentValue);
   };
 
-  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleProfileClick = (event: MouseEvent<HTMLElement>): void => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleProfileClose = () => {
+  const handleProfileClose = (): void => {
     setAnchorEl(null);
   };
 
-  const toggleTheme = () => {
+  const toggleTheme = (): void => {
     setThemeMode(themeMode === "dark" ? "light" : "dark");
   };
+
+  const handleLogout = async (): Promise<void> => {
+    handleProfileClose();
+
+    try {
+      const response = await cancellableApi.post<
+        LogoutApiResponse,
+        LogoutApiParams
+      >(LOGOUT_REQUEST_ID, "/auth/logout", {});
+
+      setCurrentUser(null);
+      router.push(response?.redirectTo ?? "/");
+      router.refresh();
+    } catch {
+      setCurrentUser(null);
+      router.push("/");
+      router.refresh();
+    }
+  };
+
+  const drawerAuthButtons = currentUser ? (
+    <StackedDrawerAuth
+      accountLabel={dictionary.auth.navbar.account}
+      logoutLabel={dictionary.auth.navbar.logout}
+      onLogout={async () => {
+        await handleLogout();
+        setMobileOpen(false);
+      }}
+      isLoggingOut={isPending(LOGOUT_REQUEST_ID)}
+    />
+  ) : (
+    <Box sx={{ px: 2 }}>
+      <Button
+        component={Link}
+        href="/login"
+        variant="contained"
+        fullWidth
+        sx={(theme) => ({
+          mb: 1,
+          backgroundColor: theme.palette.info.main,
+          "&:hover": {
+            backgroundColor: theme.palette.info.dark,
+          },
+        })}
+      >
+        {dictionary.auth.navbar.login}
+      </Button>
+      <Button
+        component={Link}
+        href="/register"
+        variant="outlined"
+        fullWidth
+        color="primary"
+      >
+        {dictionary.auth.navbar.register}
+      </Button>
+    </Box>
+  );
 
   const drawer = (
     <Box sx={{ width: 280, pt: 2 }}>
@@ -95,12 +175,14 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         {navItems.map((item) => (
           <ListItem key={item.label} disablePadding>
             <ListItemButton
-              sx={{
+              component={Link}
+              href={item.href}
+              sx={(theme) => ({
                 py: 1.5,
                 "&:hover": {
-                  backgroundColor: alpha(AppColors.accent, 0.08),
+                  backgroundColor: alpha(theme.palette.info.main, 0.08),
                 },
-              }}
+              })}
             >
               <ListItemText
                 primary={item.label}
@@ -115,46 +197,27 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         ))}
       </List>
       <Divider sx={{ my: 2 }} />
-      <Box sx={{ px: 2 }}>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            mb: 1,
-            backgroundColor: AppColors.accent,
-            "&:hover": {
-              backgroundColor: AppColors.accentDark,
-            },
-          }}
-        >
-          Iniciar Sesión
-        </Button>
-        <Button variant="outlined" fullWidth color="primary">
-          Crear Cuenta
-        </Button>
-      </Box>
+      {drawerAuthButtons}
     </Box>
   );
+
+  const displayName = currentUser?.profile.firstName ?? currentUser?.email;
 
   return (
     <>
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor:
-            theme.palette.mode === "dark"
-              ? alpha(AppColors.primary, 0.95)
-              : alpha("#ffffff", 0.95),
+          backgroundColor: alpha(theme.palette.background.paper, 0.95),
           backdropFilter: "blur(10px)",
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
         <Container maxWidth="lg">
           <Toolbar disableGutters sx={{ minHeight: { xs: 64, md: 72 } }}>
-            {/* Logo */}
             <Typography
               variant="h5"
-              component="a"
+              component={Link}
               href="/"
               sx={{
                 fontWeight: 700,
@@ -167,18 +230,18 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
               }}
             >
               <Box
-                sx={{
+                sx={(theme) => ({
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  backgroundColor: AppColors.accent,
+                  backgroundColor: theme.palette.info.main,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "#fff",
                   fontSize: 18,
                   fontWeight: 700,
-                }}
+                })}
               >
                 {CompanyValues.name.slice(0, 2).toUpperCase()}
               </Box>
@@ -190,7 +253,6 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
               </Box>
             </Typography>
 
-            {/* Desktop Navigation */}
             <Box
               sx={{
                 flexGrow: 1,
@@ -201,22 +263,23 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
               {navItems.map((item) => (
                 <Button
                   key={item.label}
-                  sx={{
+                  component={Link}
+                  href={item.href}
+                  sx={(theme) => ({
                     color: "text.primary",
                     fontWeight: 500,
                     px: 2,
                     "&:hover": {
-                      backgroundColor: alpha(AppColors.accent, 0.08),
-                      color: AppColors.accent,
+                      backgroundColor: alpha(theme.palette.info.main, 0.08),
+                      color: theme.palette.info.main,
                     },
-                  }}
+                  })}
                 >
                   {item.label}
                 </Button>
               ))}
             </Box>
 
-            {/* Actions */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <IconButton
                 sx={{
@@ -248,15 +311,110 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                 </Badge>
               </IconButton>
 
-              <IconButton
-                onClick={handleProfileClick}
-                sx={{
-                  color: "text.primary",
-                  display: { xs: "none", md: "flex" },
-                }}
-              >
-                <Person />
-              </IconButton>
+              {hasResolvedCurrentUser ? (
+                currentUser ? (
+                  <Box
+                    sx={{
+                      display: { xs: "none", md: "flex" },
+                      alignItems: "center",
+                      gap: 1,
+                      ml: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "text.primary",
+                        fontWeight: 500,
+                        maxWidth: 160,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {displayName}
+                    </Typography>
+                    <Tooltip title={dictionary.auth.navbar.account}>
+                      <IconButton
+                        onClick={handleProfileClick}
+                        size="small"
+                        sx={(theme) => ({
+                          border: `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
+                          backgroundColor: alpha(theme.palette.info.main, 0.08),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.info.main,
+                              0.16,
+                            ),
+                          },
+                        })}
+                      >
+                        <Avatar
+                          sx={(theme) => ({
+                            width: 32,
+                            height: 32,
+                            fontSize: 14,
+                            bgcolor: theme.palette.info.main,
+                            color: "#fff",
+                          })}
+                        >
+                          {(displayName ?? dictionary.auth.navbar.hello)
+                            .slice(0, 1)
+                            .toUpperCase()}
+                        </Avatar>
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                ) : (
+                  <Box
+                    sx={{ display: { xs: "none", md: "flex" }, gap: 1, ml: 1 }}
+                  >
+                    <Button
+                      component={Link}
+                      href="/login"
+                      variant="outlined"
+                      sx={(theme) => ({
+                        color: "text.primary",
+                        borderColor: alpha(theme.palette.text.primary, 0.28),
+                        backgroundColor: alpha(
+                          theme.palette.text.primary,
+                          0.02,
+                        ),
+                        "&:hover": {
+                          borderColor: theme.palette.info.main,
+                          backgroundColor: alpha(theme.palette.info.main, 0.08),
+                        },
+                      })}
+                    >
+                      {dictionary.auth.navbar.login}
+                    </Button>
+                    <Button
+                      component={Link}
+                      href="/register"
+                      variant="contained"
+                      sx={(theme) => ({
+                        backgroundColor: theme.palette.info.main,
+                        color: "#fff",
+                        "&:hover": {
+                          backgroundColor: theme.palette.info.dark,
+                        },
+                      })}
+                    >
+                      {dictionary.auth.navbar.register}
+                    </Button>
+                  </Box>
+                )
+              ) : (
+                <Box
+                  sx={{
+                    display: { xs: "none", md: "flex" },
+                    alignItems: "center",
+                    px: 2,
+                  }}
+                >
+                  <CircularProgress size={20} />
+                </Box>
+              )}
 
               <IconButton
                 sx={{ display: { md: "none" }, color: "text.primary" }}
@@ -269,7 +427,6 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         </Container>
       </AppBar>
 
-      {/* Profile Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -278,21 +435,38 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
           paper: {
             sx: {
               mt: 1,
-              minWidth: 200,
+              minWidth: 220,
               borderRadius: 2,
             },
           },
         }}
       >
-        <MenuItem onClick={handleProfileClose}>Iniciar Sesion</MenuItem>
-        <MenuItem onClick={handleProfileClose}>Crear Cuenta</MenuItem>
+        <MenuItem component={Link} href="/account" onClick={handleProfileClose}>
+          {dictionary.auth.navbar.account}
+        </MenuItem>
+        <MenuItem
+          component={Link}
+          href="/account/orders"
+          onClick={handleProfileClose}
+        >
+          {dictionary.auth.navbar.orders}
+        </MenuItem>
+        <MenuItem
+          component={Link}
+          href="/account/wishlist"
+          onClick={handleProfileClose}
+        >
+          {dictionary.auth.navbar.wishlist}
+        </MenuItem>
         <Divider />
-        <MenuItem onClick={handleProfileClose}>Mi Perfil</MenuItem>
-        <MenuItem onClick={handleProfileClose}>Mis Pedidos</MenuItem>
-        <MenuItem onClick={handleProfileClose}>Lista de Deseos</MenuItem>
+        <MenuItem
+          onClick={() => void handleLogout()}
+          disabled={isPending(LOGOUT_REQUEST_ID)}
+        >
+          {dictionary.auth.navbar.logout}
+        </MenuItem>
       </Menu>
 
-      {/* Mobile Drawer */}
       <Drawer
         variant="temporary"
         anchor="right"
@@ -310,8 +484,37 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         {drawer}
       </Drawer>
 
-      {/* Spacer for fixed AppBar */}
       <Toolbar sx={{ minHeight: { xs: 64, md: 72 } }} />
     </>
+  );
+}
+
+interface StackedDrawerAuthProps {
+  accountLabel: string;
+  logoutLabel: string;
+  isLoggingOut: boolean;
+  onLogout: () => Promise<void>;
+}
+
+function StackedDrawerAuth({
+  accountLabel,
+  logoutLabel,
+  isLoggingOut,
+  onLogout,
+}: StackedDrawerAuthProps) {
+  return (
+    <Box sx={{ px: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+      <Button component={Link} href="/account" variant="contained" fullWidth>
+        {accountLabel}
+      </Button>
+      <Button
+        onClick={() => void onLogout()}
+        variant="outlined"
+        fullWidth
+        disabled={isLoggingOut}
+      >
+        {logoutLabel}
+      </Button>
+    </Box>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
+import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { priceFormatter } from "@/utils/price_formatter";
 import {
   ArrowForward,
@@ -21,7 +20,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import * as React from "react";
+import { useState } from "react";
 
 const products = [
   {
@@ -32,7 +31,6 @@ const products = [
     rating: 4.8,
     reviews: 124,
     badge: "Mas Vendido",
-    color: AppColors.secondary,
   },
   {
     id: 2,
@@ -42,7 +40,6 @@ const products = [
     rating: 4.9,
     reviews: 89,
     badge: "Nuevo",
-    color: AppColors.secondaryDark,
   },
   {
     id: 3,
@@ -52,7 +49,6 @@ const products = [
     rating: 4.7,
     reviews: 67,
     badge: "-20%",
-    color: AppColors.secondaryLight,
   },
   {
     id: 4,
@@ -62,17 +58,44 @@ const products = [
     rating: 4.6,
     reviews: 45,
     badge: null,
-    color: AppColors.secondary,
   },
 ];
 
 export function FeaturedProductsSection({
-  dictionary,
+  dictionary: _dictionary,
 }: {
   dictionary: Dictionary;
 }) {
+  void _dictionary;
+
   const theme = useTheme();
-  const [favorites, setFavorites] = React.useState<number[]>([]);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const productSurfacePalette =
+    theme.palette.mode === "dark"
+      ? theme.palette.primary
+      : theme.palette.secondary;
+  const productImageBackgrounds = [
+    productSurfacePalette.main,
+    productSurfacePalette.dark,
+    productSurfacePalette.light,
+    productSurfacePalette.main,
+  ];
+  const baseShadowColor =
+    theme.palette.mode === "dark"
+      ? theme.palette.background.paper
+      : theme.palette.primary.main;
+  const actionBackgroundColor =
+    theme.palette.mode === "dark"
+      ? theme.palette.background.paper
+      : theme.palette.primary.main;
+  const actionHoverBackgroundColor =
+    theme.palette.mode === "dark"
+      ? theme.palette.background.default
+      : theme.palette.primary.light;
+  const deepSurfaceTextColor =
+    theme.palette.mode === "dark"
+      ? theme.palette.background.paper
+      : theme.palette.primary.main;
 
   const toggleFavorite = (id: number) => {
     setFavorites((prev) =>
@@ -102,17 +125,17 @@ export function FeaturedProductsSection({
           <Box>
             <Typography
               component="span"
-              sx={{
+              sx={(theme) => ({
                 display: "inline-block",
                 px: 2,
                 py: 0.5,
                 mb: 2,
                 borderRadius: 5,
-                backgroundColor: alpha(AppColors.accent, 0.1),
-                color: AppColors.accent,
+                backgroundColor: alpha(theme.palette.info.main, 0.1),
+                color: theme.palette.info.main,
                 fontWeight: 600,
                 fontSize: "0.875rem",
-              }}
+              })}
             >
               Destacados
             </Typography>
@@ -129,13 +152,13 @@ export function FeaturedProductsSection({
           </Box>
           <Button
             endIcon={<ArrowForward />}
-            sx={{
-              color: AppColors.accent,
+            sx={(theme) => ({
+              color: theme.palette.info.main,
               fontWeight: 600,
               "&:hover": {
-                backgroundColor: alpha(AppColors.accent, 0.08),
+                backgroundColor: alpha(theme.palette.info.main, 0.08),
               },
-            }}
+            })}
           >
             Ver Todos
           </Button>
@@ -153,7 +176,7 @@ export function FeaturedProductsSection({
             gap: 3,
           }}
         >
-          {products.map((product) => (
+          {products.map((product, index) => (
             <Card
               key={product.id}
               sx={{
@@ -164,7 +187,7 @@ export function FeaturedProductsSection({
                 boxShadow: "none",
                 "&:hover": {
                   transform: "translateY(-8px)",
-                  boxShadow: `0 20px 40px ${alpha(AppColors.primary, 0.1)}`,
+                  boxShadow: `0 20px 40px ${alpha(baseShadowColor, 0.1)}`,
                   "& .add-to-cart": {
                     opacity: 1,
                     transform: "translateY(0)",
@@ -177,7 +200,10 @@ export function FeaturedProductsSection({
                 sx={{
                   position: "relative",
                   height: 280,
-                  backgroundColor: product.color,
+                  backgroundColor:
+                    productImageBackgrounds[
+                      index % productImageBackgrounds.length
+                    ],
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -193,10 +219,10 @@ export function FeaturedProductsSection({
                       left: 12,
                       backgroundColor:
                         product.badge === "Nuevo"
-                          ? AppColors.accent
+                          ? theme.palette.info.main
                           : product.badge.includes("%")
-                            ? "#e53935"
-                            : AppColors.primary,
+                            ? theme.palette.error.main
+                            : actionBackgroundColor,
                       color: "#fff",
                       fontWeight: 600,
                     }}
@@ -211,9 +237,9 @@ export function FeaturedProductsSection({
                     position: "absolute",
                     top: 8,
                     right: 8,
-                    backgroundColor: alpha("#fff", 0.9),
+                    backgroundColor: alpha(theme.palette.common.white, 0.9),
                     "&:hover": {
-                      backgroundColor: "#fff",
+                      backgroundColor: theme.palette.common.white,
                     },
                   }}
                 >
@@ -227,7 +253,7 @@ export function FeaturedProductsSection({
                 <Typography
                   variant="h4"
                   sx={{
-                    color: AppColors.primary,
+                    color: deepSurfaceTextColor,
                     fontWeight: 700,
                     opacity: 0.3,
                   }}
@@ -247,10 +273,10 @@ export function FeaturedProductsSection({
                     transform: "translateX(-50%) translateY(10px)",
                     opacity: 0,
                     transition: "all 0.3s ease",
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: actionBackgroundColor,
                     color: "#fff",
                     "&:hover": {
-                      backgroundColor: AppColors.primaryLight,
+                      backgroundColor: actionHoverBackgroundColor,
                     },
                   }}
                 >
@@ -279,11 +305,11 @@ export function FeaturedProductsSection({
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     <Typography
                       variant="body2"
-                      sx={{ color: AppColors.accent, fontWeight: 600 }}
+                      sx={{ color: "info.main", fontWeight: 600 }}
                     >
                       {product.rating}
                     </Typography>
-                    <Box sx={{ color: AppColors.accent }}>★</Box>
+                    <Box sx={{ color: "info.main" }}>★</Box>
                   </Box>
                   <Typography variant="body2" sx={{ color: "text.secondary" }}>
                     ({product.reviews} resenas)

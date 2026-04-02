@@ -1,7 +1,6 @@
 "use client";
 
-import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
+import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { Send } from "@mui/icons-material";
 import {
   alpha,
@@ -10,15 +9,20 @@ import {
   Container,
   TextField,
   Typography,
-  useTheme,
 } from "@mui/material";
-import * as React from "react";
+import type { FormEvent } from "react";
+import { useState } from "react";
 
-export function NewsletterSection({ dictionary }: { dictionary: Dictionary }) {
-  const theme = useTheme();
-  const [email, setEmail] = React.useState("");
+export function NewsletterSection({
+  dictionary: _dictionary,
+}: {
+  dictionary: Dictionary;
+}) {
+  void _dictionary;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     // Handle newsletter subscription
     setEmail("");
@@ -26,35 +30,43 @@ export function NewsletterSection({ dictionary }: { dictionary: Dictionary }) {
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         py: { xs: 8, md: 10 },
         backgroundColor:
           theme.palette.mode === "dark"
-            ? AppColors.primaryLight
-            : AppColors.primary,
-      }}
+            ? theme.palette.background.paper
+            : theme.palette.primary.main,
+      })}
     >
       <Container maxWidth="md">
         <Box sx={{ textAlign: "center" }}>
           <Typography
             variant="h3"
-            sx={{
+            sx={(theme) => ({
               fontSize: { xs: "1.75rem", md: "2.25rem" },
               fontWeight: 700,
-              color: AppColors.secondary,
+              color:
+                theme.palette.mode === "dark"
+                  ? theme.palette.text.primary
+                  : theme.palette.secondary.main,
               mb: 2,
-            }}
+            })}
           >
             Recibe Ofertas Exclusivas
           </Typography>
           <Typography
             variant="body1"
-            sx={{
-              color: alpha(AppColors.secondary, 0.8),
+            sx={(theme) => ({
+              color: alpha(
+                theme.palette.mode === "dark"
+                  ? theme.palette.text.primary
+                  : theme.palette.secondary.main,
+                0.8,
+              ),
               mb: 4,
               maxWidth: 500,
               mx: "auto",
-            }}
+            })}
           >
             Suscribete a nuestro boletin y recibe un 10% de descuento en tu
             primera compra, ademas de acceso anticipado a nuevas colecciones.
@@ -77,40 +89,61 @@ export function NewsletterSection({ dictionary }: { dictionary: Dictionary }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              sx={{
+              sx={(theme) => ({
                 "& .MuiOutlinedInput-root": {
-                  backgroundColor: alpha("#fff", 0.1),
-                  color: AppColors.secondary,
+                  backgroundColor: alpha(theme.palette.common.white, 0.1),
+                  color:
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.primary
+                      : theme.palette.secondary.main,
                   "& fieldset": {
-                    borderColor: alpha(AppColors.secondary, 0.3),
+                    borderColor: alpha(
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.primary
+                        : theme.palette.secondary.main,
+                      0.3,
+                    ),
                   },
                   "&:hover fieldset": {
-                    borderColor: alpha(AppColors.secondary, 0.5),
+                    borderColor: alpha(
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.primary
+                        : theme.palette.secondary.main,
+                      0.5,
+                    ),
                   },
                   "&.Mui-focused fieldset": {
-                    borderColor: AppColors.secondary,
+                    borderColor:
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.primary
+                        : theme.palette.secondary.main,
                   },
                 },
                 "& .MuiOutlinedInput-input::placeholder": {
-                  color: alpha(AppColors.secondary, 0.6),
+                  color: alpha(
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.primary
+                      : theme.palette.secondary.main,
+                    0.6,
+                  ),
                   opacity: 1,
                 },
-              }}
+              })}
             />
             <Button
               type="submit"
               variant="contained"
               endIcon={<Send />}
-              sx={{
+              sx={(theme) => ({
                 px: 4,
                 py: 1.5,
-                backgroundColor: AppColors.accent,
+                backgroundColor: theme.palette.info.main,
                 color: "#fff",
                 whiteSpace: "nowrap",
                 "&:hover": {
-                  backgroundColor: AppColors.accentDark,
+                  backgroundColor: theme.palette.info.dark,
                 },
-              }}
+              })}
             >
               Suscribirse
             </Button>
@@ -118,11 +151,16 @@ export function NewsletterSection({ dictionary }: { dictionary: Dictionary }) {
 
           <Typography
             variant="caption"
-            sx={{
+            sx={(theme) => ({
               display: "block",
               mt: 2,
-              color: alpha(AppColors.secondary, 0.6),
-            }}
+              color: alpha(
+                theme.palette.mode === "dark"
+                  ? theme.palette.text.primary
+                  : theme.palette.secondary.main,
+                0.6,
+              ),
+            })}
           >
             Al suscribirte aceptas recibir correos promocionales. Puedes
             cancelar en cualquier momento.

@@ -1,7 +1,6 @@
 "use client";
 
-import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
+import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import {
   Autorenew,
   LocalShipping,
@@ -35,18 +34,24 @@ const benefits = [
   },
 ];
 
-export function BenefitsSection({ dictionary }: { dictionary: Dictionary }) {
+export function BenefitsSection({
+  dictionary: _dictionary,
+}: {
+  dictionary: Dictionary;
+}) {
+  void _dictionary;
+
   const theme = useTheme();
 
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         py: { xs: 8, md: 10 },
         backgroundColor:
           theme.palette.mode === "dark"
-            ? AppColors.primary
-            : AppColors.secondary,
-      }}
+            ? theme.palette.background.paper
+            : theme.palette.secondary.main,
+      })}
     >
       <Container maxWidth="xl">
         <Box
@@ -71,51 +76,48 @@ export function BenefitsSection({ dictionary }: { dictionary: Dictionary }) {
                 }}
               >
                 <Box
-                  sx={{
+                  sx={(theme) => ({
                     width: 72,
                     height: 72,
                     borderRadius: "50%",
                     backgroundColor:
                       theme.palette.mode === "dark"
-                        ? alpha(AppColors.secondary, 0.1)
-                        : alpha(AppColors.primary, 0.08),
+                        ? alpha(theme.palette.primary.main, 0.1)
+                        : alpha(theme.palette.primary.main, 0.08),
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     mx: "auto",
                     mb: 2,
-                  }}
+                  })}
                 >
                   <Icon
-                    sx={{
+                    sx={(theme) => ({
                       fontSize: 32,
                       color:
                         theme.palette.mode === "dark"
-                          ? AppColors.secondary
-                          : AppColors.accent,
-                    }}
+                          ? theme.palette.primary.main
+                          : theme.palette.info.main,
+                    })}
                   />
                 </Box>
                 <Typography
                   variant="h6"
-                  sx={{
+                  sx={(theme) => ({
                     fontWeight: 600,
                     mb: 1,
                     color:
                       theme.palette.mode === "dark"
-                        ? AppColors.secondary
-                        : AppColors.primary,
-                  }}
+                        ? theme.palette.primary.main
+                        : theme.palette.primary.main,
+                  })}
                 >
                   {benefit.title}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{
-                    color:
-                      theme.palette.mode === "dark"
-                        ? alpha(AppColors.secondary, 0.7)
-                        : alpha(AppColors.primary, 0.7),
+                    color: alpha(theme.palette.primary.main, 0.7),
                     lineHeight: 1.6,
                   }}
                 >

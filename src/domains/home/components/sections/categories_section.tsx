@@ -1,7 +1,6 @@
 "use client";
 
-import { Dictionary } from "@/dictionary/services/get-dictionary";
-import { AppColors } from "@/styles/mui_theme";
+import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import {
   alpha,
   Box,
@@ -51,7 +50,13 @@ const categories = [
   },
 ];
 
-export function CategoriesSection({ dictionary }: { dictionary: Dictionary }) {
+export function CategoriesSection({
+  dictionary: _dictionary,
+}: {
+  dictionary: Dictionary;
+}) {
+  void _dictionary;
+
   const theme = useTheme();
 
   return (
@@ -66,17 +71,17 @@ export function CategoriesSection({ dictionary }: { dictionary: Dictionary }) {
         <Box sx={{ textAlign: "center", mb: { xs: 6, md: 8 } }}>
           <Typography
             component="span"
-            sx={{
+            sx={(theme) => ({
               display: "inline-block",
               px: 2,
               py: 0.5,
               mb: 2,
               borderRadius: 5,
-              backgroundColor: alpha(AppColors.accent, 0.1),
-              color: AppColors.accent,
+              backgroundColor: alpha(theme.palette.info.main, 0.1),
+              color: theme.palette.info.main,
               fontWeight: 600,
               fontSize: "0.875rem",
-            }}
+            })}
           >
             Categorias
           </Typography>
@@ -126,10 +131,15 @@ export function CategoriesSection({ dictionary }: { dictionary: Dictionary }) {
                 boxShadow: "none",
                 "&:hover": {
                   transform: "translateY(-8px)",
-                  boxShadow: `0 20px 40px ${alpha(AppColors.primary, 0.1)}`,
-                  borderColor: AppColors.accent,
+                  boxShadow: `0 20px 40px ${alpha(
+                    theme.palette.mode === "dark"
+                      ? theme.palette.background.paper
+                      : theme.palette.primary.main,
+                    0.1,
+                  )}`,
+                  borderColor: theme.palette.info.main,
                   "& .category-icon": {
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: theme.palette.info.main,
                     color: "#fff",
                   },
                 },
@@ -139,19 +149,19 @@ export function CategoriesSection({ dictionary }: { dictionary: Dictionary }) {
                 <Box sx={{ display: "flex", alignItems: "flex-start", gap: 3 }}>
                   <Box
                     className="category-icon"
-                    sx={{
+                    sx={(theme) => ({
                       width: 60,
                       height: 60,
                       borderRadius: 2,
-                      backgroundColor: alpha(AppColors.accent, 0.1),
-                      color: AppColors.accent,
+                      backgroundColor: alpha(theme.palette.info.main, 0.1),
+                      color: theme.palette.info.main,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       fontWeight: 700,
                       fontSize: "1.25rem",
                       transition: "all 0.3s ease",
-                    }}
+                    })}
                   >
                     {category.icon}
                   </Box>
@@ -171,7 +181,7 @@ export function CategoriesSection({ dictionary }: { dictionary: Dictionary }) {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: AppColors.accent,
+                        color: "info.main",
                         fontWeight: 600,
                       }}
                     >

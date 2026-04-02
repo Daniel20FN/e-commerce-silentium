@@ -7,7 +7,7 @@ const montserrat = Montserrat({
 const quicksand = Quicksand({ subsets: ["latin"] });
 
 // Paleta de colores de la aplicación
-export const AppColors = {
+const AppColors = {
   // Color primario - Azul oscuro profundo
   primary: "#001E3B",
   // Color secundario - Beige cálido
