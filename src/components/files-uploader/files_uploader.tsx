@@ -5,6 +5,7 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FilesViewer } from "../files-viewer/files_viewer";
+import { moveFileInList } from "./services/move_file_in_list";
 import { verifyPermitedFileTypesProp } from "./services/verify_allowed_file_types";
 import { AvailableFileType, DocumentType } from "./types";
 
@@ -13,6 +14,7 @@ interface FilesUploaderProps {
   disabled?: boolean;
   multiple: boolean;
   disableDrag?: boolean;
+  enableReorder?: boolean;
   onFilesChange?: (files: DocumentType[]) => void;
   initialFiles?: DocumentType[];
   permitedFileTypes?: AvailableFileType;
@@ -32,6 +34,10 @@ interface FilesUploaderProps {
     file_upload_disabled: string;
     drag_or_click_to_select: string;
     close?: string;
+    move_file_backward?: string;
+    move_file_forward?: string;
+    remove_file?: string;
+    primary_file?: string;
   };
   maxFiles?: number;
   maxFileSize?: number;
@@ -98,6 +104,7 @@ interface FilesUploaderProps {
 export const FilesUploader = ({
   multiple,
   disableDrag,
+  enableReorder = false,
   maxFiles,
   maxFileSize,
   disabled,
@@ -243,6 +250,10 @@ export const FilesUploader = ({
     }
   };
 
+  const reorderFiles = useCallback((fromIndex: number, toIndex: number) => {
+    setFiles((prevFiles) => moveFileInList(prevFiles, fromIndex, toIndex));
+  }, []);
+
   // Notify parent component of file changes, avoiding initial echo and redundant updates
   React.useEffect(() => {
     const currentSig = makeSignature(files);
@@ -276,7 +287,7 @@ export const FilesUploader = ({
       syncingFromProps.current = true;
       setFiles(formatedFiles);
     }
-  }, [formatedFiles]);
+  }, [files, formatedFiles]);
 
   // Cleanup blobs on unmount
   React.useEffect(() => {
@@ -415,7 +426,9 @@ export const FilesUploader = ({
       {files.length > 0 && (
         <FilesViewer
           files={files}
+          enableReorder={enableReorder}
           isDisabled={isDisabled}
+          onReorder={reorderFiles}
           removeFiles={removeFiles}
           trads={{
             ...trads,

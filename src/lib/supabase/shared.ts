@@ -1,4 +1,5 @@
 const SUPABASE_ENV_KEYS = {
+  catalogStorageBucket: "SUPABASE_STORAGE_CATALOG_BUCKET",
   url: "NEXT_PUBLIC_SUPABASE_URL",
   publishableKey: "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   legacyAnonKey: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -38,4 +39,8 @@ export function getSupabaseSecretKey(): string {
     getOptionalEnv(SUPABASE_ENV_KEYS.secretKey) ??
     getRequiredEnv(SUPABASE_ENV_KEYS.legacySecretKey)
   );
+}
+
+export function getSupabaseCatalogStorageBucket(): string {
+  return getRequiredEnv(SUPABASE_ENV_KEYS.catalogStorageBucket);
 }
