@@ -27,6 +27,7 @@ describe("auth route helpers", () => {
 
   it("detects configured protected routes", () => {
     expect(isProtectedAppRoute("/checkout/shipping")).toBe(true);
+    expect(isProtectedAppRoute("/admin")).toBe(true);
     expect(isProtectedAppRoute("/productos")).toBe(false);
   });
 });

@@ -163,5 +163,42 @@
       "email_already_confirmed": "Ese correo ya fue confirmado. Ya puedes iniciar sesión.",
       "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez."
     }
+  },
+  "admin": {
+    "navigation": {
+      "panel": "Panel de Administración",
+      "dashboard": "Dashboard",
+      "storefront": "Ver tienda"
+    },
+    "layout": {
+      "title": "Administración",
+      "menu": "Abrir navegación del panel",
+      "collapse": "Contraer navegación",
+      "expand": "Expandir navegación",
+      "welcome": "Bienvenido"
+    },
+    "dashboard": {
+      "eyebrow": "Centro de control",
+      "title": "Panel de Administración",
+      "subtitle": "Gestiona la operación principal de Silentium desde un único espacio de trabajo.",
+      "summaryTitle": "Módulos iniciales",
+      "summaryDescription": "Esta base deja listo el acceso privado y la estructura principal para seguir incorporando herramientas administrativas.",
+      "cards": {
+        "catalogTitle": "Catálogo",
+        "catalogDescription": "Prepara la gestión de productos, colecciones y stock desde el panel interno.",
+        "ordersTitle": "Pedidos",
+        "ordersDescription": "Centraliza el seguimiento de estados, pagos y cumplimiento operativo.",
+        "customersTitle": "Clientes",
+        "customersDescription": "Consulta cuentas, roles y atención postventa en una vista administrativa.",
+        "settingsTitle": "Configuración",
+        "settingsDescription": "Mantén permisos, procesos internos y ajustes clave bajo control."
+      }
+    },
+    "forbidden": {
+      "eyebrow": "Acceso restringido",
+      "title": "No tienes permisos para ingresar al panel",
+      "description": "Tu cuenta inició sesión correctamente, pero no cuenta con un rol habilitado para esta sección.",
+      "action": "Volver al inicio"
+    }
   }
 }

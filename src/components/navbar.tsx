@@ -2,6 +2,7 @@
 
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { canAccessAdmin } from "@/domains/admin/services/admin_roles";
 import {
   currentUserAtom,
   hasResolvedCurrentUserAtom,
@@ -110,9 +111,15 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
     }
   };
 
+  const showAdminAccess = canAccessAdmin(currentUser);
+
   const drawerAuthButtons = currentUser ? (
     <StackedDrawerAuth
       accountLabel={dictionary.auth.navbar.account}
+      adminHref={showAdminAccess ? "/admin" : undefined}
+      adminLabel={
+        showAdminAccess ? dictionary.admin.navigation.panel : undefined
+      }
       logoutLabel={dictionary.auth.navbar.logout}
       onLogout={async () => {
         await handleLogout();
@@ -458,6 +465,11 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         >
           {dictionary.auth.navbar.wishlist}
         </MenuItem>
+        {showAdminAccess ? (
+          <MenuItem component={Link} href="/admin" onClick={handleProfileClose}>
+            {dictionary.admin.navigation.panel}
+          </MenuItem>
+        ) : null}
         <Divider />
         <MenuItem
           onClick={() => void handleLogout()}
@@ -491,6 +503,8 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
 
 interface StackedDrawerAuthProps {
   accountLabel: string;
+  adminHref?: string;
+  adminLabel?: string;
   logoutLabel: string;
   isLoggingOut: boolean;
   onLogout: () => Promise<void>;
@@ -498,6 +512,8 @@ interface StackedDrawerAuthProps {
 
 function StackedDrawerAuth({
   accountLabel,
+  adminHref,
+  adminLabel,
   logoutLabel,
   isLoggingOut,
   onLogout,
@@ -507,6 +523,11 @@ function StackedDrawerAuth({
       <Button component={Link} href="/account" variant="contained" fullWidth>
         {accountLabel}
       </Button>
+      {adminHref && adminLabel ? (
+        <Button component={Link} href={adminHref} variant="outlined" fullWidth>
+          {adminLabel}
+        </Button>
+      ) : null}
       <Button
         onClick={() => void onLogout()}
         variant="outlined"
