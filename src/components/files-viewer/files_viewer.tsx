@@ -1,4 +1,11 @@
-import { Clear, Delete, PhotoLibrary, Visibility } from "@mui/icons-material";
+import {
+  Clear,
+  Delete,
+  KeyboardArrowLeft,
+  KeyboardArrowRight,
+  PhotoLibrary,
+  Visibility,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -18,8 +25,10 @@ import { FileViewBox } from "./files_view_box";
 import { formatFileSize } from "./services/format_file_size";
 
 interface FilesViewerProps {
+  enableReorder?: boolean;
   files: DocumentType[];
   isDisabled?: boolean;
+  onReorder?: (fromIndex: number, toIndex: number) => void;
   removeFiles?: (files: DocumentType[]) => void;
   trads: {
     selected_files: string;
@@ -29,16 +38,28 @@ interface FilesViewerProps {
     size: string;
     this_file_type_is_not_permited: string;
     close?: string;
+    move_file_backward?: string;
+    move_file_forward?: string;
+    remove_file?: string;
+    primary_file?: string;
   };
 }
 
 export const FilesViewer = ({
+  enableReorder,
   files,
   isDisabled,
+  onReorder,
   removeFiles,
   trads,
 }: FilesViewerProps) => {
   const { openDialog } = useDialog();
+  const canReorder = Boolean(
+    enableReorder &&
+      onReorder &&
+      trads.move_file_backward &&
+      trads.move_file_forward,
+  );
 
   return (
     <Fade in timeout={500}>
@@ -119,6 +140,9 @@ export const FilesViewer = ({
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
+                    "&:focus-within .action-buttons": {
+                      opacity: 1,
+                    },
                     "&:hover": {
                       elevation: 8,
                       transform: "translateY(-4px)",
@@ -138,6 +162,21 @@ export const FilesViewer = ({
                       overflow: "hidden",
                     }}
                   >
+                    {canReorder && index === 0 && trads.primary_file ? (
+                      <Chip
+                        color="primary"
+                        label={trads.primary_file}
+                        size="small"
+                        sx={{
+                          position: "absolute",
+                          top: { xs: 4, sm: 8 },
+                          left: { xs: 4, sm: 8 },
+                          zIndex: 2,
+                          fontWeight: 600,
+                        }}
+                      />
+                    ) : null}
+
                     <FileViewBox file={file} />
 
                     {/* Overlay */}
@@ -220,7 +259,7 @@ export const FilesViewer = ({
                             height: { xs: 28, sm: 32 },
                           }}
                           size="small"
-                          aria-label={`Eliminar ${file.fileName}`}
+                          aria-label={`${trads.remove_file ?? trads.clean_all} ${file.fileName}`.trim()}
                         >
                           <Delete sx={{ fontSize: { xs: 14, sm: 16 } }} />
                         </IconButton>
@@ -250,6 +289,57 @@ export const FilesViewer = ({
                     >
                       {formatFileSize(file.size ?? 0)}
                     </Typography>
+
+                    {canReorder ? (
+                      <Box
+                        sx={{
+                          mt: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500 }}
+                        >
+                          #{index + 1}
+                        </Typography>
+
+                        <Box sx={{ display: "flex", gap: 0.5 }}>
+                          <IconButton
+                            aria-label={`${trads.move_file_backward} ${file.fileName}`.trim()}
+                            disabled={isDisabled || index === 0}
+                            onClick={() => {
+                              if (!isDisabled && index > 0) {
+                                onReorder?.(index, index - 1);
+                              }
+                            }}
+                            size="small"
+                          >
+                            <KeyboardArrowLeft
+                              sx={{ fontSize: { xs: 18, sm: 20 } }}
+                            />
+                          </IconButton>
+                          <IconButton
+                            aria-label={`${trads.move_file_forward} ${file.fileName}`.trim()}
+                            disabled={isDisabled || index === files.length - 1}
+                            onClick={() => {
+                              if (!isDisabled && index < files.length - 1) {
+                                onReorder?.(index, index + 1);
+                              }
+                            }}
+                            size="small"
+                          >
+                            <KeyboardArrowRight
+                              sx={{ fontSize: { xs: 18, sm: 20 } }}
+                            />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    ) : null}
                   </CardContent>
                 </Card>
               </Zoom>

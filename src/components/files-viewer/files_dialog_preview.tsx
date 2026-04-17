@@ -70,7 +70,13 @@ const FileDialogPreview = ({
       </Box>
       <Box>
         {isImage(file.fileName, file.type) ? (
-          <Box sx={{ position: "relative", flex: 1, minHeight: 400 }}>
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              height: { xs: 280, sm: 360, md: 460 },
+            }}
+          >
             {filePreview(file)}
           </Box>
         ) : isVideo(file.fileName, file.type) ? (
