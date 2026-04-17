@@ -132,13 +132,17 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
       <Button
         component={Link}
         href="/login"
-        variant="contained"
+        variant="text"
         fullWidth
         sx={(theme) => ({
           mb: 1,
-          backgroundColor: theme.palette.info.main,
+          justifyContent: "flex-start",
+          px: 1.5,
+          color: "text.primary",
+          fontWeight: 500,
+          borderRadius: 999,
           "&:hover": {
-            backgroundColor: theme.palette.info.dark,
+            backgroundColor: alpha(theme.palette.text.primary, 0.06),
           },
         })}
       >
@@ -147,9 +151,21 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
       <Button
         component={Link}
         href="/register"
-        variant="outlined"
+        variant="contained"
         fullWidth
-        color="primary"
+        sx={(theme) => ({
+          justifyContent: "flex-start",
+          px: 2,
+          fontWeight: 600,
+          borderRadius: 999,
+          boxShadow: "none",
+          backgroundColor: theme.palette.text.primary,
+          color: theme.palette.background.paper,
+          "&:hover": {
+            boxShadow: "none",
+            backgroundColor: alpha(theme.palette.text.primary, 0.86),
+          },
+        })}
       >
         {dictionary.auth.navbar.register}
       </Button>
@@ -379,17 +395,17 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                     <Button
                       component={Link}
                       href="/login"
-                      variant="outlined"
+                      variant="text"
                       sx={(theme) => ({
                         color: "text.primary",
-                        borderColor: alpha(theme.palette.text.primary, 0.28),
-                        backgroundColor: alpha(
-                          theme.palette.text.primary,
-                          0.02,
-                        ),
+                        px: 1.5,
+                        fontWeight: 500,
+                        borderRadius: 999,
                         "&:hover": {
-                          borderColor: theme.palette.info.main,
-                          backgroundColor: alpha(theme.palette.info.main, 0.08),
+                          backgroundColor: alpha(
+                            theme.palette.text.primary,
+                            0.06,
+                          ),
                         },
                       })}
                     >
@@ -400,10 +416,18 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                       href="/register"
                       variant="contained"
                       sx={(theme) => ({
-                        backgroundColor: theme.palette.info.main,
-                        color: "#fff",
+                        px: 2.25,
+                        fontWeight: 600,
+                        borderRadius: 999,
+                        boxShadow: "none",
+                        backgroundColor: theme.palette.text.primary,
+                        color: theme.palette.background.paper,
                         "&:hover": {
-                          backgroundColor: theme.palette.info.dark,
+                          boxShadow: "none",
+                          backgroundColor: alpha(
+                            theme.palette.text.primary,
+                            0.86,
+                          ),
                         },
                       })}
                     >
