@@ -1,6 +1,12 @@
 "use client";
 
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import {
+  ADMIN_ROUTE_SECTION,
+  getAdminNavigationSections,
+  resolveAdminRouteMetadata,
+  type AdminRouteSection,
+} from "@/domains/admin/services/admin_route_metadata";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import {
   ChevronLeft,
@@ -126,8 +132,8 @@ interface AdminNavigationItem {
   href: string;
   icon: ReactNode;
   label: string;
-  matches: (pathname: string) => boolean;
-  subtitle?: string;
+  isActive: boolean;
+  section?: AdminRouteSection;
 }
 
 export function AdminShell({
@@ -138,35 +144,25 @@ export function AdminShell({
   const theme = useTheme();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const activeRoute = resolveAdminRouteMetadata(pathname, dictionary);
+  const navigationIcons: Partial<Record<AdminRouteSection, ReactNode>> = {
+    [ADMIN_ROUTE_SECTION.dashboard]: <DashboardOutlined />,
+    [ADMIN_ROUTE_SECTION.users]: <PeopleOutlined />,
+  };
 
   const navigationItems: AdminNavigationItem[] = [
-    {
-      href: "/admin",
-      icon: <DashboardOutlined />,
-      label: dictionary.admin.navigation.dashboard,
-      matches: (currentPathname) => currentPathname === "/admin",
-      subtitle: dictionary.admin.dashboard.subtitle,
-    },
-    {
-      href: "/admin/usuarios",
-      icon: <PeopleOutlined />,
-      label: dictionary.admin.navigation.users,
-      matches: (currentPathname) =>
-        currentPathname === "/admin/usuarios" ||
-        currentPathname.startsWith("/admin/usuarios/"),
-      subtitle: dictionary.admin.users.subtitle,
-    },
+    ...getAdminNavigationSections(dictionary).map((item) => ({
+      ...item,
+      icon: navigationIcons[item.section] ?? <DashboardOutlined />,
+      isActive: activeRoute.navigationHref === item.href,
+    })),
     {
       href: "/",
       icon: <StorefrontOutlined />,
       label: dictionary.admin.navigation.storefront,
-      matches: (currentPathname) => currentPathname === "/",
+      isActive: false,
     },
   ];
-
-  const activeNavigationItem =
-    navigationItems.find((item) => item.matches(pathname)) ??
-    navigationItems[0];
 
   const displayName = currentUser.profile.firstName ?? currentUser.email;
 
@@ -182,11 +178,10 @@ export function AdminShell({
         <Toolbar sx={{ gap: 2 }}>
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {dictionary.admin.layout.title}
+              {activeRoute.title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {activeNavigationItem.subtitle ??
-                dictionary.admin.layout.defaultSubtitle}
+              {activeRoute.description}
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} alignItems="center">
@@ -240,19 +235,19 @@ export function AdminShell({
               <ListItemButton
                 component={Link}
                 href={item.href}
-                selected={item.matches(pathname)}
+                selected={item.isActive}
                 sx={{
                   minHeight: 48,
                   px: 2.5,
                   justifyContent: open ? "initial" : "center",
-                  borderRight: item.matches(pathname)
+                  borderRight: item.isActive
                     ? `2px solid ${theme.palette.info.main}`
                     : "2px solid transparent",
-                  backgroundColor: item.matches(pathname)
+                  backgroundColor: item.isActive
                     ? "action.selected"
                     : "transparent",
                   "&:hover": {
-                    backgroundColor: item.matches(pathname)
+                    backgroundColor: item.isActive
                       ? "action.selected"
                       : "action.hover",
                   },
@@ -263,7 +258,7 @@ export function AdminShell({
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
-                    color: item.matches(pathname) ? "info.main" : "inherit",
+                    color: item.isActive ? "info.main" : "inherit",
                   }}
                 >
                   {item.icon}
@@ -273,10 +268,8 @@ export function AdminShell({
                   sx={{
                     opacity: open ? 1 : 0,
                     "& .MuiTypography-root": {
-                      fontWeight: item.matches(pathname) ? 700 : 500,
-                      color: item.matches(pathname)
-                        ? "info.main"
-                        : "text.primary",
+                      fontWeight: item.isActive ? 700 : 500,
+                      color: item.isActive ? "info.main" : "text.primary",
                     },
                   }}
                 />

@@ -31,24 +31,30 @@ export default async function AdminDashboardPage() {
   return (
     <Box>
       <Stack spacing={3}>
-        <Stack spacing={1}>
-          <Typography
-            variant="overline"
-            color="info.main"
-            sx={{ fontWeight: 700 }}
-          >
-            {dictionary.admin.dashboard.eyebrow}
-          </Typography>
-          <Typography variant="h4">
-            {dictionary.admin.dashboard.title}
-          </Typography>
-          <Typography variant="h6">
-            {dictionary.admin.dashboard.summaryTitle}
-          </Typography>
-          <Typography color="text.secondary">
-            {dictionary.admin.dashboard.summaryDescription}
-          </Typography>
-        </Stack>
+        <Paper
+          sx={{
+            p: { xs: 2, md: 2.5 },
+            border: 1,
+            borderColor: "divider",
+            boxShadow: "none",
+          }}
+        >
+          <Stack spacing={0.75}>
+            <Typography
+              variant="overline"
+              color="info.main"
+              sx={{ fontWeight: 700 }}
+            >
+              {dictionary.admin.dashboard.eyebrow}
+            </Typography>
+            <Typography variant="h6">
+              {dictionary.admin.dashboard.summaryTitle}
+            </Typography>
+            <Typography color="text.secondary">
+              {dictionary.admin.dashboard.summaryDescription}
+            </Typography>
+          </Stack>
+        </Paper>
 
         <Grid container spacing={3} sx={{ alignContent: "flex-start" }}>
           {cards.map((card) => (

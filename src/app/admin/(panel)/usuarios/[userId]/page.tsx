@@ -58,17 +58,7 @@ export default async function AdminUserDetailPage({
         >
           {dictionary.admin.users.detail.back}
         </Button>
-        <Typography
-          variant="overline"
-          color="info.main"
-          sx={{ fontWeight: 700 }}
-        >
-          {dictionary.admin.users.title}
-        </Typography>
         <Typography variant="h4">{user.fullName}</Typography>
-        <Typography color="text.secondary">
-          {dictionary.admin.users.detail.subtitle}
-        </Typography>
       </Stack>
 
       <Grid container spacing={2.5}>

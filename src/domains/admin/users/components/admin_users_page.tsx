@@ -372,20 +372,6 @@ export function AdminUsersPage({ dictionary }: AdminUsersPageProps) {
 
   return (
     <Stack spacing={3}>
-      <Stack spacing={1}>
-        <Typography
-          variant="overline"
-          color="info.main"
-          sx={{ fontWeight: 700 }}
-        >
-          {dictionary.admin.users.eyebrow}
-        </Typography>
-        <Typography variant="h4">{dictionary.admin.users.title}</Typography>
-        <Typography color="text.secondary">
-          {dictionary.admin.users.description}
-        </Typography>
-      </Stack>
-
       <Paper
         sx={{
           p: { xs: 2, md: 2.5 },
