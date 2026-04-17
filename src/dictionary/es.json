@@ -168,6 +168,7 @@
     "navigation": {
       "panel": "Panel de Administración",
       "dashboard": "Dashboard",
+      "users": "Usuarios",
       "storefront": "Ver tienda"
     },
     "layout": {
@@ -175,7 +176,8 @@
       "menu": "Abrir navegación del panel",
       "collapse": "Contraer navegación",
       "expand": "Expandir navegación",
-      "welcome": "Bienvenido"
+      "welcome": "Bienvenido",
+      "defaultSubtitle": "Gestiona la operación principal de Silentium desde un único espacio de trabajo."
     },
     "dashboard": {
       "eyebrow": "Centro de control",
@@ -199,6 +201,104 @@
       "title": "No tienes permisos para ingresar al panel",
       "description": "Tu cuenta inició sesión correctamente, pero no cuenta con un rol habilitado para esta sección.",
       "action": "Volver al inicio"
+    },
+    "users": {
+      "title": "Usuarios",
+      "subtitle": "Consulta cuentas, roles y estado operativo desde una vista compacta y ordenable.",
+      "eyebrow": "Administración de accesos",
+      "description": "Busca por nombre, correo o identificador y aplica cambios puntuales sin salir del panel.",
+      "table": {
+        "columns": {
+          "fullName": "Nombre completo",
+          "email": "Correo",
+          "role": "Rol",
+          "status": "Estado",
+          "phone": "Teléfono",
+          "createdAt": "Creado",
+          "lastAccessAt": "Último acceso",
+          "actions": "Acciones"
+        },
+        "searchLabel": "Buscar usuarios",
+        "searchPlaceholder": "Buscar por nombre, correo o ID",
+        "roleFilter": "Rol",
+        "statusFilter": "Estado",
+        "allRoles": "Todos los roles",
+        "allStatuses": "Todos los estados",
+        "results": "Resultados",
+        "rowsSelected": "Filtros activos",
+        "emptyTitle": "No encontramos usuarios para esta búsqueda",
+        "emptyDescription": "Ajusta los filtros o limpia la búsqueda para volver a ver resultados.",
+        "errorTitle": "No pudimos cargar los usuarios",
+        "retry": "Reintentar",
+        "pagination": {
+          "rowsPerPage": "Filas por página",
+          "displayedRows": "{from}-{to} de {count}",
+          "moreThan": "más de {count}"
+        }
+      },
+      "actions": {
+        "viewDetail": "Ver detalle",
+        "editRole": "Editar rol",
+        "block": "Bloquear",
+        "activate": "Activar",
+        "save": "Guardar cambios",
+        "cancel": "Cancelar",
+        "close": "Cerrar"
+      },
+      "filters": {
+        "clear": "Limpiar filtros"
+      },
+      "detail": {
+        "title": "Detalle del usuario",
+        "subtitle": "Revisa la información principal de la cuenta y su estado operativo actual.",
+        "back": "Volver a usuarios",
+        "sections": {
+          "account": "Cuenta",
+          "profile": "Perfil",
+          "activity": "Actividad"
+        },
+        "fields": {
+          "userId": "ID de usuario",
+          "authUserId": "ID de autenticación",
+          "email": "Correo",
+          "role": "Rol",
+          "status": "Estado",
+          "emailVerified": "Correo verificado",
+          "fullName": "Nombre completo",
+          "firstName": "Nombre",
+          "lastName": "Apellido",
+          "phone": "Teléfono",
+          "createdAt": "Creado",
+          "updatedAt": "Actualizado",
+          "lastAccessAt": "Último acceso"
+        },
+        "notAvailable": "No disponible",
+        "verified": "Sí",
+        "notVerified": "No",
+        "notFound": "No encontramos el usuario solicitado."
+      },
+      "dialogs": {
+        "editRoleTitle": "Editar rol",
+        "editRoleDescription": "Actualiza el rol operativo del usuario seleccionado.",
+        "roleLabel": "Nuevo rol"
+      },
+      "feedback": {
+        "roleUpdated": "Rol actualizado correctamente.",
+        "statusUpdated": "Estado actualizado correctamente.",
+        "updateError": "No pudimos guardar el cambio. Inténtalo nuevamente."
+      },
+      "roleLabels": {
+        "super_admin": "Super administrador",
+        "admin": "Administrador",
+        "support": "Soporte",
+        "customer": "Cliente"
+      },
+      "statusLabels": {
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "blocked": "Bloqueado",
+        "pending_profile": "Perfil pendiente"
+      }
     }
   }
 }

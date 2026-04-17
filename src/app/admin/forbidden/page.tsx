@@ -8,7 +8,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
 
 export default function AdminForbiddenPage() {
   const dictionary = getDictionary("es");
@@ -42,7 +41,7 @@ export default function AdminForbiddenPage() {
                 {dictionary.admin.forbidden.description}
               </Typography>
             </Box>
-            <Button component={Link} href="/" variant="contained">
+            <Button href="/" variant="contained">
               {dictionary.admin.forbidden.action}
             </Button>
           </Stack>

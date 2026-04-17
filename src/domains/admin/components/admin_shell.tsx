@@ -7,6 +7,7 @@ import {
   ChevronRight,
   DashboardOutlined,
   Menu as MenuIcon,
+  PeopleOutlined,
   StorefrontOutlined,
 } from "@mui/icons-material";
 import {
@@ -29,6 +30,7 @@ import {
 import type { CSSObject, Theme } from "@mui/material/styles";
 import { styled, useTheme } from "@mui/material/styles";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
@@ -124,6 +126,8 @@ interface AdminNavigationItem {
   href: string;
   icon: ReactNode;
   label: string;
+  matches: (pathname: string) => boolean;
+  subtitle?: string;
 }
 
 export function AdminShell({
@@ -132,6 +136,7 @@ export function AdminShell({
   currentUser,
 }: AdminShellProps) {
   const theme = useTheme();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   const navigationItems: AdminNavigationItem[] = [
@@ -139,13 +144,29 @@ export function AdminShell({
       href: "/admin",
       icon: <DashboardOutlined />,
       label: dictionary.admin.navigation.dashboard,
+      matches: (currentPathname) => currentPathname === "/admin",
+      subtitle: dictionary.admin.dashboard.subtitle,
+    },
+    {
+      href: "/admin/usuarios",
+      icon: <PeopleOutlined />,
+      label: dictionary.admin.navigation.users,
+      matches: (currentPathname) =>
+        currentPathname === "/admin/usuarios" ||
+        currentPathname.startsWith("/admin/usuarios/"),
+      subtitle: dictionary.admin.users.subtitle,
     },
     {
       href: "/",
       icon: <StorefrontOutlined />,
       label: dictionary.admin.navigation.storefront,
+      matches: (currentPathname) => currentPathname === "/",
     },
   ];
+
+  const activeNavigationItem =
+    navigationItems.find((item) => item.matches(pathname)) ??
+    navigationItems[0];
 
   const displayName = currentUser.profile.firstName ?? currentUser.email;
 
@@ -164,7 +185,8 @@ export function AdminShell({
               {dictionary.admin.layout.title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {dictionary.admin.dashboard.subtitle}
+              {activeNavigationItem.subtitle ??
+                dictionary.admin.layout.defaultSubtitle}
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} alignItems="center">
@@ -218,10 +240,22 @@ export function AdminShell({
               <ListItemButton
                 component={Link}
                 href={item.href}
+                selected={item.matches(pathname)}
                 sx={{
                   minHeight: 48,
                   px: 2.5,
                   justifyContent: open ? "initial" : "center",
+                  borderRight: item.matches(pathname)
+                    ? `2px solid ${theme.palette.info.main}`
+                    : "2px solid transparent",
+                  backgroundColor: item.matches(pathname)
+                    ? "action.selected"
+                    : "transparent",
+                  "&:hover": {
+                    backgroundColor: item.matches(pathname)
+                      ? "action.selected"
+                      : "action.hover",
+                  },
                 }}
               >
                 <ListItemIcon
@@ -229,13 +263,22 @@ export function AdminShell({
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    color: item.matches(pathname) ? "info.main" : "inherit",
                   }}
                 >
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
-                  sx={{ opacity: open ? 1 : 0 }}
+                  sx={{
+                    opacity: open ? 1 : 0,
+                    "& .MuiTypography-root": {
+                      fontWeight: item.matches(pathname) ? 700 : 500,
+                      color: item.matches(pathname)
+                        ? "info.main"
+                        : "text.primary",
+                    },
+                  }}
                 />
               </ListItemButton>
             </ListItem>
