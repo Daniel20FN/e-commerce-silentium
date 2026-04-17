@@ -27,6 +27,12 @@
 - Load `github-pr` or `branch-pr` when preparing a Pull Request through `gh`; use them for PR quality, body structure, and branch workflow.
 - Load `judgment-day` only when the user explicitly asks for adversarial or dual review.
 
+## Design System Guidance
+
+- Read `DESIGN.md` before making UI, layout, or UX changes.
+- Treat `DESIGN.md` as the source of truth for visual hierarchy, layout rhythm, storefront vs admin behavior, and component intent.
+- If `AGENTS.md` and `DESIGN.md` ever seem to conflict, follow `AGENTS.md` for engineering and workflow constraints, and `DESIGN.md` for visual and UX direction.
+
 ## Workspace Safety
 
 - The repo may be dirty; do not revert unrelated user changes.
