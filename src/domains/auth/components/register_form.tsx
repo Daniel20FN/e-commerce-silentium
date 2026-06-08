@@ -168,6 +168,13 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
       }
 
       setSuccessEmail(response.email);
+      setEmail("");
+      setPassword("");
+      setFirstName("");
+      setLastName("");
+      setAcceptTerms(false);
+      setAcceptsMarketingEmails(false);
+      setAcceptsWhatsAppMarketing(false);
       setCountdownNow(Date.now());
       setResendAvailableAt(Date.now() + AUTH_RESEND_COOLDOWN.seconds * 1000);
       setResendFeedback({

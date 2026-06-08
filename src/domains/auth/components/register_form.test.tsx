@@ -98,5 +98,31 @@ describe("RegisterForm", () => {
         acceptsWhatsAppMarketing: false,
       });
     });
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText(dictionary.auth.common.firstName),
+      ).toHaveValue("");
+      expect(
+        screen.getByLabelText(dictionary.auth.common.lastName),
+      ).toHaveValue("");
+      expect(screen.getByLabelText(dictionary.auth.common.email)).toHaveValue(
+        "",
+      );
+      expect(
+        screen.getByLabelText(dictionary.auth.common.password),
+      ).toHaveValue("");
+      expect(
+        screen.getByLabelText(dictionary.auth.common.acceptTerms),
+      ).not.toBeChecked();
+      expect(
+        screen.getByLabelText(dictionary.auth.register.acceptsMarketingEmails),
+      ).not.toBeChecked();
+      expect(
+        screen.getByLabelText(
+          dictionary.auth.register.acceptsWhatsAppMarketing,
+        ),
+      ).not.toBeChecked();
+    });
   });
 });
