@@ -49,12 +49,19 @@ export function useCancellableApi(options: UseCancellableApiOptions = {}): {
   const controllersRef = useRef<Map<string, AbortController>>(new Map());
 
   // Limpiar controllers completados del Map
-  const cleanupCompleted = useCallback((id: string) => {
-    controllersRef.current.delete(id);
-  }, []);
+  const cleanupCompleted = useCallback(
+    (id: string, controller?: AbortController) => {
+      if (controller && controllersRef.current.get(id) !== controller) {
+        return;
+      }
+
+      controllersRef.current.delete(id);
+    },
+    [],
+  );
 
   // Crear o reutilizar controller para un ID, cancelando el anterior si existe
-  const getOrCreateController = useCallback((id: string): AbortSignal => {
+  const getOrCreateController = useCallback((id: string): AbortController => {
     const existingController = controllersRef.current.get(id);
     if (existingController) {
       existingController.abort();
@@ -62,7 +69,7 @@ export function useCancellableApi(options: UseCancellableApiOptions = {}): {
 
     const newController = new AbortController();
     controllersRef.current.set(id, newController);
-    return newController.signal;
+    return newController;
   }, []);
 
   const getFn = useCallback(
@@ -72,22 +79,16 @@ export function useCancellableApi(options: UseCancellableApiOptions = {}): {
       params?: K,
       successMessage?: string,
     ): Promise<T["data"] | undefined> => {
-      const signal = getOrCreateController(id);
+      const controller = getOrCreateController(id);
       try {
-        const result = await apiService.get<T, K>(
+        return await apiService.get<T, K>(
           endpoint,
           params,
           successMessage,
-          signal,
+          controller.signal,
         );
-        cleanupCompleted(id);
-        return result;
-      } catch (error) {
-        // Si fue cancelado, limpiar y relanzar
-        if (error instanceof Error && error.name === "AbortError") {
-          cleanupCompleted(id);
-        }
-        throw error;
+      } finally {
+        cleanupCompleted(id, controller);
       }
     },
     [getOrCreateController, cleanupCompleted],
@@ -100,21 +101,16 @@ export function useCancellableApi(options: UseCancellableApiOptions = {}): {
       params: K,
       successMessage?: string,
     ): Promise<T["data"] | undefined> => {
-      const signal = getOrCreateController(id);
+      const controller = getOrCreateController(id);
       try {
-        const result = await apiService.post<T, K>(
+        return await apiService.post<T, K>(
           endpoint,
           params,
           successMessage,
-          signal,
+          controller.signal,
         );
-        cleanupCompleted(id);
-        return result;
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          cleanupCompleted(id);
-        }
-        throw error;
+      } finally {
+        cleanupCompleted(id, controller);
       }
     },
     [getOrCreateController, cleanupCompleted],
@@ -127,21 +123,16 @@ export function useCancellableApi(options: UseCancellableApiOptions = {}): {
       params: K,
       successMessage?: string,
     ): Promise<T["data"] | undefined> => {
-      const signal = getOrCreateController(id);
+      const controller = getOrCreateController(id);
       try {
-        const result = await apiService.put<T, K>(
+        return await apiService.put<T, K>(
           endpoint,
           params,
           successMessage,
-          signal,
+          controller.signal,
         );
-        cleanupCompleted(id);
-        return result;
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          cleanupCompleted(id);
-        }
-        throw error;
+      } finally {
+        cleanupCompleted(id, controller);
       }
     },
     [getOrCreateController, cleanupCompleted],
@@ -154,21 +145,16 @@ export function useCancellableApi(options: UseCancellableApiOptions = {}): {
       params: K,
       successMessage?: string,
     ): Promise<T["data"] | undefined> => {
-      const signal = getOrCreateController(id);
+      const controller = getOrCreateController(id);
       try {
-        const result = await apiService.patch<T, K>(
+        return await apiService.patch<T, K>(
           endpoint,
           params,
           successMessage,
-          signal,
+          controller.signal,
         );
-        cleanupCompleted(id);
-        return result;
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          cleanupCompleted(id);
-        }
-        throw error;
+      } finally {
+        cleanupCompleted(id, controller);
       }
     },
     [getOrCreateController, cleanupCompleted],
@@ -181,21 +167,16 @@ export function useCancellableApi(options: UseCancellableApiOptions = {}): {
       params?: K,
       successMessage?: string,
     ): Promise<T["data"] | undefined> => {
-      const signal = getOrCreateController(id);
+      const controller = getOrCreateController(id);
       try {
-        const result = await apiService.delete<T, K>(
+        return await apiService.delete<T, K>(
           endpoint,
           params,
           successMessage,
-          signal,
+          controller.signal,
         );
-        cleanupCompleted(id);
-        return result;
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") {
-          cleanupCompleted(id);
-        }
-        throw error;
+      } finally {
+        cleanupCompleted(id, controller);
       }
     },
     [getOrCreateController, cleanupCompleted],
