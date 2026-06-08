@@ -4,6 +4,8 @@ export interface RegisterApiParams {
   firstName: string;
   lastName: string;
   acceptTerms: boolean;
+  acceptsMarketingEmails: boolean;
+  acceptsWhatsAppMarketing: boolean;
 }
 
 export interface LoginApiParams {

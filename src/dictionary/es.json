@@ -135,7 +135,9 @@
       "resendSubmitting": "Reenviando correo...",
       "resendCooldown": "Puedes solicitar otro correo en {seconds}s.",
       "resendInitialCooldown": "Ya te enviamos un correo. Espera un momento antes de solicitar otro.",
-      "resendSuccess": "Listo. Te reenviamos el correo de confirmación."
+      "resendSuccess": "Listo. Te reenviamos el correo de confirmación.",
+      "acceptsMarketingEmails": "Quiero recibir novedades y promociones por email",
+      "acceptsWhatsAppMarketing": "Quiero recibir novedades y promociones por WhatsApp"
     },
     "pendingConfirmation": {
       "title": "Confirmación pendiente",

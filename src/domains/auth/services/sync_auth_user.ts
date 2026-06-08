@@ -12,6 +12,8 @@ export interface SyncAuthUserInput {
   authUser: SupabaseAuthUser;
   profile?: SyncAuthUserProfileInput;
   acceptedTermsAt?: Date;
+  acceptsMarketingEmails?: boolean;
+  acceptsWhatsAppMarketing?: boolean;
 }
 
 function normalizeName(value?: string | null): string | null {
@@ -153,14 +155,24 @@ export async function syncAuthUser(
     where: {
       userId: user.id,
     },
-    update: input.acceptedTermsAt
-      ? {
-          acceptedTermsAt: input.acceptedTermsAt,
-          acceptedPrivacyPolicyAt: input.acceptedTermsAt,
-        }
-      : {},
+    update: {
+      ...(input.acceptedTermsAt
+        ? {
+            acceptedTermsAt: input.acceptedTermsAt,
+            acceptedPrivacyPolicyAt: input.acceptedTermsAt,
+          }
+        : {}),
+      ...(input.acceptsMarketingEmails !== undefined
+        ? { acceptsMarketingEmails: input.acceptsMarketingEmails }
+        : {}),
+      ...(input.acceptsWhatsAppMarketing !== undefined
+        ? { acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing }
+        : {}),
+    },
     create: {
       userId: user.id,
+      acceptsMarketingEmails: input.acceptsMarketingEmails ?? false,
+      acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing ?? false,
       ...(input.acceptedTermsAt
         ? {
             acceptedTermsAt: input.acceptedTermsAt,

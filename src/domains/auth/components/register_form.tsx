@@ -72,6 +72,9 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptsMarketingEmails, setAcceptsMarketingEmails] = useState(false);
+  const [acceptsWhatsAppMarketing, setAcceptsWhatsAppMarketing] =
+    useState(false);
   const [errors, setErrors] = useState<RegisterFormErrors>({});
   const [successEmail, setSuccessEmail] = useState<string | null>(null);
   const [resendFeedback, setResendFeedback] = useState<{
@@ -155,6 +158,8 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         acceptTerms,
+        acceptsMarketingEmails,
+        acceptsWhatsAppMarketing,
       });
 
       if (!response) {
@@ -309,22 +314,52 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
         fullWidth
       />
 
-      <Box>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={acceptTerms}
-              onChange={(event) => setAcceptTerms(event.target.checked)}
-            />
-          }
-          label={dictionary.auth.common.acceptTerms}
-        />
-        {errors.acceptTerms ? (
-          <Typography color="error" variant="caption">
-            {errors.acceptTerms}
-          </Typography>
-        ) : null}
-      </Box>
+      <Stack spacing={0.75}>
+        <Box>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={acceptTerms}
+                onChange={(event) => setAcceptTerms(event.target.checked)}
+              />
+            }
+            label={dictionary.auth.common.acceptTerms}
+          />
+          {errors.acceptTerms ? (
+            <Typography color="error" variant="caption">
+              {errors.acceptTerms}
+            </Typography>
+          ) : null}
+        </Box>
+
+        <Box>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={acceptsMarketingEmails}
+                onChange={(event) =>
+                  setAcceptsMarketingEmails(event.target.checked)
+                }
+              />
+            }
+            label={dictionary.auth.register.acceptsMarketingEmails}
+          />
+        </Box>
+
+        <Box>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={acceptsWhatsAppMarketing}
+                onChange={(event) =>
+                  setAcceptsWhatsAppMarketing(event.target.checked)
+                }
+              />
+            }
+            label={dictionary.auth.register.acceptsWhatsAppMarketing}
+          />
+        </Box>
+      </Stack>
 
       <Button
         type="submit"

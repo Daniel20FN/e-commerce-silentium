@@ -94,6 +94,8 @@ export async function POST(
       lastName: payload.data.lastName,
     },
     acceptedTermsAt: new Date(),
+    acceptsMarketingEmails: payload.data.acceptsMarketingEmails,
+    acceptsWhatsAppMarketing: payload.data.acceptsWhatsAppMarketing,
   });
 
   return response;
