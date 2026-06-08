@@ -103,42 +103,10 @@ export function HeroSection({
                 variant="contained"
                 size="large"
                 endIcon={<ArrowForward />}
-                sx={(theme) => ({
-                  px: 4,
-                  py: 1.5,
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? theme.palette.background.paper
-                      : theme.palette.primary.main,
-                  color: "#fff",
-                  "&:hover": {
-                    backgroundColor:
-                      theme.palette.mode === "dark"
-                        ? theme.palette.background.default
-                        : theme.palette.primary.light,
-                  },
-                })}
               >
                 Ver Coleccion
               </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                sx={(theme) => ({
-                  px: 4,
-                  py: 1.5,
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  borderColor: theme.palette.info.main,
-                  color: theme.palette.info.main,
-                  "&:hover": {
-                    borderColor: theme.palette.info.dark,
-                    backgroundColor: alpha(theme.palette.info.main, 0.08),
-                  },
-                })}
-              >
+              <Button variant="outlined" size="large">
                 Conoce Nuestra Historia
               </Button>
             </Box>

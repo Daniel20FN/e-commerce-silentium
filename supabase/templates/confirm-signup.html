@@ -1,0 +1,226 @@
+<!--
+  Silentium · Plantilla de email "Confirm signup" para Supabase.
+  Pegar en: Dashboard de Supabase -> Authentication -> Emails -> "Confirm signup".
+  Asunto sugerido: Confirma tu cuenta en Silentium
+  Importante: el enlace apunta a /auth/confirm con token_hash + type=email
+  para que funcione el flujo SSR (verifyOtp) de la app.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light only" />
+    <title>Confirma tu cuenta</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      background-color: #f8f6f4;
+      -webkit-font-smoothing: antialiased;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    "
+  >
+    <!-- Preheader (texto de vista previa, oculto) -->
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        mso-hide: all;
+        font-size: 1px;
+        line-height: 1px;
+        color: #f8f6f4;
+        opacity: 0;
+      "
+    >
+      Confirma tu correo para activar tu cuenta en Silentium.
+    </div>
+
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f8f6f4"
+    >
+      <tr>
+        <td align="center" style="padding: 32px 16px">
+          <table
+            role="presentation"
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="width: 100%; max-width: 600px"
+          >
+            <!-- Marca -->
+            <tr>
+              <td align="center" style="padding: 8px 0 24px 0">
+                <span
+                  style="
+                    display: inline-block;
+                    font-size: 12px;
+                    letter-spacing: 3px;
+                    text-transform: uppercase;
+                    color: #957662;
+                    font-weight: 700;
+                  "
+                  >Silentium</span
+                >
+              </td>
+            </tr>
+
+            <!-- Tarjeta -->
+            <tr>
+              <td
+                style="
+                  background-color: #ffffff;
+                  border-radius: 16px;
+                  border: 1px solid rgba(0, 30, 59, 0.08);
+                  padding: 40px 40px 32px 40px;
+                "
+              >
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                >
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        font-size: 24px;
+                        line-height: 1.3;
+                        font-weight: 700;
+                        color: #001e3b;
+                        padding-bottom: 12px;
+                      "
+                    >
+                      Confirma tu cuenta
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        font-size: 15px;
+                        line-height: 1.6;
+                        color: rgba(0, 30, 59, 0.7);
+                        padding-bottom: 28px;
+                      "
+                    >
+                      ¡Bienvenido a Silentium! Solo falta un paso: confirma tu
+                      correo para activar tu cuenta y empezar a descubrir nuestra
+                      colección de ropa de cama premium.
+                    </td>
+                  </tr>
+
+                  <!-- Botón -->
+                  <tr>
+                    <td align="center" style="padding-bottom: 28px">
+                      <table
+                        role="presentation"
+                        cellpadding="0"
+                        cellspacing="0"
+                      >
+                        <tr>
+                          <td
+                            align="center"
+                            style="
+                              border-radius: 10px;
+                              background-color: #001e3b;
+                            "
+                          >
+                            <a
+                              href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+                              target="_blank"
+                              style="
+                                display: inline-block;
+                                padding: 14px 32px;
+                                font-size: 15px;
+                                font-weight: 600;
+                                color: #ffffff;
+                                text-decoration: none;
+                                border-radius: 10px;
+                              "
+                              >Confirmar mi correo</a
+                            >
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Enlace alternativo -->
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        font-size: 13px;
+                        line-height: 1.6;
+                        color: rgba(0, 30, 59, 0.55);
+                        padding-bottom: 8px;
+                      "
+                    >
+                      Si el botón no funciona, copia y pega este enlace en tu
+                      navegador:
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      align="center"
+                      style="
+                        font-size: 13px;
+                        line-height: 1.6;
+                        word-break: break-all;
+                        padding-bottom: 4px;
+                      "
+                    >
+                      <a
+                        href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+                        target="_blank"
+                        style="color: #957662; text-decoration: underline"
+                        >{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash
+                        }}&type=email</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Pie -->
+            <tr>
+              <td align="center" style="padding: 24px 16px 8px 16px">
+                <p
+                  style="
+                    margin: 0 0 6px 0;
+                    font-size: 12px;
+                    line-height: 1.6;
+                    color: rgba(0, 30, 59, 0.5);
+                  "
+                >
+                  Si no creaste esta cuenta, puedes ignorar este correo de forma
+                  segura.
+                </p>
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.6;
+                    color: rgba(0, 30, 59, 0.5);
+                  "
+                >
+                  &copy; Silentium · Confort y elegancia para tu descanso
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

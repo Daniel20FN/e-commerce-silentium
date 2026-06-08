@@ -32,6 +32,8 @@
 - Read `DESIGN.md` before making UI, layout, or UX changes.
 - Treat `DESIGN.md` as the source of truth for visual hierarchy, layout rhythm, storefront vs admin behavior, and component intent.
 - If `AGENTS.md` and `DESIGN.md` ever seem to conflict, follow `AGENTS.md` for engineering and workflow constraints, and `DESIGN.md` for visual and UX direction.
+- Storefront UX is mobile-first: design and validate `xs` layouts before desktop because the public shopping experience is expected to be used primarily on mobile.
+- Admin UX must remain fully usable on mobile, but desktop/tablet may be optimized for dense operational workflows.
 
 ## Workspace Safety
 

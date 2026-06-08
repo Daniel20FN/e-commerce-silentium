@@ -9,6 +9,7 @@ import {
 } from "@/domains/admin/services/admin_route_metadata";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import {
+  CategoryOutlined,
   ChevronLeft,
   ChevronRight,
   DashboardOutlined,
@@ -148,6 +149,7 @@ export function AdminShell({
   const navigationIcons: Partial<Record<AdminRouteSection, ReactNode>> = {
     [ADMIN_ROUTE_SECTION.dashboard]: <DashboardOutlined />,
     [ADMIN_ROUTE_SECTION.users]: <PeopleOutlined />,
+    [ADMIN_ROUTE_SECTION.categories]: <CategoryOutlined />,
   };
 
   const navigationItems: AdminNavigationItem[] = [

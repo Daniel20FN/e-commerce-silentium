@@ -66,6 +66,8 @@ describe("POST /api/auth/register", () => {
           firstName: " Ana ",
           lastName: " Pérez ",
           acceptTerms: true,
+          acceptsMarketingEmails: true,
+          acceptsWhatsAppMarketing: false,
         }),
       }),
     );
@@ -91,6 +93,8 @@ describe("POST /api/auth/register", () => {
         lastName: "Pérez",
       },
       acceptedTermsAt: expect.any(Date),
+      acceptsMarketingEmails: true,
+      acceptsWhatsAppMarketing: false,
     });
     expect(signOut).not.toHaveBeenCalled();
     expect(response.status).toBe(200);

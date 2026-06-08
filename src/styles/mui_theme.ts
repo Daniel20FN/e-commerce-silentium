@@ -100,6 +100,40 @@ const coreThemeObj: ThemeOptions = {
         }),
       },
     },
+    MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+      },
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          fontWeight: 600,
+          borderRadius: 10,
+          letterSpacing: 0,
+          transition: "all 0.2s ease",
+        },
+        sizeLarge: {
+          paddingInline: 28,
+          paddingBlock: 12,
+          fontSize: "1rem",
+        },
+        containedPrimary: ({ theme }: { theme: Theme }) => ({
+          boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.18)}`,
+          "&:hover": {
+            boxShadow: `0 10px 24px ${alpha(theme.palette.primary.main, 0.26)}`,
+            transform: "translateY(-1px)",
+          },
+        }),
+        outlined: ({ theme }: { theme: Theme }) => ({
+          borderColor: alpha(theme.palette.info.main, 0.5),
+          color: theme.palette.info.main,
+          "&:hover": {
+            borderColor: theme.palette.info.main,
+            backgroundColor: alpha(theme.palette.info.main, 0.06),
+          },
+        }),
+      },
+    },
     MuiDataGrid: {
       styleOverrides: {
         root: ({ theme }: { theme: Theme }) => ({

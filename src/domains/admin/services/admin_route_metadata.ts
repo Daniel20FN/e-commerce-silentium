@@ -4,6 +4,7 @@ export const ADMIN_ROUTE_SECTION = {
   dashboard: "dashboard",
   users: "users",
   userDetail: "user-detail",
+  categories: "categories",
 } as const;
 
 export type AdminRouteSection =
@@ -38,6 +39,11 @@ export function getAdminNavigationSections(
       label: dictionary.admin.navigation.users,
       section: ADMIN_ROUTE_SECTION.users,
     },
+    {
+      href: "/admin/categorias",
+      label: dictionary.admin.navigation.categories,
+      section: ADMIN_ROUTE_SECTION.categories,
+    },
   ];
 }
 
@@ -54,6 +60,14 @@ export function resolveAdminRouteMetadata(
       description: dictionary.admin.users.detail.subtitle,
       matches: (currentPathname) =>
         currentPathname.startsWith("/admin/usuarios/"),
+    },
+    {
+      href: "/admin/categorias",
+      navigationHref: "/admin/categorias",
+      section: ADMIN_ROUTE_SECTION.categories,
+      title: dictionary.admin.categories.title,
+      description: dictionary.admin.categories.description,
+      matches: (currentPathname) => currentPathname === "/admin/categorias",
     },
     {
       href: "/admin/usuarios",

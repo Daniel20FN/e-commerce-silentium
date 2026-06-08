@@ -8,6 +8,8 @@ export const registerSchema = z.object({
   acceptTerms: z.literal(true, {
     error: "accept_terms_required",
   }),
+  acceptsMarketingEmails: z.boolean().optional().default(false),
+  acceptsWhatsAppMarketing: z.boolean().optional().default(false),
 });
 
 export const loginSchema = z.object({

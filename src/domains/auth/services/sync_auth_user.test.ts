@@ -90,6 +90,8 @@ describe("syncAuthUser", () => {
         lastName: " Pérez ",
       },
       acceptedTermsAt,
+      acceptsMarketingEmails: true,
+      acceptsWhatsAppMarketing: false,
     });
 
     expect(mockPrisma.user.findFirst).toHaveBeenCalledWith({
@@ -134,9 +136,13 @@ describe("syncAuthUser", () => {
       update: {
         acceptedTermsAt,
         acceptedPrivacyPolicyAt: acceptedTermsAt,
+        acceptsMarketingEmails: true,
+        acceptsWhatsAppMarketing: false,
       },
       create: {
         userId: "user-1",
+        acceptsMarketingEmails: true,
+        acceptsWhatsAppMarketing: false,
         acceptedTermsAt,
         acceptedPrivacyPolicyAt: acceptedTermsAt,
       },
@@ -210,6 +216,8 @@ describe("syncAuthUser", () => {
       update: {},
       create: {
         userId: "legacy-user-1",
+        acceptsMarketingEmails: false,
+        acceptsWhatsAppMarketing: false,
       },
     });
     expect(result).toBe(syncedUser);

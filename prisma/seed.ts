@@ -3,6 +3,7 @@ import {
   createClient,
   type User as SupabaseAuthUser,
 } from "@supabase/supabase-js";
+import { seedCategories } from "./seed_categories";
 
 const prisma = new PrismaClient();
 
@@ -252,6 +253,7 @@ const seedAdminUser = async (): Promise<void> => {
 
 const main = async (): Promise<void> => {
   await seedAdminUser();
+  await seedCategories(prisma);
 };
 
 main()

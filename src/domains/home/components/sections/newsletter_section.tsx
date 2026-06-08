@@ -133,17 +133,10 @@ export function NewsletterSection({
             <Button
               type="submit"
               variant="contained"
+              color="info"
+              size="large"
               endIcon={<Send />}
-              sx={(theme) => ({
-                px: 4,
-                py: 1.5,
-                backgroundColor: theme.palette.info.main,
-                color: "#fff",
-                whiteSpace: "nowrap",
-                "&:hover": {
-                  backgroundColor: theme.palette.info.dark,
-                },
-              })}
+              sx={{ whiteSpace: "nowrap" }}
             >
               Suscribirse
             </Button>

@@ -1,6 +1,7 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { AuthShell } from "@/domains/auth/components/auth_shell";
 import { LoginForm } from "@/domains/auth/components/login_form";
+import { Suspense } from "react";
 
 export default function LoginPage() {
   const dictionary = getDictionary("es");
@@ -11,7 +12,9 @@ export default function LoginPage() {
       title={dictionary.auth.login.title}
       subtitle={dictionary.auth.login.subtitle}
     >
-      <LoginForm dictionary={dictionary} />
+      <Suspense>
+        <LoginForm dictionary={dictionary} />
+      </Suspense>
     </AuthShell>
   );
 }
