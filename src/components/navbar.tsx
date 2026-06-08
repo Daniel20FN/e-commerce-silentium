@@ -17,6 +17,7 @@ import {
   Favorite,
   LightMode,
   Menu as MenuIcon,
+  PersonOutline,
   Search,
   ShoppingCart,
 } from "@mui/icons-material";
@@ -128,23 +129,13 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
       isLoggingOut={isPending(LOGOUT_REQUEST_ID)}
     />
   ) : (
-    <Box sx={{ px: 2 }}>
+    <Box sx={{ px: 2, display: "flex", flexDirection: "column", gap: 1 }}>
       <Button
         component={Link}
         href="/login"
-        variant="text"
+        variant="outlined"
+        color="info"
         fullWidth
-        sx={(theme) => ({
-          mb: 1,
-          justifyContent: "flex-start",
-          px: 1.5,
-          color: "text.primary",
-          fontWeight: 500,
-          borderRadius: 999,
-          "&:hover": {
-            backgroundColor: alpha(theme.palette.text.primary, 0.06),
-          },
-        })}
       >
         {dictionary.auth.navbar.login}
       </Button>
@@ -152,20 +143,8 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         component={Link}
         href="/register"
         variant="contained"
+        color="info"
         fullWidth
-        sx={(theme) => ({
-          justifyContent: "flex-start",
-          px: 2,
-          fontWeight: 600,
-          borderRadius: 999,
-          boxShadow: "none",
-          backgroundColor: theme.palette.text.primary,
-          color: theme.palette.background.paper,
-          "&:hover": {
-            boxShadow: "none",
-            backgroundColor: alpha(theme.palette.text.primary, 0.86),
-          },
-        })}
       >
         {dictionary.auth.navbar.register}
       </Button>
@@ -390,49 +369,33 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                   </Box>
                 ) : (
                   <Box
-                    sx={{ display: { xs: "none", md: "flex" }, gap: 1, ml: 1 }}
+                    sx={{
+                      display: { xs: "none", md: "flex" },
+                      alignItems: "center",
+                      ml: 0.5,
+                    }}
                   >
-                    <Button
-                      component={Link}
-                      href="/login"
-                      variant="text"
-                      sx={(theme) => ({
-                        color: "text.primary",
-                        px: 1.5,
-                        fontWeight: 500,
-                        borderRadius: 999,
-                        "&:hover": {
-                          backgroundColor: alpha(
+                    <Tooltip title={dictionary.auth.navbar.account}>
+                      <IconButton
+                        onClick={handleProfileClick}
+                        aria-label={dictionary.auth.navbar.account}
+                        sx={(theme) => ({
+                          color: "text.primary",
+                          border: `1px solid ${alpha(
                             theme.palette.text.primary,
-                            0.06,
-                          ),
-                        },
-                      })}
-                    >
-                      {dictionary.auth.navbar.login}
-                    </Button>
-                    <Button
-                      component={Link}
-                      href="/register"
-                      variant="contained"
-                      sx={(theme) => ({
-                        px: 2.25,
-                        fontWeight: 600,
-                        borderRadius: 999,
-                        boxShadow: "none",
-                        backgroundColor: theme.palette.text.primary,
-                        color: theme.palette.background.paper,
-                        "&:hover": {
-                          boxShadow: "none",
-                          backgroundColor: alpha(
-                            theme.palette.text.primary,
-                            0.86,
-                          ),
-                        },
-                      })}
-                    >
-                      {dictionary.auth.navbar.register}
-                    </Button>
+                            0.18,
+                          )}`,
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.text.primary,
+                              0.06,
+                            ),
+                          },
+                        })}
+                      >
+                        <PersonOutline />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 )
               ) : (
@@ -472,35 +435,70 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
           },
         }}
       >
-        <MenuItem component={Link} href="/account" onClick={handleProfileClose}>
-          {dictionary.auth.navbar.account}
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          href="/account/orders"
-          onClick={handleProfileClose}
-        >
-          {dictionary.auth.navbar.orders}
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          href="/account/wishlist"
-          onClick={handleProfileClose}
-        >
-          {dictionary.auth.navbar.wishlist}
-        </MenuItem>
-        {showAdminAccess ? (
-          <MenuItem component={Link} href="/admin" onClick={handleProfileClose}>
-            {dictionary.admin.navigation.panel}
-          </MenuItem>
-        ) : null}
-        <Divider />
-        <MenuItem
-          onClick={() => void handleLogout()}
-          disabled={isPending(LOGOUT_REQUEST_ID)}
-        >
-          {dictionary.auth.navbar.logout}
-        </MenuItem>
+        {currentUser
+          ? [
+              <MenuItem
+                key="account"
+                component={Link}
+                href="/account"
+                onClick={handleProfileClose}
+              >
+                {dictionary.auth.navbar.account}
+              </MenuItem>,
+              <MenuItem
+                key="orders"
+                component={Link}
+                href="/account/orders"
+                onClick={handleProfileClose}
+              >
+                {dictionary.auth.navbar.orders}
+              </MenuItem>,
+              <MenuItem
+                key="wishlist"
+                component={Link}
+                href="/account/wishlist"
+                onClick={handleProfileClose}
+              >
+                {dictionary.auth.navbar.wishlist}
+              </MenuItem>,
+              showAdminAccess ? (
+                <MenuItem
+                  key="admin"
+                  component={Link}
+                  href="/admin"
+                  onClick={handleProfileClose}
+                >
+                  {dictionary.admin.navigation.panel}
+                </MenuItem>
+              ) : null,
+              <Divider key="divider" />,
+              <MenuItem
+                key="logout"
+                onClick={() => void handleLogout()}
+                disabled={isPending(LOGOUT_REQUEST_ID)}
+              >
+                {dictionary.auth.navbar.logout}
+              </MenuItem>,
+            ]
+          : [
+              <MenuItem
+                key="login"
+                component={Link}
+                href="/login"
+                onClick={handleProfileClose}
+              >
+                {dictionary.auth.navbar.login}
+              </MenuItem>,
+              <Divider key="divider" />,
+              <MenuItem
+                key="register"
+                component={Link}
+                href="/register"
+                onClick={handleProfileClose}
+              >
+                {dictionary.auth.navbar.register}
+              </MenuItem>,
+            ]}
       </Menu>
 
       <Drawer
