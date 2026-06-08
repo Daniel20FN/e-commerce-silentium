@@ -169,6 +169,7 @@
       "panel": "Panel de Administración",
       "dashboard": "Dashboard",
       "users": "Usuarios",
+      "categories": "Categorías",
       "storefront": "Ver tienda"
     },
     "layout": {
@@ -298,6 +299,112 @@
         "inactive": "Inactivo",
         "blocked": "Bloqueado",
         "pending_profile": "Perfil pendiente"
+      }
+    },
+    "categories": {
+      "title": "Categorías",
+      "description": "Gestioná taxonomías jerárquicas, estado operativo y papelera del catálogo.",
+      "table": {
+        "columns": {
+          "name": "Nombre",
+          "slug": "Slug",
+          "hierarchy": "Jerarquía",
+          "status": "Estado",
+          "sortOrder": "Orden",
+          "trash": "Papelera",
+          "actions": "Acciones"
+        },
+        "searchLabel": "Buscar categorías",
+        "searchPlaceholder": "Buscar por nombre o slug",
+        "statusFilter": "Estado",
+        "hierarchyFilter": "Jerarquía",
+        "allStatuses": "Todos",
+        "allHierarchy": "Todas",
+        "onlyTrash": "Solo papelera",
+        "clearFilters": "Limpiar filtros",
+        "noRows": "No encontramos categorías para este criterio",
+        "trashYes": "Sí",
+        "trashNo": "No"
+      },
+      "status": {
+        "active": "Activa",
+        "inactive": "Inactiva"
+      },
+      "hierarchy": {
+        "root": "Raíz",
+        "child": "Hija"
+      },
+      "actions": {
+        "create": "Crear categoría",
+        "edit": "Editar",
+        "sendToTrash": "Enviar a papelera",
+        "restore": "Restaurar"
+      },
+      "form": {
+        "createTitle": "Nueva categoría",
+        "editTitle": "Editar categoría",
+        "name": "Nombre",
+        "slug": "Slug",
+        "description": "Descripción",
+        "parent": "Categoría padre",
+        "noParent": "Sin categoría padre",
+        "sortOrder": "Orden",
+        "status": "Activa",
+        "seoTitle": "SEO title",
+        "seoDescription": "SEO description",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "image": "Imagen de categor?a",
+        "imageUploader": {
+          "download_file": "Descargar archivo",
+          "size": "Tama?o",
+          "this_file_type_is_not_permited": "Tipo de archivo no permitido",
+          "upload_documents": "Subir imagen",
+          "drag_an_drop_files_or_click_to_select_them": "Arrastr? una imagen o hac? click para seleccionarla.",
+          "supports_images_pdf_word_docs_and_txt": "Soporta im?genes AVIF, JPG, PNG o WebP de hasta 5 MB.",
+          "selected_files": "Imagen seleccionada",
+          "clean_all": "Limpiar imagen",
+          "documents_preview": "Vista previa de imagen",
+          "not_selected_files": "No hay imagen seleccionada",
+          "drag_or_click_some_files_in_the_area": "Arrastr? o seleccion? una imagen",
+          "drop_files_here": "Solt? la imagen ac?",
+          "file_upload_disabled": "Carga de imagen deshabilitada",
+          "drag_or_click_to_select": "Arrastr? o hac? click para seleccionar",
+          "close": "Cerrar",
+          "move_file_backward": "Mover hacia atr?s",
+          "move_file_forward": "Mover hacia adelante",
+          "remove_file": "Eliminar imagen",
+          "primary_file": "Imagen principal"
+        }
+      },
+      "trashConfirm": {
+        "title": "Confirmar envío a papelera",
+        "description": "Esta acción enviará la categoría a papelera y saldrá del listado operativo.",
+        "withProductsWarning": "Esta categoría tiene productos asociados.",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar"
+      },
+      "bulk": {
+        "activate": "Activar selección",
+        "deactivate": "Desactivar selección",
+        "trash": "Papelera selección",
+        "restore": "Restaurar selección",
+        "report": "{success} procesadas con éxito, {failed} con excepción"
+      },
+      "feedback": {
+        "loadError": "No pudimos cargar las categorías. Inténtalo nuevamente.",
+        "imageUploadError": "No pudimos subir la imagen. Intent? nuevamente."
+      },
+      "formHelp": {
+        "name": "Nombre interno y visible de la categor?a en el panel y el cat?logo.",
+        "slug": "Se genera autom?ticamente desde el nombre y no se edita manualmente.",
+        "description": "Texto corto para explicar qu? agrupa esta categor?a.",
+        "parent": "Eleg? una categor?a padre para crear una jerarqu?a; dejalo vac?o si debe ser ra?z.",
+        "sortOrder": "N?mero usado para ordenar categor?as: cuanto menor, antes aparece.",
+        "status": "Solo las categor?as activas deber?an usarse en la experiencia p?blica del cat?logo.",
+        "seoTitle": "T?tulo recomendado para buscadores cuando la categor?a tenga p?gina p?blica.",
+        "seoDescription": "Descripci?n recomendada para buscadores y previews sociales.",
+        "image": "La imagen se sube a Supabase Storage al guardar y se conserva como URL p?blica de la categor?a."
       }
     }
   }
