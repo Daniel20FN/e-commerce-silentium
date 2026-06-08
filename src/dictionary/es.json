@@ -312,7 +312,8 @@
           "status": "Estado",
           "sortOrder": "Orden",
           "trash": "Papelera",
-          "actions": "Acciones"
+          "actions": "Acciones",
+          "productsCount": "Productos"
         },
         "searchLabel": "Buscar categorías",
         "searchPlaceholder": "Buscar por nombre o slug",
@@ -324,7 +325,8 @@
         "clearFilters": "Limpiar filtros",
         "noRows": "No encontramos categorías para este criterio",
         "trashYes": "Sí",
-        "trashNo": "No"
+        "trashNo": "No",
+        "productsUnavailable": "No disponible"
       },
       "status": {
         "active": "Activa",
@@ -332,7 +334,9 @@
       },
       "hierarchy": {
         "root": "Raíz",
-        "child": "Hija"
+        "child": "Hija",
+        "parentInactive": "padre inactivo",
+        "parentInTrash": "padre en papelera"
       },
       "actions": {
         "create": "Crear categoría",
@@ -393,7 +397,15 @@
       },
       "feedback": {
         "loadError": "No pudimos cargar las categorías. Inténtalo nuevamente.",
-        "imageUploadError": "No pudimos subir la imagen. Intent? nuevamente."
+        "imageUploadError": "No pudimos subir la imagen. Intent? nuevamente.",
+        "saveError": "No pudimos guardar la categor?a. Intent? nuevamente.",
+        "category_slug_conflict": "Ya existe una categor?a con ese slug. Cambi? el nombre para generar uno distinto.",
+        "category_parent_not_found": "La categor?a padre no existe o est? en papelera.",
+        "category_self_parent_not_allowed": "Una categor?a no puede ser su propia categor?a padre.",
+        "category_hierarchy_cycle_detected": "Ese cambio generar?a un bucle en la jerarqu?a de categor?as.",
+        "category_has_active_children": "No pod?s enviar a papelera una categor?a con subcategor?as activas.",
+        "record_not_found": "La categor?a ya no existe o no est? disponible.",
+        "bulk_action_failed": "No pudimos completar la acci?n masiva."
       },
       "formHelp": {
         "name": "Nombre interno y visible de la categor?a en el panel y el cat?logo.",
@@ -405,6 +417,13 @@
         "seoTitle": "T?tulo recomendado para buscadores cuando la categor?a tenga p?gina p?blica.",
         "seoDescription": "Descripci?n recomendada para buscadores y previews sociales.",
         "image": "La imagen se sube a Supabase Storage al guardar y se conserva como URL p?blica de la categor?a."
+      },
+      "bulkTrashConfirm": {
+        "title": "Confirmar env?o masivo a papelera",
+        "description": "Vas a enviar {count} categor?as seleccionadas a papelera. Dejar?n de aparecer en el listado operativo por defecto.",
+        "withProductsWarning": "Algunas categor?as seleccionadas tienen productos asociados.",
+        "confirm": "Enviar a papelera",
+        "cancel": "Cancelar"
       }
     }
   }

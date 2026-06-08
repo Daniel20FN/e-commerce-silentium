@@ -8,6 +8,8 @@ export interface AdminCategoryListItemDto {
   imageUrl: string | null;
   parentId: string | null;
   parentName: string | null;
+  parentIsActive?: boolean | null;
+  parentInTrash?: boolean;
   isActive: boolean;
   inTrash: boolean;
   sortOrder: number;

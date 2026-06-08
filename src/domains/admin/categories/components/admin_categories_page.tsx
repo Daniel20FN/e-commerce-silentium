@@ -20,6 +20,9 @@ import {
   ADMIN_CATEGORY_HIERARCHY,
   ADMIN_CATEGORY_HIERARCHY_VALUES,
   ADMIN_CATEGORY_PAGE_SIZE_OPTIONS,
+  ADMIN_CATEGORY_SORT_DIRECTION,
+  ADMIN_CATEGORY_SORT_FIELD,
+  ADMIN_CATEGORY_SORT_FIELD_VALUES,
   ADMIN_CATEGORY_STATUS,
   ADMIN_CATEGORY_STATUS_VALUES,
 } from "@/domains/admin/categories/types/shared";
@@ -55,6 +58,7 @@ import {
   DataGrid,
   type GridColDef,
   type GridPaginationModel,
+  type GridSortModel,
 } from "@mui/x-data-grid";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
@@ -85,6 +89,12 @@ interface CategoryFormState {
   seoDescription: string;
 }
 
+function isAdminCategorySortField(
+  field: string,
+): field is (typeof ADMIN_CATEGORY_SORT_FIELD_VALUES)[number] {
+  return ADMIN_CATEGORY_SORT_FIELD_VALUES.some((value) => value === field);
+}
+
 function getStatusLabel(dictionary: Dictionary, isActive: boolean): string {
   return isActive
     ? dictionary.admin.categories.status.active
@@ -95,7 +105,44 @@ function getHierarchyLabel(
   dictionary: Dictionary,
   category: AdminCategoryListItemDto,
 ): string {
-  return category.parentName ?? dictionary.admin.categories.hierarchy.root;
+  if (!category.parentName) {
+    return dictionary.admin.categories.hierarchy.root;
+  }
+
+  if (category.parentInTrash) {
+    return `${category.parentName} (${dictionary.admin.categories.hierarchy.parentInTrash})`;
+  }
+
+  if (category.parentIsActive === false) {
+    return `${category.parentName} (${dictionary.admin.categories.hierarchy.parentInactive})`;
+  }
+
+  return category.parentName;
+}
+
+function getProductCountLabel(
+  dictionary: Dictionary,
+  productsCount: number | null,
+): string {
+  return productsCount === null
+    ? dictionary.admin.categories.table.productsUnavailable
+    : String(productsCount);
+}
+
+function resolveCategoryFeedbackMessage(
+  dictionary: Dictionary,
+  error: unknown,
+): string {
+  const message = error instanceof Error ? error.message : undefined;
+  const feedbackMessages = dictionary.admin.categories.feedback as Record<
+    string,
+    string
+  >;
+
+  return (
+    (message ? feedbackMessages[message] : undefined) ??
+    dictionary.admin.categories.feedback.saveError
+  );
 }
 
 function toNullableTrimmedValue(value: string): string | null {
@@ -172,12 +219,19 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
   const [hierarchy, setHierarchy] = useState<
     (typeof ADMIN_CATEGORY_HIERARCHY)[keyof typeof ADMIN_CATEGORY_HIERARCHY]
   >(ADMIN_CATEGORY_HIERARCHY.all);
+  const [sortField, setSortField] = useState<
+    (typeof ADMIN_CATEGORY_SORT_FIELD)[keyof typeof ADMIN_CATEGORY_SORT_FIELD]
+  >(ADMIN_CATEGORY_SORT_FIELD.sortOrder);
+  const [sortDirection, setSortDirection] = useState<
+    (typeof ADMIN_CATEGORY_SORT_DIRECTION)[keyof typeof ADMIN_CATEGORY_SORT_DIRECTION]
+  >(ADMIN_CATEGORY_SORT_DIRECTION.asc);
   const [inTrash, setInTrash] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [pendingTrashCategory, setPendingTrashCategory] =
     useState<AdminCategoryListItemDto | null>(null);
+  const [isBulkTrashConfirmOpen, setIsBulkTrashConfirmOpen] = useState(false);
   const [categoryImageFiles, setCategoryImageFiles] = useState<DocumentType[]>(
     [],
   );
@@ -215,6 +269,8 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
           status,
           hierarchy,
           inTrash,
+          sortField,
+          sortDirection,
         });
 
         if (!mounted || !response) {
@@ -257,6 +313,8 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
     page,
     pageSize,
     search,
+    sortDirection,
+    sortField,
     status,
   ]);
 
@@ -302,32 +360,40 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
       return;
     }
 
-    const response = await cancellableApi.post<
-      AdminCategoryBulkActionApiResponse,
-      {
-        action: "activate" | "deactivate" | "trash" | "restore";
-        categoryIds: string[];
+    try {
+      const response = await cancellableApi.post<
+        AdminCategoryBulkActionApiResponse,
+        {
+          action: "activate" | "deactivate" | "trash" | "restore";
+          categoryIds: string[];
+        }
+      >("admin-categories-bulk", "/admin/categories/bulk", {
+        action,
+        categoryIds: selectedRows,
+      });
+
+      if (!response) {
+        return;
       }
-    >("admin-categories-bulk", "/admin/categories/bulk", {
-      action,
-      categoryIds: selectedRows,
-    });
 
-    if (!response) {
-      return;
+      enqueueSnackbar(
+        dictionary.admin.categories.bulk.report
+          .replace("{success}", String(response.successCount))
+          .replace("{failed}", String(response.exceptions.length)),
+        {
+          variant: response.exceptions.length > 0 ? "warning" : "success",
+        },
+      );
+
+      setSelectedRows([]);
+      setPage(0);
+    } catch (error) {
+      enqueueSnackbar(resolveCategoryFeedbackMessage(dictionary, error), {
+        variant: "error",
+      });
+    } finally {
+      setIsBulkTrashConfirmOpen(false);
     }
-
-    enqueueSnackbar(
-      dictionary.admin.categories.bulk.report
-        .replace("{success}", String(response.successCount))
-        .replace("{failed}", String(response.exceptions.length)),
-      {
-        variant: response.exceptions.length > 0 ? "warning" : "success",
-      },
-    );
-
-    setSelectedRows([]);
-    setPage(0);
   };
 
   const handleTrashOrRestore = async (
@@ -452,14 +518,9 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
 
       setIsFormOpen(false);
     } catch (error) {
-      enqueueSnackbar(
-        error instanceof Error
-          ? error.message
-          : dictionary.admin.categories.feedback.imageUploadError,
-        {
-          variant: "error",
-        },
-      );
+      enqueueSnackbar(resolveCategoryFeedbackMessage(dictionary, error), {
+        variant: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -477,17 +538,20 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
       headerName: dictionary.admin.categories.table.columns.slug,
       flex: 1,
       minWidth: 180,
+      sortable: false,
     },
     {
       field: "hierarchy",
       headerName: dictionary.admin.categories.table.columns.hierarchy,
       minWidth: 150,
+      sortable: false,
       valueGetter: (_value, row) => getHierarchyLabel(dictionary, row),
     },
     {
       field: "status",
       headerName: dictionary.admin.categories.table.columns.status,
       minWidth: 120,
+      sortable: false,
       valueGetter: (_value, row) => getStatusLabel(dictionary, row.isActive),
     },
     {
@@ -496,9 +560,18 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
       minWidth: 100,
     },
     {
+      field: "productsCount",
+      headerName: dictionary.admin.categories.table.columns.productsCount,
+      minWidth: 140,
+      sortable: false,
+      valueGetter: (_value, row) =>
+        getProductCountLabel(dictionary, row.productsCount),
+    },
+    {
       field: "trash",
       headerName: dictionary.admin.categories.table.columns.trash,
       minWidth: 110,
+      sortable: false,
       valueGetter: (_value, row) =>
         row.inTrash
           ? dictionary.admin.categories.table.trashYes
@@ -548,6 +621,12 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
   }
 
   const parentOptions = Array.from(parentOptionsById.values());
+  const selectedCategories = rows.filter((row) =>
+    selectedRows.includes(row.id),
+  );
+  const selectedCategoriesWithProducts = selectedCategories.some(
+    (category) => (category.productsCount ?? 0) > 0,
+  );
 
   const confirmSendToTrash = async (): Promise<void> => {
     if (!pendingTrashCategory) {
@@ -719,7 +798,7 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
             <Button
               variant="outlined"
               disabled={selectedRows.length === 0}
-              onClick={() => void executeBulk("trash")}
+              onClick={() => setIsBulkTrashConfirmOpen(true)}
             >
               {dictionary.admin.categories.bulk.trash}
             </Button>
@@ -744,6 +823,7 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
               disableRowSelectionOnClick
               pagination
               paginationMode="server"
+              sortingMode="server"
               pageSizeOptions={
                 ADMIN_CATEGORY_PAGE_SIZE_OPTIONS as unknown as number[]
               }
@@ -751,6 +831,30 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
               onPaginationModelChange={(model: GridPaginationModel) => {
                 setPage(model.page);
                 setPageSize(model.pageSize);
+              }}
+              sortModel={[
+                {
+                  field: sortField,
+                  sort:
+                    sortDirection === ADMIN_CATEGORY_SORT_DIRECTION.desc
+                      ? "desc"
+                      : "asc",
+                },
+              ]}
+              onSortModelChange={(model: GridSortModel) => {
+                const nextSort = model[0];
+                const nextField =
+                  nextSort && isAdminCategorySortField(nextSort.field)
+                    ? nextSort.field
+                    : ADMIN_CATEGORY_SORT_FIELD.sortOrder;
+
+                setSortField(nextField);
+                setSortDirection(
+                  nextSort?.sort === "desc"
+                    ? ADMIN_CATEGORY_SORT_DIRECTION.desc
+                    : ADMIN_CATEGORY_SORT_DIRECTION.asc,
+                );
+                setPage(0);
               }}
               onRowSelectionModelChange={(model) => {
                 setSelectedRows(Array.from(model.ids) as string[]);
@@ -983,6 +1087,43 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
           </Button>
           <Button variant="contained" onClick={() => void confirmSendToTrash()}>
             {dictionary.admin.categories.trashConfirm.confirm}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={isBulkTrashConfirmOpen}
+        onClose={() => setIsBulkTrashConfirmOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          {dictionary.admin.categories.bulkTrashConfirm.title}
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={1.5} sx={{ pt: 1 }}>
+            <Typography>
+              {dictionary.admin.categories.bulkTrashConfirm.description.replace(
+                "{count}",
+                String(selectedRows.length),
+              )}
+            </Typography>
+            {selectedCategoriesWithProducts ? (
+              <Alert severity="warning">
+                {
+                  dictionary.admin.categories.bulkTrashConfirm
+                    .withProductsWarning
+                }
+              </Alert>
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsBulkTrashConfirmOpen(false)}>
+            {dictionary.admin.categories.bulkTrashConfirm.cancel}
+          </Button>
+          <Button variant="contained" onClick={() => void executeBulk("trash")}>
+            {dictionary.admin.categories.bulkTrashConfirm.confirm}
           </Button>
         </DialogActions>
       </Dialog>

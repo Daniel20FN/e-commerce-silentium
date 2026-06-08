@@ -23,6 +23,8 @@ interface CategoryListRecord {
   imageUrl: string | null;
   parentId: string | null;
   parent: {
+    deletedAt: Date | null;
+    isActive: boolean;
     name: string;
   } | null;
   sortOrder: number;
@@ -50,6 +52,11 @@ function toCategoryListItem(
     imageUrl: category.imageUrl,
     parentId: category.parentId,
     parentName: category.parent?.name ?? null,
+    parentIsActive: category.parent?.isActive ?? null,
+    parentInTrash: category.parent
+      ? category.parent.deletedAt !== null &&
+        category.parent.deletedAt !== undefined
+      : false,
     isActive: category.isActive,
     inTrash: category.deletedAt !== null,
     sortOrder: category.sortOrder,
@@ -166,6 +173,8 @@ export async function listAdminCategories(
       include: {
         parent: {
           select: {
+            deletedAt: true,
+            isActive: true,
             name: true,
           },
         },

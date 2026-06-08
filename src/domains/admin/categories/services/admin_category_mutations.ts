@@ -35,6 +35,8 @@ interface CategoryRecord {
   createdAt: Date;
   updatedAt: Date;
   parent?: {
+    deletedAt: Date | null;
+    isActive: boolean;
     name: string;
   } | null;
 }
@@ -60,6 +62,11 @@ function toAdminCategoryListItem(
     imageUrl: category.imageUrl,
     parentId: category.parentId,
     parentName: category.parent?.name ?? null,
+    parentIsActive: category.parent?.isActive ?? null,
+    parentInTrash: category.parent
+      ? category.parent.deletedAt !== null &&
+        category.parent.deletedAt !== undefined
+      : false,
     isActive: category.isActive,
     inTrash: category.deletedAt !== null,
     sortOrder: category.sortOrder,
@@ -154,6 +161,8 @@ export async function createAdminCategory(
     include: {
       parent: {
         select: {
+          deletedAt: true,
+          isActive: true,
           name: true,
         },
       },
@@ -176,6 +185,8 @@ export async function updateAdminCategory(
     include: {
       parent: {
         select: {
+          deletedAt: true,
+          isActive: true,
           name: true,
         },
       },
@@ -231,6 +242,8 @@ export async function updateAdminCategory(
     include: {
       parent: {
         select: {
+          deletedAt: true,
+          isActive: true,
           name: true,
         },
       },
@@ -281,6 +294,8 @@ export async function trashAdminCategory(
     include: {
       parent: {
         select: {
+          deletedAt: true,
+          isActive: true,
           name: true,
         },
       },

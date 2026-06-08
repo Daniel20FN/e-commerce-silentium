@@ -55,19 +55,53 @@ jest.mock("@mui/x-data-grid", () => ({
   DataGrid: ({
     rows,
     columns,
+    onRowSelectionModelChange,
+    onSortModelChange,
   }: {
-    rows: Array<{ id: string; name?: string }>;
+    rows: Array<{ id: string; name?: string; [key: string]: unknown }>;
     columns: Array<{
       field: string;
+      valueGetter?: (
+        value: unknown,
+        row: { id: string; name?: string; [key: string]: unknown },
+      ) => string;
       renderCell?: (params: {
-        row: { id: string; name?: string };
+        row: { id: string; name?: string; [key: string]: unknown };
       }) => ReactElement;
     }>;
+    onRowSelectionModelChange?: (model: { ids: Set<string> }) => void;
+    onSortModelChange?: (
+      model: Array<{ field: string; sort: "asc" | "desc" }>,
+    ) => void;
   }) => (
     <div>
+      <button
+        type="button"
+        onClick={() => onSortModelChange?.([{ field: "name", sort: "desc" }])}
+      >
+        Sort by name desc
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          onRowSelectionModelChange?.({
+            ids: new Set(rows.map((row) => row.id)),
+          })
+        }
+      >
+        Select all rows
+      </button>
       {rows.map((row) => (
         <div key={row.id}>
           <div>{row.name ?? row.id}</div>
+          {columns
+            .filter((column) => column.field !== "actions")
+            .map((column) => (
+              <span key={`${row.id}-${column.field}`}>
+                {column.valueGetter?.(row[column.field], row) ??
+                  String(row[column.field] ?? "")}
+              </span>
+            ))}
           {columns
             .filter((column) => column.field === "actions" && column.renderCell)
             .map((column) => (
@@ -85,6 +119,7 @@ const mockGet = jest.fn();
 const mockPost = jest.fn();
 const mockPatch = jest.fn();
 const mockAbort = jest.fn();
+const mockEnqueueSnackbar = jest.fn();
 
 jest.mock("@/context/use_cancellable_api_context", () => ({
   useCancellableApiContext: () => ({
@@ -102,7 +137,7 @@ jest.mock("@/context/use_cancellable_api_context", () => ({
 }));
 
 jest.mock("notistack", () => ({
-  enqueueSnackbar: jest.fn(),
+  enqueueSnackbar: (...args: unknown[]) => mockEnqueueSnackbar(...args),
 }));
 
 const dictionary = {
@@ -117,6 +152,7 @@ const dictionary = {
           hierarchy: "Jerarquía",
           status: "Estado",
           sortOrder: "Orden",
+          productsCount: "Productos",
           trash: "Papelera",
           actions: "Acciones",
         },
@@ -129,6 +165,7 @@ const dictionary = {
         onlyTrash: "Solo papelera",
         clearFilters: "Limpiar filtros",
         noRows: "Sin categorías",
+        productsUnavailable: "No disponible",
       },
       actions: {
         create: "Crear categoría",
@@ -159,6 +196,19 @@ const dictionary = {
         },
       },
       feedback: {
+        bulk_action_failed: "No pudimos completar la acci?n masiva.",
+        category_has_active_children:
+          "No pod?s enviar a papelera una categor?a con subcategor?as activas.",
+        category_hierarchy_cycle_detected:
+          "Ese cambio generar?a un bucle en la jerarqu?a de categor?as.",
+        category_parent_not_found:
+          "La categor?a padre no existe o est? en papelera.",
+        category_self_parent_not_allowed:
+          "Una categor?a no puede ser su propia categor?a padre.",
+        category_slug_conflict: "Ya existe una categor?a con ese slug.",
+        imageUploadError: "No pudimos subir la imagen",
+        record_not_found: "La categor?a ya no existe o no est? disponible.",
+        saveError: "No pudimos guardar la categor?a.",
         loadError: "No pudimos cargar categorías",
       },
       status: {
@@ -168,6 +218,8 @@ const dictionary = {
       hierarchy: {
         root: "Raíz",
         child: "Hija",
+        parentInactive: "padre inactivo",
+        parentInTrash: "padre en papelera",
       },
       form: {
         createTitle: "Nueva categoría",
@@ -231,6 +283,15 @@ const dictionary = {
         restore: "Restaurar selección",
         report: "{success} exitosas, {failed} con error",
       },
+      bulkTrashConfirm: {
+        title: "Confirmar env?o masivo a papelera",
+        description:
+          "Vas a enviar {count} categor?as seleccionadas a papelera.",
+        withProductsWarning:
+          "Algunas categor?as seleccionadas tienen productos asociados.",
+        confirm: "Enviar a papelera",
+        cancel: "Cancelar",
+      },
     },
   },
   grid: {
@@ -242,7 +303,7 @@ const dictionary = {
 
 describe("admin_categories_page", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     mockUploadAdminStorageImage.mockResolvedValue({
       publicUrl: "https://storage.example.com/category.webp",
     });
@@ -301,6 +362,67 @@ describe("admin_categories_page", () => {
         }),
       );
     });
+  });
+
+  it("sends server-side sort params when sorting a supported column", async () => {
+    mockGet.mockResolvedValue({
+      items: [],
+      total: 0,
+      page: 0,
+      pageSize: 10,
+    });
+
+    render(<AdminCategoriesPage dictionary={dictionary as never} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Sort by name desc" }));
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenLastCalledWith(
+        "admin-categories-list",
+        "/admin/categories",
+        expect.objectContaining({
+          sortField: "name",
+          sortDirection: "desc",
+          page: 0,
+        }),
+      );
+    });
+  });
+
+  it("shows unavailable product count and inactive parent state in the table", async () => {
+    mockGet.mockResolvedValue({
+      items: [
+        {
+          id: "cat-child",
+          name: "S?banas",
+          slug: "sabanas",
+          description: null,
+          imageUrl: null,
+          parentId: "cat-parent",
+          parentName: "Dormitorio",
+          parentIsActive: false,
+          parentInTrash: false,
+          isActive: true,
+          inTrash: false,
+          sortOrder: 10,
+          seoTitle: null,
+          seoDescription: null,
+          productsCount: null,
+          createdAt: "2026-04-18T10:00:00.000Z",
+          updatedAt: "2026-04-18T10:00:00.000Z",
+        },
+      ],
+      total: 1,
+      page: 0,
+      pageSize: 10,
+    });
+
+    render(<AdminCategoriesPage dictionary={dictionary as never} />);
+
+    expect(
+      await screen.findByText("Dormitorio (padre inactivo)"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("No disponible")).toBeInTheDocument();
   });
 
   it("shows load error when request fails", async () => {
@@ -380,6 +502,35 @@ describe("admin_categories_page", () => {
 
     expect(screen.getByLabelText("Slug")).toHaveValue("fundas");
     expect(screen.getByLabelText("Slug")).toBeDisabled();
+  });
+
+  it("shows friendly feedback when generated slug already exists", async () => {
+    mockGet.mockResolvedValue({
+      items: [],
+      total: 0,
+      page: 0,
+      pageSize: 10,
+    });
+    mockPost.mockRejectedValue(new Error("category_slug_conflict"));
+
+    render(<AdminCategoriesPage dictionary={dictionary as never} />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: dictionary.admin.categories.actions.create,
+      }),
+    );
+    fireEvent.change(screen.getByLabelText("Nombre"), {
+      target: { value: "Fundas" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Guardar" }));
+
+    await waitFor(() => {
+      expect(mockEnqueueSnackbar).toHaveBeenCalledWith(
+        dictionary.admin.categories.feedback.category_slug_conflict,
+        { variant: "error" },
+      );
+    });
   });
 
   it("uploads a selected category image before saving", async () => {
@@ -669,6 +820,79 @@ describe("admin_categories_page", () => {
     });
   });
 
+  it("requires confirmation before sending selected categories to trash", async () => {
+    mockGet.mockResolvedValue({
+      items: [
+        {
+          id: "cat-1",
+          name: "Ropa de cama",
+          slug: "ropa-de-cama",
+          description: null,
+          imageUrl: null,
+          parentId: null,
+          parentName: null,
+          isActive: true,
+          inTrash: false,
+          sortOrder: 10,
+          seoTitle: null,
+          seoDescription: null,
+          productsCount: 2,
+          createdAt: "2026-04-18T10:00:00.000Z",
+          updatedAt: "2026-04-18T10:00:00.000Z",
+        },
+      ],
+      total: 1,
+      page: 0,
+      pageSize: 10,
+    });
+    mockPost.mockResolvedValue({
+      processed: 1,
+      successCount: 1,
+      exceptions: [],
+    });
+
+    render(<AdminCategoriesPage dictionary={dictionary as never} />);
+
+    await screen.findAllByText("Ropa de cama");
+    fireEvent.click(screen.getByRole("button", { name: "Select all rows" }));
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: dictionary.admin.categories.bulk.trash,
+      }),
+    );
+
+    expect(mockPost).not.toHaveBeenCalledWith(
+      "admin-categories-bulk",
+      "/admin/categories/bulk",
+      expect.anything(),
+    );
+    expect(
+      screen.getByText(dictionary.admin.categories.bulkTrashConfirm.title),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        dictionary.admin.categories.bulkTrashConfirm.withProductsWarning,
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: dictionary.admin.categories.bulkTrashConfirm.confirm,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith(
+        "admin-categories-bulk",
+        "/admin/categories/bulk",
+        {
+          action: "trash",
+          categoryIds: ["cat-1"],
+        },
+      );
+    });
+  });
+
   it("requires confirmation before sending category to trash", async () => {
     mockGet.mockResolvedValue({
       items: [
@@ -689,6 +913,21 @@ describe("admin_categories_page", () => {
       total: 1,
       page: 0,
       pageSize: 10,
+    });
+    mockPost.mockResolvedValue({
+      category: {
+        id: "cat-1",
+        name: "Ropa de cama",
+        slug: "ropa-de-cama",
+        parentId: null,
+        parentName: null,
+        isActive: true,
+        inTrash: true,
+        sortOrder: 10,
+        productsCount: 3,
+        createdAt: "2026-04-18T10:00:00.000Z",
+        updatedAt: "2026-04-18T10:00:00.000Z",
+      },
     });
 
     render(<AdminCategoriesPage dictionary={dictionary as never} />);
