@@ -163,7 +163,8 @@
       "resend_confirmation_rate_limited": "Ya enviamos un correo hace muy poco. Espera un minuto e inténtalo de nuevo.",
       "resend_confirmation_user_not_found": "No encontramos una cuenta pendiente para ese correo.",
       "email_already_confirmed": "Ese correo ya fue confirmado. Ya puedes iniciar sesión.",
-      "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez."
+      "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez.",
+      "auth_service_unavailable": "El servicio de acceso no está disponible. Intentá nuevamente en unos minutos."
     }
   },
   "admin": {
@@ -172,7 +173,8 @@
       "dashboard": "Dashboard",
       "users": "Usuarios",
       "categories": "Categorías",
-      "storefront": "Ver tienda"
+      "storefront": "Ver tienda",
+      "products": "Productos"
     },
     "layout": {
       "title": "Administración",
@@ -425,6 +427,191 @@
         "description": "Vas a enviar {count} categor?as seleccionadas a papelera. Dejar?n de aparecer en el listado operativo por defecto.",
         "withProductsWarning": "Algunas categor?as seleccionadas tienen productos asociados.",
         "confirm": "Enviar a papelera",
+        "cancel": "Cancelar"
+      }
+    },
+    "products": {
+      "title": "Productos",
+      "description": "Gestioná productos, categorías asociadas, variantes vendibles y alertas operativas del catálogo.",
+      "table": {
+        "columns": {
+          "name": "Producto",
+          "slug": "Slug",
+          "status": "Estado",
+          "brand": "Marca",
+          "categories": "Categorías",
+          "variants": "Variantes",
+          "sellable": "Vendibles",
+          "warnings": "Alertas",
+          "trash": "Papelera",
+          "actions": "Acciones"
+        },
+        "searchLabel": "Buscar productos",
+        "searchPlaceholder": "Buscar por nombre, slug, marca o SKU",
+        "statusFilter": "Estado",
+        "allStatuses": "Todos los estados",
+        "categoryFilter": "Categoría",
+        "brandFilter": "Marca",
+        "featuredFilter": "Destacado",
+        "featuredAll": "Todos",
+        "featuredYes": "Destacados",
+        "featuredNo": "No destacados",
+        "onlyTrash": "Solo papelera",
+        "clearFilters": "Limpiar filtros",
+        "noRows": "No encontramos productos para este criterio",
+        "results": "Resultados",
+        "trashYes": "Sí",
+        "trashNo": "No",
+        "stockFilter": "Disponibilidad",
+        "stockAll": "Todo el stock",
+        "stockYes": "Con stock vendible",
+        "stockNo": "Sin stock vendible",
+        "discountFilter": "Descuento",
+        "discountAll": "Todos los descuentos",
+        "discountYes": "Con descuento",
+        "discountNo": "Sin descuento",
+        "createdAt": "Fecha de creación",
+        "updatedAt": "Última actualización"
+      },
+      "status": {
+        "draft": "Borrador",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "archived": "Archivado"
+      },
+      "actions": {
+        "create": "Crear producto",
+        "edit": "Editar",
+        "variants": "Variantes",
+        "generateVariants": "Generar variantes",
+        "sendToTrash": "Enviar a papelera",
+        "restore": "Restaurar",
+        "archive": "Archivar"
+      },
+      "bulk": {
+        "trash": "Enviar selección a papelera",
+        "restore": "Restaurar selección",
+        "archive": "Archivar selección",
+        "report": "{success} procesados con éxito, {failed} con error"
+      },
+      "form": {
+        "createTitle": "Nuevo producto",
+        "editTitle": "Editar producto",
+        "name": "Nombre",
+        "slug": "Slug",
+        "shortDescription": "Descripción corta",
+        "longDescription": "Descripción larga",
+        "brand": "Marca",
+        "seoTitle": "SEO title",
+        "seoDescription": "SEO description",
+        "featured": "Producto destacado",
+        "status": "Estado",
+        "categories": "Categorías asociadas",
+        "primaryCategory": "Categoría principal",
+        "options": "Opciones",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      },
+      "formHelp": {
+        "slug": "Se genera automáticamente desde el nombre y no se edita manualmente.",
+        "categories": "Buscá y elegí al menos una categoría activa.",
+        "primaryCategory": "Elegí una categoría principal entre las categorías asociadas."
+      },
+      "options": {
+        "name": "Nombre de la opción",
+        "value": "Valor",
+        "addOption": "Agregar opción",
+        "addValue": "Agregar valor",
+        "removeOption": "Eliminar opción",
+        "removeValue": "Eliminar valor",
+        "moveUp": "Mover opción hacia arriba",
+        "moveDown": "Mover opción hacia abajo",
+        "moveValueUp": "Mover valor hacia arriba",
+        "moveValueDown": "Mover valor hacia abajo",
+        "empty": "Todavía no hay opciones. Agregá una si el producto varía por tamaño, color u otra característica.",
+        "locked": "Estas opciones ya se usan en variantes. Podés consultarlas, pero no cambiarlas desde este formulario."
+      },
+      "variants": {
+        "title": "Variantes",
+        "description": "SKU, precio, stock y disponibilidad viven en la variante, no en el producto.",
+        "sku": "SKU",
+        "priceCents": "Precio en centavos",
+        "compareAtPriceCents": "Precio anterior en centavos",
+        "stock": "Stock",
+        "active": "Activa",
+        "isDefault": "Predeterminada",
+        "displayOrder": "Orden",
+        "dimensions": "Peso y medidas",
+        "create": "Crear variante",
+        "update": "Actualizar variante",
+        "edit": "Editar",
+        "cancelEdit": "Cancelar edición",
+        "empty": "Todavía no hay variantes cargadas.",
+        "stockZeroLabel": "Stock 0",
+        "stockZeroWarning": "Stock 0: visible en admin, no vendible en tienda.",
+        "sellable": "Vendible",
+        "notSellable": "No vendible",
+        "weightGrams": "Peso en gramos",
+        "widthMm": "Ancho en milímetros",
+        "heightMm": "Alto en milímetros",
+        "lengthMm": "Largo en milímetros",
+        "trash": "Enviar variante a papelera",
+        "restore": "Restaurar variante",
+        "onlyTrash": "Variantes en papelera",
+        "loading": "Cargando variantes…",
+        "trashConfirm": "¿Enviar esta variante a papelera? Podrás restaurarla después.",
+        "restoreConfirm": "¿Restaurar esta variante?",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar"
+      },
+      "generation": {
+        "title": "Generar variantes",
+        "options": "Opciones para combinar",
+        "optionsHelp": "Elegí las características que querés combinar. Todas están seleccionadas inicialmente.",
+        "preview": "Previsualizar combinaciones",
+        "previewTitle": "Combinaciones a crear",
+        "duplicateTitle": "Duplicadas omitidas",
+        "skuPrefix": "Prefijo SKU",
+        "priceCents": "Precio base en centavos",
+        "stock": "Stock inicial",
+        "confirm": "Confirmar generación",
+        "cancel": "Cancelar",
+        "emptyPreview": "No hay combinaciones nuevas para crear.",
+        "confirmed": "Generación confirmada: {count} variantes creadas."
+      },
+      "warnings": {
+        "product_has_no_sellable_variants": "Producto activo sin variantes vendibles. No aparecerá en tienda.",
+        "product_category_required": "Asociá al menos una categoría activa.",
+        "product_primary_category_invalid": "La categoría principal debe estar asociada al producto."
+      },
+      "feedback": {
+        "loadError": "No pudimos cargar los productos. Intentá nuevamente.",
+        "loadCategoriesError": "No pudimos cargar las categorías disponibles. Intentá nuevamente.",
+        "saveError": "No pudimos guardar el producto. Intentá nuevamente.",
+        "product_slug_conflict": "Ya existe un producto con ese slug. Cambiá el nombre para generar uno distinto.",
+        "product_category_required": "Asociá al menos una categoría activa.",
+        "product_primary_category_invalid": "La categoría principal debe estar asociada al producto.",
+        "product_options_locked_by_variants": "No podés cambiar opciones cuando ya existen variantes.",
+        "variant_sku_conflict": "Ya existe una variante con ese SKU.",
+        "variant_combination_conflict": "Ya existe una variante con esa combinación.",
+        "variant_option_value_invalid": "Algún valor seleccionado no pertenece a este producto.",
+        "variant_option_value_duplicate": "La variante repite valores de una misma opción.",
+        "variant_compare_at_price_invalid": "El precio anterior debe ser mayor al precio actual.",
+        "record_not_found": "El producto ya no existe o no está disponible.",
+        "validation_error": "Revisá los campos marcados antes de continuar.",
+        "invalid_variant_numbers": "Ingresá números válidos, no negativos; precio, stock y orden deben ser enteros.",
+        "variant_in_trash": "Restaurá la variante antes de editarla."
+      },
+      "trashConfirm": {
+        "title": "Confirmar envío a papelera",
+        "description": "El producto saldrá del listado operativo por defecto.",
+        "confirm": "Enviar a papelera",
+        "cancel": "Cancelar"
+      },
+      "bulkConfirm": {
+        "title": "Confirmar acción masiva",
+        "description": "Vas a procesar {count} productos seleccionados.",
+        "confirm": "Confirmar",
         "cancel": "Cancelar"
       }
     }

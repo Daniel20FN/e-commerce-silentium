@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   DashboardOutlined,
+  Inventory2Outlined,
   Menu as MenuIcon,
   PeopleOutlined,
   StorefrontOutlined,
@@ -150,6 +151,7 @@ export function AdminShell({
     [ADMIN_ROUTE_SECTION.dashboard]: <DashboardOutlined />,
     [ADMIN_ROUTE_SECTION.users]: <PeopleOutlined />,
     [ADMIN_ROUTE_SECTION.categories]: <CategoryOutlined />,
+    [ADMIN_ROUTE_SECTION.products]: <Inventory2Outlined />,
   };
 
   const navigationItems: AdminNavigationItem[] = [

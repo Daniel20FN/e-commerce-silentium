@@ -77,4 +77,66 @@ describe("GET /api/auth/me", () => {
       message: "unexpected_auth_error",
     });
   });
+
+  it("clears stale Supabase cookies and returns 401 when the refresh token no longer exists", async () => {
+    mockCreateRouteHandlerSupabaseClient.mockImplementation(
+      (_request, response: NextResponse<unknown>) => {
+        response.cookies.set("sb-project-auth-token", "stale-token");
+        return { auth: {} } as never;
+      },
+    );
+    mockResolveCurrentUser.mockRejectedValue(
+      Object.assign(
+        new Error("Invalid Refresh Token: Refresh Token Not Found"),
+        { code: "refresh_token_not_found" },
+      ),
+    );
+    const request = new NextRequest("http://localhost/api/auth/me", {
+      headers: {
+        cookie: "sb-project-auth-token=stale-token; unrelated-cookie=keep-me",
+      },
+    });
+
+    const response = await GET(request);
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      type: "unauthorized",
+      message: "session_expired",
+    });
+    expect(response.cookies.get("sb-project-auth-token")?.value).toBe("");
+    expect(response.cookies.get("unrelated-cookie")).toBeUndefined();
+  });
+
+  it("recognizes a missing refresh token when only the Supabase error message survives", async () => {
+    mockCreateRouteHandlerSupabaseClient.mockReturnValue({ auth: {} });
+    mockResolveCurrentUser.mockRejectedValue(
+      new Error("Invalid Refresh Token: Refresh Token Not Found"),
+    );
+
+    const response = await GET(new NextRequest("http://localhost/api/auth/me"));
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      type: "unauthorized",
+      message: "session_expired",
+    });
+  });
+
+  it("returns 401 when no Supabase auth session exists", async () => {
+    mockCreateRouteHandlerSupabaseClient.mockReturnValue({ auth: {} });
+    mockResolveCurrentUser.mockRejectedValue(
+      Object.assign(new Error("Auth session missing!"), {
+        name: "AuthSessionMissingError",
+      }),
+    );
+
+    const response = await GET(new NextRequest("http://localhost/api/auth/me"));
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      type: "unauthorized",
+      message: "session_expired",
+    });
+  });
 });

@@ -1,5 +1,11 @@
 import { getClientCookie, setClientCookie } from "@/utils/cookies_helper";
-import { ReactNode, createContext, useContext, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 export type ThemeMode = "light" | "dark";
 
@@ -39,6 +45,11 @@ function getInitialTheme(): ThemeMode {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const hasHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
   const [themeMode, setThemeModeState] = useState<ThemeMode>(() =>
     getInitialTheme(),
   );
@@ -46,7 +57,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   return (
     <ThemeContext.Provider
       value={{
-        themeMode,
+        themeMode: hasHydrated ? themeMode : "light",
         setThemeMode: (mode) => {
           setClientCookie("theme", mode);
           setThemeModeState(mode);
@@ -57,3 +68,15 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     </ThemeContext.Provider>
   );
 };
+
+function subscribeToHydration(): () => void {
+  return () => {};
+}
+
+function getClientHydrationSnapshot(): boolean {
+  return true;
+}
+
+function getServerHydrationSnapshot(): boolean {
+  return false;
+}

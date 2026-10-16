@@ -59,6 +59,29 @@ function createSupabaseUser(overrides?: Partial<User>): User {
 }
 
 describe("POST /api/auth/login", () => {
+  it("does not misreport an Auth outage as invalid credentials", async () => {
+    mockCreateRouteHandlerSupabaseClient.mockReturnValue({
+      auth: {
+        signInWithPassword: jest.fn().mockResolvedValue({
+          data: { user: null },
+          error: { status: 502, message: "Bad gateway" },
+        }),
+      },
+    });
+    const response = await POST(
+      new NextRequest("http://localhost/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: "qa@example.com",
+          password: "test-password",
+        }),
+      }),
+    );
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({
+      message: "auth_service_unavailable",
+    });
+  });
   beforeEach(() => {
     jest.clearAllMocks();
   });
