@@ -185,6 +185,7 @@
 
 ## MUI And Styling Conventions
 
+- Keep `AppRouterCacheProvider` around the root providers in `src/app/layout.tsx`; it collects Emotion styles in the document head during App Router streaming and avoids hydration mismatches from style tags in the body.
 - The UI layer is MUI-first; prefer `@mui/material` primitives and `sx` props over ad hoc CSS.
 - Reuse theme values from `src/styles/mui_theme.ts` and context from `src/styles/theme_context.tsx`.
 - When styling interactive states, follow existing patterns using `alpha(...)`, palette tokens, and `sx` nesting.
