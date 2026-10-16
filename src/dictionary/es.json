@@ -163,7 +163,8 @@
       "resend_confirmation_rate_limited": "Ya enviamos un correo hace muy poco. Espera un minuto e inténtalo de nuevo.",
       "resend_confirmation_user_not_found": "No encontramos una cuenta pendiente para ese correo.",
       "email_already_confirmed": "Ese correo ya fue confirmado. Ya puedes iniciar sesión.",
-      "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez."
+      "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez.",
+      "auth_service_unavailable": "El servicio de acceso no está disponible. Intentá nuevamente en unos minutos."
     }
   },
   "admin": {

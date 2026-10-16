@@ -36,10 +36,28 @@ export async function POST(
   const supabaseResponse = NextResponse.json(null);
   supabaseResponse.headers.set("Cache-Control", "private, no-store");
   const supabase = createRouteHandlerSupabaseClient(request, supabaseResponse);
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: payload.data.email.trim().toLowerCase(),
-    password: payload.data.password,
-  });
+  let authResult: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>;
+  try {
+    authResult = await supabase.auth.signInWithPassword({
+      email: payload.data.email.trim().toLowerCase(),
+      password: payload.data.password,
+    });
+  } catch {
+    return createJsonResponse(
+      { type: "internal_server_error", message: "auth_service_unavailable" },
+      503,
+    );
+  }
+  const { data, error } = authResult;
+  if (
+    error &&
+    ((error.status ?? 0) >= 500 || error.name === "AuthRetryableFetchError")
+  ) {
+    return createJsonResponse(
+      { type: "internal_server_error", message: "auth_service_unavailable" },
+      503,
+    );
+  }
 
   if (error || !data.user) {
     const errorMessage = error?.message.toLowerCase() ?? "";

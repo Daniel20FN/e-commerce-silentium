@@ -20,22 +20,36 @@ interface SupabaseAuthReader {
 export async function resolveCurrentUser(
   supabase: SupabaseAuthReader,
 ): Promise<CurrentUserDto | null> {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      throw error;
+    }
+
+    if (!user) {
+      return null;
+    }
+
+    const businessUser = await syncAuthUser({
+      authUser: user,
+    });
+
+    return sanitizeCurrentUser(businessUser);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.name === "AuthSessionMissingError" ||
+        ("code" in error &&
+          (error.code === "refresh_token_not_found" ||
+            error.code === "refresh_token_already_used" ||
+            error.code === "session_not_found")))
+    ) {
+      return null;
+    }
+    throw error;
   }
-
-  if (!user) {
-    return null;
-  }
-
-  const businessUser = await syncAuthUser({
-    authUser: user,
-  });
-
-  return sanitizeCurrentUser(businessUser);
 }
