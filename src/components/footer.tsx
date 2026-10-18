@@ -14,13 +14,6 @@ import {
 } from "@mui/material";
 
 const footerLinks = {
-  productos: [
-    { label: "Sabanas", href: "#" },
-    { label: "Cobijas", href: "#" },
-    { label: "Edredones", href: "#" },
-    { label: "Cubrelechos", href: "#" },
-    { label: "Almohadas", href: "#" },
-  ],
   empresa: [
     { label: "Sobre Nosotros", href: "#" },
     { label: "Nuestra Historia", href: "#" },
@@ -46,7 +39,13 @@ export function Footer({
 }: {
   dictionary: Dictionary;
 }) {
-  void _dictionary;
+  const linksBySection = {
+    productos: [
+      { label: _dictionary.storefront.allProducts, href: "/productos" },
+      { label: _dictionary.storefront.allCategories, href: "/categorias" },
+    ],
+    ...footerLinks,
+  };
 
   return (
     <Box
@@ -121,7 +120,7 @@ export function Footer({
           </Box>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([title, links]) => (
+          {Object.entries(linksBySection).map(([title, links]) => (
             <Box key={title}>
               <Typography
                 variant="subtitle2"

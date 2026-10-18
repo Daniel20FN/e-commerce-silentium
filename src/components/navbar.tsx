@@ -14,18 +14,14 @@ import { CompanyValues } from "@/values/app_values";
 import {
   Close,
   DarkMode,
-  Favorite,
   LightMode,
   Menu as MenuIcon,
   PersonOutline,
-  Search,
-  ShoppingCart,
 } from "@mui/icons-material";
 import {
   alpha,
   AppBar,
   Avatar,
-  Badge,
   Box,
   Button,
   CircularProgress,
@@ -168,7 +164,10 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         >
           {CompanyValues.name}
         </Typography>
-        <IconButton onClick={handleDrawerToggle}>
+        <IconButton
+          onClick={handleDrawerToggle}
+          aria-label={dictionary.storefront.closeNavigation}
+        >
           <Close />
         </IconButton>
       </Box>
@@ -284,33 +283,11 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               <IconButton
-                sx={{
-                  color: "text.primary",
-                  display: { xs: "none", sm: "flex" },
-                }}
+                onClick={toggleTheme}
+                aria-label={dictionary.storefront.toggleTheme}
+                sx={{ color: "text.primary" }}
               >
-                <Search />
-              </IconButton>
-
-              <IconButton onClick={toggleTheme} sx={{ color: "text.primary" }}>
                 {themeMode === "dark" ? <LightMode /> : <DarkMode />}
-              </IconButton>
-
-              <IconButton
-                sx={{
-                  color: "text.primary",
-                  display: { xs: "none", sm: "flex" },
-                }}
-              >
-                <Badge badgeContent={2} color="error">
-                  <Favorite />
-                </Badge>
-              </IconButton>
-
-              <IconButton sx={{ color: "text.primary" }}>
-                <Badge badgeContent={3} color="error">
-                  <ShoppingCart />
-                </Badge>
               </IconButton>
 
               {hasResolvedCurrentUser ? (
@@ -413,6 +390,7 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
               <IconButton
                 sx={{ display: { md: "none" }, color: "text.primary" }}
                 onClick={handleDrawerToggle}
+                aria-label={dictionary.storefront.openNavigation}
               >
                 <MenuIcon />
               </IconButton>
