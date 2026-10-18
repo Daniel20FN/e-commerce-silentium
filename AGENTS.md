@@ -72,6 +72,7 @@
 - Run a single test file with `npm run test:file -- src/path/to/file.test.ts`.
 - React Testing Library and `@testing-library/jest-dom` are available for component tests.
 - Do not claim tests were run unless you actually executed the relevant Jest command.
+- Optional catalog media PostgreSQL integration checks: set `CATALOG_MEDIA_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/media/services/catalog_media_service.integration.test.ts`. They require `DATABASE_URL` explicitly in `.env.development`, create isolated QA metadata only (no Storage uploads), and soft-delete fixtures afterward. Normal test runs skip these network-dependent checks.
 
 ## Git Hooks
 

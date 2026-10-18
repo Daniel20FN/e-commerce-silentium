@@ -6,6 +6,7 @@ import type {
   AdminCategoryParentOptionDto,
   AdminCategoryParentOptionsApiResponse,
 } from "@/domains/admin/categories/types/api_responses";
+import { CatalogMediaDialog } from "@/domains/admin/media/components/catalog_media_dialog";
 import type {
   AdminProductDetailApiResponse,
   AdminProductMutationApiResponse,
@@ -237,6 +238,12 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
     useState<AdminProductDetailDto | null>(null);
   const [variantProduct, setVariantProduct] =
     useState<AdminProductDetailDto | null>(null);
+  const [mediaProduct, setMediaProduct] =
+    useState<AdminProductListItemDto | null>(null);
+  const [openingMedia, setOpeningMedia] = useState(false);
+  const [mediaVariants, setMediaVariants] = useState<AdminProductVariantDto[]>(
+    [],
+  );
   const [generationProduct, setGenerationProduct] =
     useState<AdminProductDetailDto | null>(null);
   const [bulkDialog, setBulkDialog] = useState<BulkDialogState | null>(null);
@@ -627,7 +634,7 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
     {
       field: "actions",
       headerName: dictionary.admin.products.table.columns.actions,
-      minWidth: 520,
+      minWidth: 650,
       sortable: false,
       renderCell: ({ row }: GridRenderCellParams<AdminProductListItemDto>) => (
         <Stack direction="row" spacing={1} sx={{ py: 1 }}>
@@ -651,6 +658,36 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
             onClick={() => void openVariantGeneration(row.id)}
           >
             {dictionary.admin.products.actions.generateVariants}
+          </Button>
+          <Button
+            size="small"
+            disabled={row.inTrash || openingMedia}
+            onClick={() => {
+              setOpeningMedia(true);
+              void (async () => {
+                try {
+                  const response = await cancellableApi.get<
+                    AdminProductVariantsListApiResponse,
+                    undefined
+                  >(
+                    "admin-media-variants-" + row.id,
+                    "/admin/products/" + row.id + "/variants",
+                  );
+                  if (response) {
+                    setMediaVariants(
+                      response.items.filter((variant) => !variant.inTrash),
+                    );
+                    setMediaProduct(row);
+                  }
+                } catch {
+                  setErrorMessage(dictionary.admin.media.errors.unexpected);
+                } finally {
+                  setOpeningMedia(false);
+                }
+              })();
+            }}
+          >
+            {dictionary.admin.media.action}
           </Button>
           <Button
             size="small"
@@ -1038,6 +1075,15 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
           onSubmit={(payload, productId) =>
             void submitProduct(payload, productId)
           }
+        />
+      ) : null}
+
+      {mediaProduct ? (
+        <CatalogMediaDialog
+          dictionary={dictionary}
+          product={mediaProduct}
+          variants={mediaVariants}
+          onClose={() => setMediaProduct(null)}
         />
       ) : null}
 

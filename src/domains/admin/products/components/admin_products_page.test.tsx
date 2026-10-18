@@ -105,6 +105,7 @@ jest.mock("notistack", () => ({
 
 const dictionary = {
   admin: {
+    media: spanish.admin.media,
     products: {
       title: "Productos",
       description: "Gestioná productos y variantes del catálogo.",

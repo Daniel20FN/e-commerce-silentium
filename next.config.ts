@@ -20,6 +20,14 @@ const nextConfig: NextConfig = {
   ],
   images: {
     remotePatterns: [
+      ...(process.env.NEXT_PUBLIC_SUPABASE_URL
+        ? [
+            new URL(
+              `/storage/v1/object/public/${process.env.SUPABASE_STORAGE_CATALOG_BUCKET ?? "catalog-public-images"}/**`,
+              process.env.NEXT_PUBLIC_SUPABASE_URL,
+            ),
+          ]
+        : []),
       {
         protocol: "https",
         hostname: "firebasestorage.googleapis.com",

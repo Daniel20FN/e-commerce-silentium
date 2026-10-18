@@ -3,7 +3,7 @@ import { Box, Fade, Paper, Typography, Zoom } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import * as React from "react";
 import { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, type FileRejection } from "react-dropzone";
 import { FilesViewer } from "../files-viewer/files_viewer";
 import { moveFileInList } from "./services/move_file_in_list";
 import { verifyPermitedFileTypesProp } from "./services/verify_allowed_file_types";
@@ -41,6 +41,8 @@ interface FilesUploaderProps {
   };
   maxFiles?: number;
   maxFileSize?: number;
+  acceptedMimeTypes?: readonly string[];
+  onFilesRejected?: (rejections: FileRejection[]) => void;
   setFilesToDelete: React.Dispatch<
     React.SetStateAction<
       {
@@ -107,6 +109,8 @@ export const FilesUploader = ({
   enableReorder = false,
   maxFiles,
   maxFileSize,
+  acceptedMimeTypes,
+  onFilesRejected,
   disabled,
   disableClick,
   onFilesChange,
@@ -131,7 +135,9 @@ export const FilesUploader = ({
         try {
           return {
             ...baseFile,
-            url: URL.createObjectURL(file.originalFile),
+            url: file.url?.startsWith("blob:")
+              ? file.url
+              : URL.createObjectURL(file.originalFile),
             originalFile: file.originalFile,
             fileName: file.originalFile.name,
             size: file.size,
@@ -225,7 +231,10 @@ export const FilesUploader = ({
   const isDisabled = disabled || allFalse;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: fileTypes,
+    accept: acceptedMimeTypes
+      ? Object.fromEntries(acceptedMimeTypes.map((type) => [type, []]))
+      : fileTypes,
+    onDropRejected: onFilesRejected,
     onDrop,
     noClick: disableClick,
     disabled: isDisabled,
