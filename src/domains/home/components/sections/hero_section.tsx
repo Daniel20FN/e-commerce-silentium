@@ -4,14 +4,13 @@ import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { CompanyValues } from "@/values/app_values";
 import { ArrowForward } from "@mui/icons-material";
 import { alpha, Box, Button, Container, Typography } from "@mui/material";
+import Link from "next/link";
 
 export function HeroSection({
   dictionary: _dictionary,
 }: {
   dictionary: Dictionary;
 }) {
-  void _dictionary;
-
   return (
     <Box
       sx={(theme) => ({
@@ -100,11 +99,13 @@ export function HeroSection({
               }}
             >
               <Button
+                component={Link}
+                href="/productos"
                 variant="contained"
                 size="large"
                 endIcon={<ArrowForward />}
               >
-                Ver Coleccion
+                {_dictionary.storefront.allProducts}
               </Button>
               <Button variant="outlined" size="large">
                 Conoce Nuestra Historia
@@ -248,32 +249,6 @@ export function HeroSection({
                     Sueños
                   </Typography>
                 </Box>
-              </Box>
-
-              {/* Floating Elements */}
-              <Box
-                sx={(theme) => ({
-                  position: "absolute",
-                  top: "10%",
-                  right: "-5%",
-                  px: 2,
-                  py: 1,
-                  backgroundColor: theme.palette.background.paper,
-                  borderRadius: 2,
-                  boxShadow: `0 4px 20px ${alpha(
-                    theme.palette.mode === "dark"
-                      ? theme.palette.background.paper
-                      : theme.palette.primary.main,
-                    0.1,
-                  )}`,
-                })}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 600, color: "info.main" }}
-                >
-                  -30% OFF
-                </Typography>
               </Box>
 
               <Box
