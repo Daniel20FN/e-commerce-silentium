@@ -199,11 +199,12 @@ export const FilesViewer = ({
                       className="action-buttons"
                       sx={{
                         position: "absolute",
-                        top: { xs: 4, sm: 8 },
+                        bottom: { xs: 4, sm: 8 },
                         right: { xs: 4, sm: 8 },
                         display: "flex",
                         gap: 0.5,
-                        opacity: 0,
+                        opacity: { xs: 1, sm: 0 },
+                        "@media (hover: none)": { opacity: 1 },
                         transition: "opacity 0.3s ease-in-out",
                       }}
                     >

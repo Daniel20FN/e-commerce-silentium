@@ -12,6 +12,36 @@ export class ApiService {
     return ApiService.instance;
   }
 
+  async uploadSignedFile(
+    signedUrl: string,
+    file: File,
+    cacheControl: string,
+  ): Promise<void> {
+    const allowed = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const url = new URL(signedUrl);
+    if (
+      !allowed ||
+      url.origin !== new URL(allowed).origin ||
+      !url.pathname.startsWith("/storage/v1/object/upload/sign/")
+    ) {
+      throw new Error("media_upload_failed");
+    }
+    const form = new FormData();
+    form.set("cacheControl", cacheControl);
+    form.set("", file);
+    const key =
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const response = await fetch(url.toString(), {
+      method: "PUT",
+      body: form,
+      credentials: "omit",
+      redirect: "error",
+      headers: { "x-upsert": "false", ...(key ? { apikey: key } : {}) },
+    });
+    if (!response.ok) throw new Error("media_upload_failed");
+  }
+
   /**
    * Método privado para centralizar las peticiones HTTP.
    *
@@ -37,10 +67,16 @@ export class ApiService {
           ? `${this.baseUrl}${endpoint}?params=${encodeURIComponent(JSON.stringify(params))}`
           : `${this.baseUrl}${endpoint}`;
 
+      const isFormData =
+        typeof FormData !== "undefined" && params instanceof FormData;
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        ...(method !== "GET" && params ? { body: JSON.stringify(params) } : {}),
+        ...(isFormData
+          ? {}
+          : { headers: { "Content-Type": "application/json" } }),
+        ...(method !== "GET" && params
+          ? { body: isFormData ? params : JSON.stringify(params) }
+          : {}),
         ...(signal ? { signal } : {}),
       });
 

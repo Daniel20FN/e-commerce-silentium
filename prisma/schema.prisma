@@ -166,6 +166,7 @@ model Product {
   categories       ProductCategory[]
   options          ProductOption[]
   variants         ProductVariant[]
+  images           CatalogImage[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
@@ -239,15 +240,47 @@ model ProductVariant {
   deletedAt            DateTime?
   product              Product                     @relation(fields: [productId], references: [id], onDelete: Cascade)
   optionValues         ProductVariantOptionValue[]
+  images               CatalogImage[]
   createdAt            DateTime                    @default(now())
   updatedAt            DateTime                    @updatedAt
 
   @@unique([productId, optionCombinationKey])
+  @@unique([id, productId])
   // PostgreSQL partial unique index `ProductVariant_one_default_per_product_idx`
   // is defined in migration SQL because Prisma cannot express partial unique indexes.
   @@index([productId, displayOrder])
   @@index([productId, deletedAt, isActive, stock])
   @@index([deletedAt, isActive])
+}
+
+enum CatalogImageStatus {
+  pending
+  ready
+  failed
+}
+
+model CatalogImage {
+  id             String             @id @default(cuid())
+  productId      String
+  variantId      String?
+  product        Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant        ProductVariant?    @relation(fields: [variantId, productId], references: [id, productId], onDelete: Cascade)
+  bucket         String
+  path           String
+  publicUrl      String
+  fileName       String
+  contentType    String
+  size           Int
+  altText        String             @default("")
+  position       Int                @default(0)
+  status         CatalogImageStatus @default(pending)
+  uploadRevision String?
+  deletedAt      DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@unique([bucket, path])
+  @@index([productId, variantId, status, deletedAt, position])
 }
 
 model ProductVariantOptionValue {

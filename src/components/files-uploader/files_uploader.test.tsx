@@ -41,6 +41,26 @@ const trads = {
 };
 
 describe("FilesUploader", () => {
+  it("reuses a selected file blob preview across controlled prop updates", () => {
+    const create = jest.fn().mockReturnValue("blob:unexpected");
+    URL.createObjectURL = create;
+    URL.revokeObjectURL = jest.fn();
+    const file: DocumentType = {
+      ...createFile("local", "local.png"),
+      url: "blob:selected",
+      originalFile: new File(["png"], "local.png", { type: "image/png" }),
+    };
+    const props = {
+      multiple: true,
+      initialFiles: [file],
+      setFilesToDelete: jest.fn(),
+      trads,
+    };
+    const { rerender } = render(<FilesUploader {...props} />);
+    rerender(<FilesUploader {...props} initialFiles={[{ ...file }]} />);
+    expect(create).not.toHaveBeenCalled();
+  });
+
   it("notifies parent with reordered files", async () => {
     const onFilesChange = jest.fn();
     const files = [
