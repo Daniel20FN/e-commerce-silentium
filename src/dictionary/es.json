@@ -1,4 +1,125 @@
 {
+  "landing": {
+    "skipLink": "Saltar al contenido",
+    "mainNavigation": "Navegación principal",
+    "helpLink": "Ayuda",
+    "sessionMenu": "Opciones de sesión",
+    "hero": {
+      "eyebrow": "Tu hogar, a tu manera",
+      "title": "Tu refugio,",
+      "accent": "cada noche.",
+      "description": "Ropa de cama para hacer tuyo el descanso.",
+      "explore": "Explorar productos",
+      "about": "Conoce Silentium",
+      "note": "Elige con calma. Compra con atención personal.",
+      "visualTitle": "Un espacio para descansar",
+      "visualNote": "Silentium",
+      "imageAlt": "Ambiente ilustrativo de dormitorio con textiles cálidos y cortina de luz"
+    },
+    "about": {
+      "eyebrow": "Nosotros",
+      "title": "Siéntete en casa.",
+      "description": "En Silentium reunimos opciones de ropa de cama para ayudarte a crear un espacio cómodo y personal. Aquí puedes explorar el catálogo a tu ritmo y elegir la combinación que va contigo.",
+      "closing": "Si necesitas orientación, conversemos. Revisamos contigo los productos y los detalles de tu compra antes de que decidas.",
+      "contact": "Conversemos",
+      "values": [
+        {
+          "title": "Tu combinación",
+          "body": "Consulta los tamaños y colores disponibles de cada producto."
+        },
+        {
+          "title": "Información clara",
+          "body": "Revisa fotos, precios en pesos colombianos y disponibilidad actual."
+        },
+        {
+          "title": "Atención personal",
+          "body": "Confirma los detalles de tu compra directamente por WhatsApp."
+        }
+      ]
+    },
+    "howTo": {
+      "eyebrow": "Así de sencillo",
+      "title": "Elige. Conversemos.",
+      "steps": [
+        {
+          "title": "Encuentra tu combinación",
+          "body": "Explora las colecciones y elige tamaño, color y cantidad en el detalle del producto."
+        },
+        {
+          "title": "Revisa tu carrito",
+          "body": "Consulta las fotos y el subtotal. Puedes cambiar cantidades o retirar productos sin iniciar sesión."
+        },
+        {
+          "title": "Hablemos por WhatsApp",
+          "body": "Abre el mensaje con tu selección y envíalo cuando quieras. Allí acordamos disponibilidad, envío y forma de pago."
+        }
+      ]
+    },
+    "help": {
+      "eyebrow": "A tu ritmo",
+      "title": "Lo que necesitas saber",
+      "description": "Abre la pregunta que te interese, sin salir de esta página.",
+      "items": [
+        {
+          "id": "comprar",
+          "title": "¿Cómo compro?",
+          "body": "Selecciona una variante disponible, añádela al carrito y elige Comprar por WhatsApp. Revisas el mensaje y tú decides cuándo enviarlo. Abrir el chat no confirma una compra ni reserva productos."
+        },
+        {
+          "id": "envios",
+          "title": "Envíos y entregas",
+          "body": "Escríbenos por WhatsApp con tu ciudad para consultar cobertura, costo y tiempo estimado de entrega. Confirmamos esas condiciones contigo antes de cerrar la compra. El subtotal del carrito no incluye envío."
+        },
+        {
+          "id": "pagos",
+          "title": "¿Cómo se realiza el pago?",
+          "body": "Por ahora no cobramos dentro de la web. La forma de pago y el importe final se acuerdan directamente con el negocio por WhatsApp antes de confirmar la compra."
+        },
+        {
+          "id": "cambios",
+          "title": "Cambios e incidencias",
+          "body": "Si necesitas ayuda con una compra, contáctanos por WhatsApp con la referencia del producto y una descripción de lo ocurrido para revisar tu caso. Evita compartir datos sensibles en el mensaje inicial."
+        },
+        {
+          "id": "disponibilidad",
+          "title": "¿El carrito reserva mis productos?",
+          "body": "No. El carrito consulta la disponibilidad actual, pero no reserva stock. Si cambia un precio o una cantidad disponible, te lo indicamos al revisar. La disponibilidad final se confirma por WhatsApp."
+        },
+        {
+          "id": "datos-navegador",
+          "title": "Tu carrito y tus preferencias",
+          "body": "El carrito guarda referencias y cantidades en este navegador, sin asociarse a una cuenta. Si usas un equipo compartido puedes vaciarlo. El sitio también recuerda tus preferencias de tema e idioma; si inicias sesión se utilizan cookies para mantenerla. Borrar los datos del navegador puede reiniciar el carrito y esas preferencias."
+        }
+      ]
+    },
+    "contact": {
+      "eyebrow": "Estamos a una conversación",
+      "title": "Hablemos de tu descanso.",
+      "description": "¿Dudas sobre tamaños, colores o cómo recibir tu compra? Escríbenos por WhatsApp y revisamos los detalles contigo.",
+      "cta": "Escribir por WhatsApp",
+      "phoneLabel": "También puedes llamarnos",
+      "message": "Hola, quisiera información sobre los productos de Silentium.",
+      "note": "Tú decides qué compartir y cuándo enviar el mensaje.",
+      "browse": "Volver a los productos"
+    },
+    "footer": {
+      "description": "Ropa de cama para crear un espacio a tu manera. Elige en el catálogo y conversemos por WhatsApp.",
+      "catalog": "Explora",
+      "company": "Silentium",
+      "help": "Tu compra",
+      "collections": "Colecciones",
+      "products": "Productos",
+      "about": "Nosotros",
+      "contact": "Contacto",
+      "howTo": "Cómo comprar",
+      "shipping": "Envíos y entregas",
+      "payments": "Formas de pago",
+      "support": "Cambios e incidencias",
+      "browserData": "Carrito y preferencias",
+      "copyright": "© {year} {brand}. Todos los derechos reservados."
+    },
+    "imageryNote": "Ambientes ilustrativos, no fotografías del catálogo."
+  },
   "cart": {
     "title": "Tu carrito",
     "navCount": "Carrito: {count} unidades",
@@ -59,7 +180,7 @@
     "toggleTheme": "Cambiar tema",
     "catalogTitle": "Nuestro catálogo",
     "catalogDescription": "Encuentra el descanso que va contigo. Explora nuestras colecciones y descubre cada detalle.",
-    "categoriesTitle": "Colecciones para tu descanso",
+    "categoriesTitle": "Encuentra tu combinación",
     "categoriesDescription": "Materiales, texturas y detalles pensados para tu hogar.",
     "featuredTitle": "Selección destacada",
     "featuredDescription": "Descubre los productos que hemos elegido para ti.",

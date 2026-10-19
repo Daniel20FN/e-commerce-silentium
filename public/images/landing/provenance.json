@@ -1,0 +1,13 @@
+{
+  "approvedConcept": "Refugio inmersivo",
+  "purpose": "Illustrative brand atmosphere only; not actual catalog product photography.",
+  "generator": "Built-in image_gen",
+  "files": [
+    {
+      "file": "refugio-marfil.webp",
+      "prompt": "Edit the reference website comp into a clean photographic hero background plate only. Preserve exactly its immersive room scene: billowing ivory curtain in the left foreground, midnight navy wall, plant and bedside table in the center, beautiful ivory bedding and pillows with taupe throw on the right, warm directional morning light and tactile textile depth. Remove ALL letters, logos, navigation, buttons, swatches and other UI. Remove the lower cream collections section entirely; extend the photographic room naturally to fill a wide landscape 16:9 frame. Leave the left curtain composition softly shaded with quiet space to place real semantic headline text later. Do not paint any replacement text. Photorealistic premium bedding campaign atmosphere, no new objects, no watermark. This image is illustrative brand atmosphere, not a catalog product claim.",
+      "bytes": 228656
+    }
+  ],
+  "implementation": "One static optimized hero atmosphere. Semantic copy and controls rendered separately. No atmosphere selector. Catalog records remain authoritative; WebP quality85."
+}

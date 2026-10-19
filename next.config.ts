@@ -53,6 +53,12 @@ const nextConfig: NextConfig = {
     "*": ["node_modules/canvas"],
   },
   turbopack: {},
+  async redirects() {
+    return [
+      { source: "/nosotros", destination: "/#nosotros", permanent: true },
+      { source: "/contacto", destination: "/#contacto", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

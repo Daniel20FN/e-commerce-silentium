@@ -6,7 +6,11 @@ import { useAtomValue } from "jotai";
 import Link from "next/link";
 import { cartReadyAtom, cartUnitsAtom } from "../states/cart_state";
 
-export function CartNav({ dictionary }: { dictionary: Dictionary }) {
+export function CartNav({
+  dictionary,
+}: {
+  dictionary: { cart: Pick<Dictionary["cart"], "title" | "navCount"> };
+}) {
   const ready = useAtomValue(cartReadyAtom);
   const units = useAtomValue(cartUnitsAtom);
   return (

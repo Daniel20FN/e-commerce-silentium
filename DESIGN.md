@@ -39,6 +39,13 @@ Design work in this repo should extend existing structure instead of inventing a
 
 ## Design Thesis
 
+### Approved public landing: Refugio inmersivo
+
+- The approved opening is an immersive photographic room: billowing pale curtain in the foreground, midnight navy wall and warm bedding. Keep the room as an optimized image plate, with semantic Montserrat heading and Quicksand copy/actions above it; never bake UI into the photograph.
+- Carry this world through warm editorial category imagery, actual product photography and COP pricing, a spacious buying guide, navy image-led brand story, native FAQ, warm contact close and navy footer. Do not invent categories to fill a mockup.
+- Landing styling is scoped to the homepage; catalog/admin retain their task-focused UI. Preserve light/dark themes, mobile navigation, same-page information anchors and guest cart to WhatsApp.
+- Motion has one finite photographic arrival, restrained feedback and bounded material depth while scrolling. Reduced motion shows the finished composition with no spatial animation. The hero uses one illustrative atmospheric image, not a photograph of a specific SKU; no ambient selector is displayed.
+
 ### Storefront
 
 The storefront should feel like a **premium bedding brand**: serene, spacious, tactile, and editorial. It should sell through confidence, comfort, and presentation rather than noisy urgency.
