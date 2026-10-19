@@ -24,7 +24,7 @@ export function CategoriesSection({
       sx={sectionAnchorSx}
     >
       <Container maxWidth="xl">
-        <div className={styles.sectionIntro}>
+        <div className={styles.sectionIntro} data-reveal="rise">
           <Typography component="h2" id="collections-title" variant="h3">
             {copy.categoriesTitle}
           </Typography>
@@ -32,11 +32,13 @@ export function CategoriesSection({
         </div>
         {categories.length ? (
           <div className={styles.categoryGrid}>
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <a
                 key={category.id}
                 href={`/categorias/${category.slug}`}
                 className={styles.category}
+                data-reveal="image"
+                data-reveal-delay={Math.min(index, 3) * 70}
               >
                 <CategoryEditorialImage
                   key={category.imageUrl ?? category.id}

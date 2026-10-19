@@ -404,3 +404,10 @@ That is the design center for **e-commerce-silentium**.
 - The scene may continue below the first viewport (940px minimum) rather than shrinking typography or hiding the bedding. No internal scroll or scroll hijacking.
 - Motion: one finite reveal, at most 3% curtain scroll travel through CSS view timeline; reduced motion disables animation. No new client JavaScript or video.
 - Responsive picture art direction loads one room image, not separate hidden desktop/mobile images. CSS curtain assets exist only in the phone media query. Illustrative atmosphere never replaces actual catalog photography.
+
+## Theme default and section motion
+
+- New visitors start in light mode, including when their operating system prefers dark. A valid explicit theme cookie still wins. Dark mode remains available.
+- Scroll entrances follow the observed Sage reference: brief opacity/vertical settling when a meaningful content group enters the viewport, once per mount. Photography settles slightly; purchase steps have a short capped stagger. The approved hero remains the focal scene.
+- One IntersectionObserver and native Web Animations, inside the existing LandingShell client boundary; no animation dependency or scroll listener. Only transform/opacity animate, with no layout shift.
+- Server-rendered content is always visible. Unsupported APIs and reduced motion leave the static page intact. Runtime preference changes cancel effects; hash targets and focused controls bypass motion.

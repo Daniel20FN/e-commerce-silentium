@@ -227,3 +227,7 @@
 
 - No dedicated `typecheck` script exists yet.
 - Lint config is split between `eslint.config.mjs` and an older `.eslintrc.json`; prefer the flat config as the active modern setup, but do not delete the legacy file unless the user asks.
+
+## Source Asset Safety
+
+- Keep PDF briefs binary in `.gitattributes` (`*.pdf binary`); with Windows `core.autocrlf=true`, text classification can corrupt source PDFs. Do not format or normalize source binary files.

@@ -1,13 +1,19 @@
 "use client";
 import { brandColors } from "@/styles/brand_colors";
 import { Box, useTheme } from "@mui/material";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
+import { observeLandingReveals } from "../services/landing_motion";
 import styles from "./landing.module.css";
 
 export function LandingShell({ children }: { children: ReactNode }) {
   const dark = useTheme().palette.mode === "dark";
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (root.current) return observeLandingReveals(root.current);
+  }, []);
   return (
     <Box
+      ref={root}
       className={styles.shell}
       sx={{
         "--landing-paper": dark ? brandColors.darkCanvas : brandColors.ivory,

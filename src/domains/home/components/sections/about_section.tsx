@@ -24,7 +24,7 @@ export function AboutSection({
     >
       <Container maxWidth="xl">
         <div className={styles.aboutLayout}>
-          <div className={styles.aboutMedia}>
+          <div className={styles.aboutMedia} data-reveal="image">
             <Image
               src={image?.url ?? "/images/landing/refugio-marfil.webp"}
               alt={image?.alt ?? dictionary.landing.hero.imageAlt}
@@ -32,7 +32,11 @@ export function AboutSection({
               sizes="(max-width: 899px) 90vw, 45vw"
             />
           </div>
-          <div className={styles.aboutCopy}>
+          <div
+            className={styles.aboutCopy}
+            data-reveal="rise"
+            data-reveal-delay={70}
+          >
             <Typography component="h2" id="about-title" variant="h3">
               {copy.title}
             </Typography>

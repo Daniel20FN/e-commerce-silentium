@@ -15,12 +15,21 @@ export function BenefitsSection({ dictionary }: { dictionary: Dictionary }) {
     >
       <Container maxWidth="xl">
         <div className={styles.howToLayout}>
-          <Typography component="h2" id="how-to-title" variant="h3">
+          <Typography
+            component="h2"
+            id="how-to-title"
+            variant="h3"
+            data-reveal="rise"
+          >
             {copy.title}
           </Typography>
           <ol>
-            {copy.steps.map((step) => (
-              <li key={step.title}>
+            {copy.steps.map((step, index) => (
+              <li
+                key={step.title}
+                data-reveal="row"
+                data-reveal-delay={index * 70}
+              >
                 <Typography component="h3">{step.title}</Typography>
                 <Typography>{step.body}</Typography>
               </li>

@@ -28,7 +28,7 @@ export function FeaturedProductsSection({
         bgcolor: "action.hover",
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" data-reveal="rise">
         <Stack spacing={3}>
           <Typography
             component="h2"

@@ -75,6 +75,11 @@
   object-fit: cover;
   object-position: center 58%;
 }
+.heroMedia picture {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
 .heroCurtain {
   display: none;
 }

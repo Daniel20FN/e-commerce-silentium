@@ -26,6 +26,7 @@ export function ContactSection({ dictionary }: { dictionary: Dictionary }) {
     >
       <Container maxWidth="md">
         <Stack
+          data-reveal="rise"
           spacing={3}
           sx={{
             alignItems: { xs: "stretch", sm: "center" },

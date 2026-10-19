@@ -17,7 +17,7 @@ export function HelpSection({ dictionary }: { dictionary: Dictionary }) {
     >
       <Container maxWidth="xl">
         <div className={styles.helpLayout}>
-          <div>
+          <div data-reveal="rise">
             <Typography component="h2" id="help-title" variant="h3">
               {copy.title}
             </Typography>
