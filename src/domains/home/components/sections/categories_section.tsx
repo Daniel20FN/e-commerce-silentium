@@ -1,7 +1,11 @@
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
-import { CategoryCards } from "@/domains/storefront/components/catalog_cards";
 import type { StorefrontCategory } from "@/domains/storefront/types/catalog";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import { Box, Container, Typography } from "@mui/material";
+import { sectionAnchorSx } from "../../services/landing_links";
+import { CategoryEditorialImage } from "../category_editorial_image";
+import styles from "../landing.module.css";
+
 export function CategoriesSection({
   dictionary,
   categories,
@@ -11,25 +15,51 @@ export function CategoriesSection({
 }) {
   const copy = dictionary.storefront;
   return (
-    <Box component="section" sx={{ py: { xs: 7, md: 10 } }}>
-      <Container maxWidth="lg">
-        <Stack spacing={3}>
-          <Typography
-            component="h2"
-            variant="h3"
-            sx={{ fontSize: { xs: "1.75rem", md: "2.5rem" } }}
-          >
+    <Box
+      component="section"
+      id="colecciones"
+      aria-labelledby="collections-title"
+      tabIndex={-1}
+      className={styles.collections}
+      sx={sectionAnchorSx}
+    >
+      <Container maxWidth="xl">
+        <div className={styles.sectionIntro} data-reveal="rise">
+          <Typography component="h2" id="collections-title" variant="h3">
             {copy.categoriesTitle}
           </Typography>
-          <Typography color="text.secondary">
-            {copy.categoriesDescription}
-          </Typography>
-          {categories.length ? (
-            <CategoryCards items={categories} dictionary={dictionary} />
-          ) : (
-            <Typography role="status">{copy.emptyCategories}</Typography>
-          )}
-        </Stack>
+          <Typography>{copy.categoriesDescription}</Typography>
+        </div>
+        {categories.length ? (
+          <div className={styles.categoryGrid}>
+            {categories.map((category, index) => (
+              <a
+                key={category.id}
+                href={`/categorias/${category.slug}`}
+                className={styles.category}
+                data-reveal="image"
+                data-reveal-delay={Math.min(index, 3) * 70}
+              >
+                <CategoryEditorialImage
+                  key={category.imageUrl ?? category.id}
+                  src={category.imageUrl}
+                  alt={category.name}
+                  fallbackAlt={dictionary.landing.hero.imageAlt}
+                  fallbackNote={dictionary.landing.imageryNote}
+                />
+                <div className={styles.categoryCopy}>
+                  <div>
+                    <Typography component="h3">{category.name}</Typography>
+                    <Typography>{copy.explore}</Typography>
+                  </div>
+                  <ArrowForward aria-hidden="true" />
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <Typography role="status">{copy.emptyCategories}</Typography>
+        )}
       </Container>
     </Box>
   );

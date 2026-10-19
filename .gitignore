@@ -24,6 +24,8 @@
 .DS_Store
 *.pem
 .atl/
+.impeccable/
+.taste-skill/
 
 # debug
 npm-debug.log*

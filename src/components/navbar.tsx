@@ -1,7 +1,9 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand_logo";
+import { brandColors } from "@/styles/brand_colors";
+
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
-import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { canAccessAdmin } from "@/domains/admin/services/admin_roles";
 import {
   currentUserAtom,
@@ -10,6 +12,8 @@ import {
 import type { LogoutApiParams } from "@/domains/auth/types/api_params";
 import type { LogoutApiResponse } from "@/domains/auth/types/api_responses";
 import { CartNav } from "@/domains/cart/components/cart_nav";
+import { landingHref } from "@/domains/home/services/landing_links";
+import type { PublicNavigationDictionary } from "@/domains/storefront/types/public_navigation";
 import { useThemeMode } from "@/styles/theme_context";
 import { CompanyValues } from "@/values/app_values";
 import {
@@ -39,11 +43,12 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useScrollTrigger,
   useTheme,
 } from "@mui/material";
 import { useAtomValue, useSetAtom } from "jotai";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
 import { useState } from "react";
 
@@ -54,9 +59,17 @@ interface NavItem {
   label: string;
 }
 
-export function Navbar({ dictionary }: { dictionary: Dictionary }) {
+export function Navbar({
+  dictionary,
+  immersive = false,
+}: {
+  dictionary: PublicNavigationDictionary;
+  immersive?: boolean;
+}) {
   const theme = useTheme();
+  const scrolled = useScrollTrigger({ disableHysteresis: true, threshold: 48 });
   const router = useRouter();
+  const pathname = usePathname() ?? "/";
   const { cancellableApi, isPending } = useCancellableApiContext();
   const { themeMode, setThemeMode } = useThemeMode();
   const currentUser = useAtomValue(currentUserAtom);
@@ -66,12 +79,30 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const navItems: NavItem[] = [
-    { label: dictionary.navigation.home, href: "/" },
-    { label: dictionary.navigation.products, href: "/productos" },
-    { label: dictionary.navigation.collections, href: "/colecciones" },
-    { label: dictionary.navigation.offers, href: "/ofertas" },
-    { label: dictionary.navigation.about, href: "/nosotros" },
-    { label: dictionary.navigation.contact, href: "/contacto" },
+    {
+      label: dictionary.navigation.home,
+      href: landingHref("inicio", pathname),
+    },
+    {
+      label: dictionary.navigation.products,
+      href: landingHref("productos", pathname),
+    },
+    {
+      label: dictionary.navigation.collections,
+      href: landingHref("colecciones", pathname),
+    },
+    {
+      label: dictionary.navigation.about,
+      href: landingHref("nosotros", pathname),
+    },
+    {
+      label: dictionary.landing.helpLink,
+      href: landingHref("ayuda", pathname),
+    },
+    {
+      label: dictionary.navigation.contact,
+      href: landingHref("contacto", pathname),
+    },
   ];
 
   const handleDrawerToggle = (): void => {
@@ -110,10 +141,11 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
   };
 
   const showAdminAccess = canAccessAdmin(currentUser);
+  const displayName = currentUser?.profile.firstName ?? currentUser?.email;
 
   const drawerAuthButtons = currentUser ? (
     <StackedDrawerAuth
-      accountLabel={dictionary.auth.navbar.account}
+      displayName={displayName ?? dictionary.auth.navbar.hello}
       adminHref={showAdminAccess ? "/admin" : undefined}
       adminLabel={
         showAdminAccess ? dictionary.admin.navigation.panel : undefined
@@ -149,7 +181,11 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
   );
 
   const drawer = (
-    <Box sx={{ width: 280, pt: 2 }}>
+    <Box
+      component="nav"
+      aria-label={dictionary.landing.mainNavigation}
+      sx={{ width: 280, pt: 2 }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -159,12 +195,9 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
           mb: 2,
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 700, color: "primary.main" }}
-        >
-          {CompanyValues.name}
-        </Typography>
+        <Box sx={{ color: "text.primary" }}>
+          <BrandLogo width={164} />
+        </Box>
         <IconButton
           onClick={handleDrawerToggle}
           aria-label={dictionary.storefront.closeNavigation}
@@ -179,6 +212,8 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
             <ListItemButton
               component={Link}
               href={item.href}
+              prefetch={false}
+              onClick={() => setMobileOpen(false)}
               sx={(theme) => ({
                 py: 1.5,
                 "&:hover": {
@@ -203,16 +238,73 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
     </Box>
   );
 
-  const displayName = currentUser?.profile.firstName ?? currentUser?.email;
-
   return (
     <>
+      <Box
+        component="a"
+        href="#contenido"
+        sx={{
+          position: "fixed",
+          top: 8,
+          left: 8,
+          zIndex: 1600,
+          transform: "translateY(-200%)",
+          p: 2,
+          bgcolor: "background.paper",
+          color: "text.primary",
+          borderRadius: 1,
+          "&:focus-visible": {
+            transform: "none",
+            outline: "2px solid",
+            outlineColor: "info.main",
+          },
+        }}
+      >
+        {dictionary.landing.skipLink}
+      </Box>
       <AppBar
         position="fixed"
+        style={
+          immersive
+            ? {
+                background: scrolled
+                  ? theme.palette.mode === "dark"
+                    ? brandColors.darkSurface
+                    : brandColors.brown
+                  : theme.palette.mode === "dark"
+                    ? "rgba(33,27,23,.6)"
+                    : "rgba(33,27,23,.45)",
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+              }
+            : undefined
+        }
         sx={{
           backgroundColor: alpha(theme.palette.background.paper, 0.95),
           backdropFilter: "blur(10px)",
           borderBottom: `1px solid ${theme.palette.divider}`,
+          ...(immersive
+            ? {
+                backgroundColor: scrolled
+                  ? theme.palette.mode === "dark"
+                    ? brandColors.darkSurface
+                    : brandColors.brown
+                  : theme.palette.mode === "dark"
+                    ? "rgba(33,27,23,.6)"
+                    : "rgba(33,27,23,.45)",
+                backdropFilter: "none",
+                WebkitBackdropFilter: "none",
+                borderBottom: 0,
+                boxShadow: "none",
+                transition: "background-color 220ms ease",
+                "& .MuiTypography-root, & .MuiButton-root, & .MuiIconButton-root":
+                  { color: brandColors.ivory },
+                "& .MuiToolbar-root": {
+                  flexWrap: "nowrap",
+                  justifyContent: "space-between",
+                },
+              }
+            : {}),
         }}
       >
         <Container maxWidth="lg">
@@ -220,45 +312,29 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
             <Typography
               variant="h5"
               component={Link}
-              href="/"
+              href={landingHref("inicio", pathname)}
+              aria-label={CompanyValues.name}
               sx={{
                 fontWeight: 700,
                 color: "primary.main",
                 textDecoration: "none",
-                mr: 4,
+                mr: { xs: 2, lg: 4 },
+                width: { xs: 128, sm: 148 },
+                flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
               }}
             >
-              <Box
-                sx={(theme) => ({
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  backgroundColor: theme.palette.info.main,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                })}
-              >
-                {CompanyValues.name.slice(0, 2).toUpperCase()}
-              </Box>
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "block" } }}
-              >
-                {CompanyValues.name}
-              </Box>
+              <BrandLogo width={148} />
             </Typography>
 
             <Box
+              component="nav"
+              aria-label={dictionary.landing.mainNavigation}
               sx={{
                 flexGrow: 1,
-                display: { xs: "none", md: "flex" },
+                display: { xs: "none", lg: "flex" },
                 gap: 1,
               }}
             >
@@ -267,10 +343,11 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                   key={item.label}
                   component={Link}
                   href={item.href}
+                  prefetch={false}
                   sx={(theme) => ({
                     color: "text.primary",
                     fontWeight: 500,
-                    px: 2,
+                    px: { md: 1, lg: 1.5 },
                     "&:hover": {
                       backgroundColor: alpha(theme.palette.info.main, 0.08),
                       color: theme.palette.info.main,
@@ -296,7 +373,7 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                 currentUser ? (
                   <Box
                     sx={{
-                      display: { xs: "none", md: "flex" },
+                      display: { xs: "none", lg: "flex" },
                       alignItems: "center",
                       gap: 1,
                       ml: 1,
@@ -315,9 +392,10 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                     >
                       {displayName}
                     </Typography>
-                    <Tooltip title={dictionary.auth.navbar.account}>
+                    <Tooltip title={dictionary.landing.sessionMenu}>
                       <IconButton
                         onClick={handleProfileClick}
+                        aria-label={dictionary.landing.sessionMenu}
                         size="small"
                         sx={(theme) => ({
                           border: `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
@@ -336,7 +414,7 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                             height: 32,
                             fontSize: 14,
                             bgcolor: theme.palette.info.main,
-                            color: "#fff",
+                            color: "info.contrastText",
                           })}
                         >
                           {(displayName ?? dictionary.auth.navbar.hello)
@@ -349,15 +427,15 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
                 ) : (
                   <Box
                     sx={{
-                      display: { xs: "none", md: "flex" },
+                      display: { xs: "none", lg: "flex" },
                       alignItems: "center",
                       ml: 0.5,
                     }}
                   >
-                    <Tooltip title={dictionary.auth.navbar.account}>
+                    <Tooltip title={dictionary.landing.sessionMenu}>
                       <IconButton
                         onClick={handleProfileClick}
-                        aria-label={dictionary.auth.navbar.account}
+                        aria-label={dictionary.landing.sessionMenu}
                         sx={(theme) => ({
                           color: "text.primary",
                           border: `1px solid ${alpha(
@@ -380,7 +458,7 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
               ) : (
                 <Box
                   sx={{
-                    display: { xs: "none", md: "flex" },
+                    display: { xs: "none", lg: "flex" },
                     alignItems: "center",
                     px: 2,
                   }}
@@ -390,7 +468,7 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
               )}
 
               <IconButton
-                sx={{ display: { md: "none" }, color: "text.primary" }}
+                sx={{ display: { lg: "none" }, color: "text.primary" }}
                 onClick={handleDrawerToggle}
                 aria-label={dictionary.storefront.openNavigation}
               >
@@ -417,30 +495,6 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
       >
         {currentUser
           ? [
-              <MenuItem
-                key="account"
-                component={Link}
-                href="/account"
-                onClick={handleProfileClose}
-              >
-                {dictionary.auth.navbar.account}
-              </MenuItem>,
-              <MenuItem
-                key="orders"
-                component={Link}
-                href="/account/orders"
-                onClick={handleProfileClose}
-              >
-                {dictionary.auth.navbar.orders}
-              </MenuItem>,
-              <MenuItem
-                key="wishlist"
-                component={Link}
-                href="/account/wishlist"
-                onClick={handleProfileClose}
-              >
-                {dictionary.auth.navbar.wishlist}
-              </MenuItem>,
               showAdminAccess ? (
                 <MenuItem
                   key="admin"
@@ -488,7 +542,7 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
         sx={{
-          display: { xs: "block", md: "none" },
+          display: { xs: "block", lg: "none" },
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
             width: 280,
@@ -498,13 +552,13 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
         {drawer}
       </Drawer>
 
-      <Toolbar sx={{ minHeight: { xs: 64, md: 72 } }} />
+      {!immersive ? <Toolbar sx={{ minHeight: { xs: 64, md: 72 } }} /> : null}
     </>
   );
 }
 
 interface StackedDrawerAuthProps {
-  accountLabel: string;
+  displayName: string;
   adminHref?: string;
   adminLabel?: string;
   logoutLabel: string;
@@ -513,7 +567,7 @@ interface StackedDrawerAuthProps {
 }
 
 function StackedDrawerAuth({
-  accountLabel,
+  displayName,
   adminHref,
   adminLabel,
   logoutLabel,
@@ -522,9 +576,9 @@ function StackedDrawerAuth({
 }: StackedDrawerAuthProps) {
   return (
     <Box sx={{ px: 2, display: "flex", flexDirection: "column", gap: 1 }}>
-      <Button component={Link} href="/account" variant="contained" fullWidth>
-        {accountLabel}
-      </Button>
+      <Typography variant="body2" sx={{ overflowWrap: "anywhere" }}>
+        {displayName}
+      </Typography>
       {adminHref && adminLabel ? (
         <Button component={Link} href={adminHref} variant="outlined" fullWidth>
           {adminLabel}

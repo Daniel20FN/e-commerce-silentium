@@ -8,8 +8,8 @@ jest.mock("next/image", () => ({ __esModule: true, default: () => null }));
 it("connects the hero to the real catalog without inventing a global discount", () => {
   render(<HeroSection dictionary={dictionary} />);
   expect(
-    screen.getByRole("link", { name: dictionary.storefront.allProducts }),
-  ).toHaveAttribute("href", "/productos");
+    screen.getByRole("link", { name: dictionary.landing.hero.explore }),
+  ).toHaveAttribute("href", "#productos");
   expect(screen.queryByText(/30% OFF/)).not.toBeInTheDocument();
 });
 it("renders explicit empty merchandising states rather than fictional catalog items", () => {
@@ -28,6 +28,9 @@ it("renders explicit empty merchandising states rather than fictional catalog it
   expect(
     screen.queryByText("Sabanas de Algodon Egipcio"),
   ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: dictionary.navigation.offers }),
+  ).toHaveAttribute("href", "/ofertas");
 });
 it("links a real featured product and exposes its actual COP price in the accessible name", () => {
   render(

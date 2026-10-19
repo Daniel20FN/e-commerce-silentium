@@ -29,10 +29,13 @@
 
 ## Design System Guidance
 
+- Impeccable/Taste local design state lives in ignored `.impeccable/` and `.taste-skill/`; shipping landing images belong in `public/images/landing/` with their provenance. Keep generated atmosphere distinct from real catalog product photographs. The approved immersive landing uses a scoped theme shell, semantic server content and small client islands; do not rasterize its copy or controls.
+
 - Read `DESIGN.md` before making UI, layout, or UX changes.
 - Treat `DESIGN.md` as the source of truth for visual hierarchy, layout rhythm, storefront vs admin behavior, and component intent.
 - If `AGENTS.md` and `DESIGN.md` ever seem to conflict, follow `AGENTS.md` for engineering and workflow constraints, and `DESIGN.md` for visual and UX direction.
 - Storefront UX is mobile-first: design and validate `xs` layouts before desktop because the public shopping experience is expected to be used primarily on mobile.
+- Public brand/help/contact information stays on the landing via stable anchors (`#nosotros`, `#ayuda`, `#contacto` and FAQ fragments). Do not create separate informational pages or dead navigation links. `/nosotros` and `/contacto` redirect to the landing sections; catalog/product/cart routes remain transactional. Keep the landing server-first, native disclosures and narrowly projected navigation dictionaries; no heavy interaction dependencies or unconfirmed commercial/legal claims.
 - Admin UX must remain fully usable on mobile, but desktop/tablet may be optimized for dense operational workflows.
 
 ## Workspace Safety
@@ -224,3 +227,7 @@
 
 - No dedicated `typecheck` script exists yet.
 - Lint config is split between `eslint.config.mjs` and an older `.eslintrc.json`; prefer the flat config as the active modern setup, but do not delete the legacy file unless the user asks.
+
+## Source Asset Safety
+
+- Keep PDF briefs binary in `.gitattributes` (`*.pdf binary`); with Windows `core.autocrlf=true`, text classification can corrupt source PDFs. Do not format or normalize source binary files.

@@ -2,7 +2,7 @@ import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { priceFormatter } from "@/utils/price_formatter";
 import type { CartContact, CartQuote } from "../types/api_params";
 
-export const SALES_WHATSAPP_PHONE = "573166218114";
+export { SALES_WHATSAPP_PHONE } from "@/values/sales_contact";
 export const MAX_WHATSAPP_URL_LENGTH = 7000;
 
 export function publicOrigin(value: string | undefined): string | null {

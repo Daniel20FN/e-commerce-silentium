@@ -39,6 +39,15 @@ Design work in this repo should extend existing structure instead of inventing a
 
 ## Design Thesis
 
+### Approved public landing: Refugio inmersivo
+
+- Official brief copy is part of the identity, not optional inspiration: hero H1 “Convertimos tu hogar en un reflejo de quién eres.” and supporting hero paragraph “No vendemos productos, creamos experiencias que transforman espacios.” Keep them dictionary-driven and preserve the original “para mi hogar” vector signature.
+
+- The approved opening is an immersive photographic room: billowing pale curtain in the foreground, midnight navy wall and warm bedding. Keep the room as an optimized image plate, with semantic Cormorant Garamond headings and Manrope copy/actions above it; never bake UI into the photograph.
+- Carry this world through warm editorial category imagery, actual product photography and COP pricing, a spacious buying guide, celeste/blue image-led brand story, native FAQ, warm contact close and theme-aware blue/chocolate footer. Do not invent categories to fill a mockup.
+- Landing styling is scoped to the homepage; catalog/admin retain their task-focused UI. Preserve light/dark themes, mobile navigation, same-page information anchors and guest cart to WhatsApp.
+- Motion has one finite photographic arrival, restrained feedback and bounded material depth while scrolling. Reduced motion shows the finished composition with no spatial animation. The hero uses one illustrative atmospheric image, not a photograph of a specific SKU; no ambient selector is displayed.
+
 ### Storefront
 
 The storefront should feel like a **premium bedding brand**: serene, spacious, tactile, and editorial. It should sell through confidence, comfort, and presentation rather than noisy urgency.
@@ -188,9 +197,21 @@ Typography should communicate hierarchy more than personality.
 
 ---
 
-## Color Roles, Not Locked Brand Colors
+## Official Brand Identity
 
-Do not anchor UI work around fixed hex values in this project. Use semantic roles instead:
+- Source of truth: `docs/BRIEF.pdf`. Preserve its original wordmark, crescent/stars and handwritten tagline as vector artwork, never recreate them with a substitute font.
+- Official primitives: ivory `#FEFAF9`, beige `#CFB59E`, celeste `#BAD9EB`, chocolate `#6E4E37`. Map them through `src/styles/brand_colors.ts`, not independent component palettes.
+- Light: ivory canvas, warm secondary surfaces, chocolate ink/actions, celeste story/action fields. Beige is not a sufficient background for ordinary chocolate body text; use derived lighter surfaces or darker ink.
+- Dark: brown remains principal: canvas `#211B17`, panels/header `#302720`, ivory text. Official celeste `#BAD9EB` breaks monotony through primary actions, one full brand-story field (with chocolate ink), active FAQ text and the footer signature. Footer returns to deep brown. User clarified that more blue meant celeste accents on a brown base, NOT blue as the main canvas. Keep this balance; do not replace the warm dark identity wholesale.
+- Approved free web alternatives: self-hosted Cormorant Garamond for display, Manrope for body/UI (including Spanish). Original Catchye/Nudista font files are unavailable. Keep the original handwritten tagline in the vector signature; no third font is loaded.
+- Variable WOFF2 assets include weights 400–700, Latin/Spanish and punctuation; keep the OFL notices in `src/styles/fonts/`. No runtime font CDN calls.
+- `BrandLogo` uses the exact PDF outlines as a current-color mask, with fixed aspect ratio and an accessible brand label. Wordmark in navbar/mobile drawer, signature in footer, original isotype in app icons/favicon. Brand mark is not a heading.
+- Admin keeps compact Manrope headings and existing operational layouts; global palette/fonts change without importing landing composition.
+- Preserve the approved room photograph, layout, anchors, reduced-motion behavior and guest cart/WhatsApp flow. Photographic wall colors are not UI palette tokens.
+
+## Semantic Color Roles
+
+Map the official palette to semantic roles:
 
 - **Canvas**: main page background
 - **Elevated Surface**: cards, drawers, app bars, panels
@@ -374,3 +395,19 @@ If an agent needs the fastest mental model, use this blend:
 - **Admin shell and operational surfaces** = Linear
 
 That is the design center for **e-commerce-silentium**.
+
+## Approved mobile extension: Entre telas
+
+- Below 600px, use the approved portrait bedroom and separate real-alpha sheer curtain; keep Refugio inmersivo unchanged on tablet/desktop.
+- The exact official slogan remains the sole semantic h1, with the brand statement below it. The approved three-line mobile display is a deliberate exception to generic two-line headline guidance.
+- Reading area stays upper-left; curtain is offset 24px right to protect small-screen text contrast. Celeste primary CTA precedes the quiet about link. Both remain above the fold at 320x568.
+- The scene may continue below the first viewport (940px minimum) rather than shrinking typography or hiding the bedding. No internal scroll or scroll hijacking.
+- Motion: one finite reveal, at most 3% curtain scroll travel through CSS view timeline; reduced motion disables animation. No new client JavaScript or video.
+- Responsive picture art direction loads one room image, not separate hidden desktop/mobile images. CSS curtain assets exist only in the phone media query. Illustrative atmosphere never replaces actual catalog photography.
+
+## Theme default and section motion
+
+- New visitors start in light mode, including when their operating system prefers dark. A valid explicit theme cookie still wins. Dark mode remains available.
+- Scroll entrances follow the observed Sage reference: brief opacity/vertical settling when a meaningful content group enters the viewport, once per mount. Photography settles slightly; purchase steps have a short capped stagger. The approved hero remains the focal scene.
+- One IntersectionObserver and native Web Animations, inside the existing LandingShell client boundary; no animation dependency or scroll listener. Only transform/opacity animate, with no layout shift.
+- Server-rendered content is always visible. Unsupported APIs and reduced motion leave the static page intact. Runtime preference changes cancel effects; hash targets and focused controls bypass motion.

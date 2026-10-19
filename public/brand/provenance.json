@@ -1,0 +1,17 @@
+{
+  "source": "docs/BRIEF.pdf",
+  "page": 3,
+  "sha256": "ca35146079960199fcd535ce30764e81eb5a6f6ff4494981660c4cdd0524329d",
+  "method": "Original PDF vector paths and text outlines; removed page background, cropped, single brand-color recolor. No recreated lettering.",
+  "assets": [
+    "wordmark.svg",
+    "signature.svg",
+    "isotype.svg"
+  ],
+  "palette": [
+    "#FEFAF9",
+    "#CFB59E",
+    "#BAD9EB",
+    "#6E4E37"
+  ]
+}

@@ -1,4 +1,4 @@
-import { act } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { ThemeProvider, useThemeMode } from "./theme_context";
@@ -9,8 +9,46 @@ function ThemeProbe() {
 }
 
 describe("ThemeProvider hydration", () => {
+  beforeEach(() => {
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      writable: true,
+      value: jest.fn(),
+    });
+  });
   afterEach(() => {
     document.cookie = "theme=; max-age=0; path=/";
+    jest.restoreAllMocks();
+  });
+
+  it("defaults to light even when the operating system prefers dark", () => {
+    const preference = jest.spyOn(window, "matchMedia").mockReturnValue({
+      matches: true,
+      media: "(prefers-color-scheme: dark)",
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    });
+    render(
+      <ThemeProvider>
+        <ThemeProbe />
+      </ThemeProvider>,
+    );
+    expect(screen.getByRole("button")).toHaveTextContent("light");
+    expect(preference).not.toHaveBeenCalled();
+  });
+
+  it("defaults to light for an invalid saved choice", () => {
+    document.cookie = "theme=invalid; path=/";
+    render(
+      <ThemeProvider>
+        <ThemeProbe />
+      </ThemeProvider>,
+    );
+    expect(screen.getByRole("button")).toHaveTextContent("light");
   });
 
   it("uses the server snapshot first, then restores the saved theme without hydration errors", async () => {

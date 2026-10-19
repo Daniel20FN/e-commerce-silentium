@@ -4,12 +4,13 @@ import type {
   StorefrontCategory,
   StorefrontProductCard,
 } from "@/domains/storefront/types/catalog";
-import { Box } from "@mui/material";
+import { Box, GlobalStyles } from "@mui/material";
+import { AboutSection } from "./sections/about_section";
 import { BenefitsSection } from "./sections/benefits_sections";
 import { CategoriesSection } from "./sections/categories_section";
+import { ContactSection } from "./sections/contact_section";
+import { HelpSection } from "./sections/help_section";
 import { HeroSection } from "./sections/hero_section";
-import { NewsletterSection } from "./sections/newsletter_section";
-import { TestimonialsSection } from "./sections/testimonial_section";
 
 export function HomePage({
   dictionary,
@@ -21,13 +22,24 @@ export function HomePage({
   products: StorefrontProductCard[];
 }) {
   return (
-    <Box>
+    <Box component="main" id="contenido" tabIndex={-1}>
+      <GlobalStyles
+        styles={{
+          html: {
+            scrollBehavior: "smooth",
+            "@media (prefers-reduced-motion: reduce)": {
+              scrollBehavior: "auto",
+            },
+          },
+        }}
+      />
       <HeroSection dictionary={dictionary} />
       <CategoriesSection dictionary={dictionary} categories={categories} />
       <FeaturedProductsSection dictionary={dictionary} products={products} />
       <BenefitsSection dictionary={dictionary} />
-      <TestimonialsSection dictionary={dictionary} />
-      <NewsletterSection dictionary={dictionary} />
+      <AboutSection dictionary={dictionary} image={products[0]?.image} />
+      <HelpSection dictionary={dictionary} />
+      <ContactSection dictionary={dictionary} />
     </Box>
   );
 }

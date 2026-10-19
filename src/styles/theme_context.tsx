@@ -34,11 +34,6 @@ function getInitialTheme(): ThemeMode {
     if (cookieTheme === "light" || cookieTheme === "dark") {
       return cookieTheme;
     }
-
-    // Detectar preferencia del sistema
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
   }
 
   return "light";

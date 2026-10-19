@@ -171,7 +171,17 @@ export function AdminShell({
   const displayName = currentUser.profile.firstName ?? currentUser.email;
 
   return (
-    <Box sx={{ display: "flex", height: "100dvh", overflow: "hidden" }}>
+    <Box
+      sx={{
+        display: "flex",
+        height: "100dvh",
+        overflow: "hidden",
+        "& .MuiTypography-h1, & .MuiTypography-h2, & .MuiTypography-h3, & .MuiTypography-h4, & .MuiTypography-h5, & .MuiTypography-h6":
+          {
+            fontFamily: theme.typography.fontFamily,
+          },
+      }}
+    >
       <AppBar
         open={open}
         position="fixed"
@@ -189,7 +199,7 @@ export function AdminShell({
             </Typography>
           </Box>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <Avatar sx={{ bgcolor: "info.main", color: "#fff" }}>
+            <Avatar sx={{ bgcolor: "info.main", color: "info.contrastText" }}>
               {displayName.slice(0, 1).toUpperCase()}
             </Avatar>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
