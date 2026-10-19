@@ -182,13 +182,7 @@ export function Footer({
                 gap: 1,
               }}
             >
-              Pago seguro con
-              <Box
-                component="span"
-                sx={{ fontWeight: 600, color: "text.primary" }}
-              >
-                PSE • Visa • Mastercard
-              </Box>
+              {_dictionary.cart.salesChannel}
             </Typography>
           </Box>
         </Box>

@@ -1,5 +1,7 @@
 # PRD 00 — Roadmap del sistema de catálogo y administración
 
+> Ciclo de catálogo completado (PRD 01–05). La continuación se define en el [roadmap de compra](00-roadmap-compra.md), empezando por el [PRD 06 — Carrito](06-prd-carrito.md).
+
 ## Propósito
 
 Este documento define el orden oficial de implementación para el sistema de categorías, productos, variantes, imágenes, storefront y costos de producción. Cada PRD posterior entrega una fase funcional completa y usable, evitando construir piezas aisladas sin valor operativo.

@@ -9,6 +9,7 @@ import {
 } from "@/domains/auth/states/current_user_atom";
 import type { LogoutApiParams } from "@/domains/auth/types/api_params";
 import type { LogoutApiResponse } from "@/domains/auth/types/api_responses";
+import { CartNav } from "@/domains/cart/components/cart_nav";
 import { useThemeMode } from "@/styles/theme_context";
 import { CompanyValues } from "@/values/app_values";
 import {
@@ -282,6 +283,7 @@ export function Navbar({ dictionary }: { dictionary: Dictionary }) {
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <CartNav dictionary={dictionary} />
               <IconButton
                 onClick={toggleTheme}
                 aria-label={dictionary.storefront.toggleTheme}

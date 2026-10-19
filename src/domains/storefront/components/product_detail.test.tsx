@@ -98,7 +98,7 @@ async function choose(label: string, value: string): Promise<void> {
 }
 
 describe("public product variant selection", () => {
-  it("renders the initial variant in COP with general fallback, not a purchase action", () => {
+  it("renders the initial variant in COP with general fallback and a cart action", () => {
     render(<ProductDetail product={product} dictionary={dictionary} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Bedding QA",
@@ -111,8 +111,8 @@ describe("public product variant selection", () => {
     expect(screen.getByRole("img", { name: general.alt })).toBeInTheDocument();
     expect(screen.getByText(copy.productGallery)).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /carrito|comprar/i }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: dictionary.cart.add }),
+    ).toBeInTheDocument();
   });
   it("changes price, stock, SKU and own gallery immediately for an exact selection", async () => {
     render(<ProductDetail product={product} dictionary={dictionary} />);
