@@ -53,6 +53,7 @@
 - Run development migration: `npm run prisma:migrate:dev:development`
 - Run production migration deploy: `npm run prisma:migrate:deploy:production`
 - Seed database: `npm run db:seed`
+- Cart product links use optional server-side `APP_PUBLIC_URL` (public HTTPS origin). Until a domain is defined, leave it unset: WhatsApp messages include SKU/public photos but omit product URLs, never localhost. See `docs/cart-whatsapp.md`; no WhatsApp API credentials are needed.
 
 ## Lint, Format, And Validation
 
@@ -75,6 +76,7 @@
 - Optional catalog media PostgreSQL integration checks: set `CATALOG_MEDIA_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/media/services/catalog_media_service.integration.test.ts`. They require `DATABASE_URL` explicitly in `.env.development`, create isolated QA metadata only (no Storage uploads), and soft-delete fixtures afterward. Normal test runs skip these network-dependent checks.
 - Optional public storefront PostgreSQL integration checks: set `STOREFRONT_INTEGRATION=1` and run `npm run test:file -- src/domains/storefront/services/catalog_service.integration.test.ts`. They require `DATABASE_URL` explicitly in `.env.development`, create isolated category/product/variant/image metadata only, and soft-delete fixtures afterward. Normal runs skip these checks.
 - Optional private costs PostgreSQL integration checks: set `CATALOG_COSTS_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/costs/services/cost_service.integration.test.ts`. They require `DATABASE_URL` explicitly in `.env.development`, create isolated draft products/variants/costs and soft-delete fixtures afterward. They verify per-unit calculations, recovery, composite ownership constraints, concurrent revision conflicts and anonymous SQL denial; no Storage operations. Run Prisma generation/build only after Jest exits on Windows to avoid locking the Prisma engine DLL.
+- Optional cart PostgreSQL integration checks: set `CART_INTEGRATION=1` and run `npm run test:file -- src/domains/cart/services/cart_service.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL`; creates isolated QA catalog/image/cost metadata, soft-retires fixtures, and never uploads Storage files or consumes stock. Verifies current prices, stock changes, public eligibility/image fallback and cost privacy. Stop Jest/Next before Prisma generation/build on Windows.
 
 ## Git Hooks
 

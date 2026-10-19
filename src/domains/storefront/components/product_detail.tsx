@@ -1,6 +1,7 @@
 "use client";
 
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { AddToCart } from "@/domains/cart/components/add_to_cart";
 import {
   Alert,
   Box,
@@ -260,6 +261,11 @@ export function ProductDetail({
               </Button>
             </Stack>
           ) : null}
+          <AddToCart
+            key={variant?.id ?? "unresolved"}
+            variant={variant}
+            dictionary={dictionary}
+          />
           <Divider />
           <Typography component="h2" variant="h6">
             {copy.description}

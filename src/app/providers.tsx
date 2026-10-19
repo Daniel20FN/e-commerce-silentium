@@ -4,6 +4,7 @@ import { CustomDialogProvider } from "@/components/dialog/dialog_context";
 import { CancellableApiProvider } from "@/context/use_cancellable_api_context";
 import { LanguageProvider } from "@/dictionary/context/language_context";
 import { AuthSessionBootstrap } from "@/domains/auth/components/auth_session_bootstrap";
+import { CartBootstrap } from "@/domains/cart/components/cart_bootstrap";
 import CustomThemeProvider from "@/styles/custom_theme_provider";
 import { ThemeProvider } from "@/styles/theme_context";
 import { CssBaseline } from "@mui/material";
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: ReactNode }) {
                   <CancellableApiProvider options={{ autoCleanup: true }}>
                     <CssBaseline />
                     <AuthSessionBootstrap />
+                    <CartBootstrap />
                     {children}
                   </CancellableApiProvider>
                 </SnackbarProvider>

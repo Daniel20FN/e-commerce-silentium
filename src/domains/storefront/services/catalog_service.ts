@@ -193,7 +193,7 @@ function productCard(product: CardRecord): StorefrontProductCard | null {
   };
 }
 
-function publicProductWhere(
+export function publicProductWhere(
   categories: StorefrontCategory[],
 ): Prisma.ProductWhereInput {
   return {
