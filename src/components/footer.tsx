@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/brand_logo";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { CompanyValues } from "@/values/app_values";
 import {
@@ -59,6 +60,7 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
             sx={{ gridColumn: { xs: "1 / -1", md: "auto" }, minWidth: 0 }}
           >
             <Link
+              aria-label={CompanyValues.name}
               href="/#inicio"
               underline="none"
               color="text.primary"
@@ -68,7 +70,7 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
                 alignSelf: "flex-start",
               }}
             >
-              {CompanyValues.name}
+              <BrandLogo variant="signature" width={244} />
             </Link>
             <Typography
               variant="body2"

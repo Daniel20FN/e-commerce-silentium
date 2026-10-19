@@ -7,7 +7,44 @@
       "file": "refugio-marfil.webp",
       "prompt": "Edit the reference website comp into a clean photographic hero background plate only. Preserve exactly its immersive room scene: billowing ivory curtain in the left foreground, midnight navy wall, plant and bedside table in the center, beautiful ivory bedding and pillows with taupe throw on the right, warm directional morning light and tactile textile depth. Remove ALL letters, logos, navigation, buttons, swatches and other UI. Remove the lower cream collections section entirely; extend the photographic room naturally to fill a wide landscape 16:9 frame. Leave the left curtain composition softly shaded with quiet space to place real semantic headline text later. Do not paint any replacement text. Photorealistic premium bedding campaign atmosphere, no new objects, no watermark. This image is illustrative brand atmosphere, not a catalog product claim.",
       "bytes": 228656
+    },
+    {
+      "file": "entre-telas-room-480.webp",
+      "width": 480,
+      "height": 853,
+      "bytes": 69654,
+      "hasAlpha": false,
+      "source": "exec-ad20b3fd-f9fe-4963-8068-b5f29bd3430a.png",
+      "prompt": "From the approved Entre telas portrait mockup, remove all UI, lettering and foreground curtain; reconstruct the clean warm brown sunlit bedroom with ivory bedding and celeste throw. Preserve upper-left reading space. Illustrative atmosphere, not a catalog product."
+    },
+    {
+      "file": "entre-telas-room-800.webp",
+      "width": 800,
+      "height": 1421,
+      "bytes": 157398,
+      "hasAlpha": false,
+      "source": "exec-ad20b3fd-f9fe-4963-8068-b5f29bd3430a.png",
+      "prompt": "From the approved Entre telas portrait mockup, remove all UI, lettering and foreground curtain; reconstruct the clean warm brown sunlit bedroom with ivory bedding and celeste throw. Preserve upper-left reading space. Illustrative atmosphere, not a catalog product."
+    },
+    {
+      "file": "entre-telas-curtain-480.webp",
+      "width": 480,
+      "height": 852,
+      "bytes": 17546,
+      "hasAlpha": true,
+      "source": "exec-a9d304fd-2814-45f7-b8f8-ed6f87eac7f8.png",
+      "prompt": "Extract the ivory sheer foreground curtain from the approved portrait concept onto a genuinely transparent, aligned portrait canvas; preserve folds, warm light and lower-right sweeping fabric. No room, text or UI."
+    },
+    {
+      "file": "entre-telas-curtain-800.webp",
+      "width": 800,
+      "height": 1421,
+      "bytes": 38882,
+      "hasAlpha": true,
+      "source": "exec-a9d304fd-2814-45f7-b8f8-ed6f87eac7f8.png",
+      "prompt": "Extract the ivory sheer foreground curtain from the approved portrait concept onto a genuinely transparent, aligned portrait canvas; preserve folds, warm light and lower-right sweeping fabric. No room, text or UI."
     }
   ],
-  "implementation": "One static optimized hero atmosphere. Semantic copy and controls rendered separately. No atmosphere selector. Catalog records remain authoritative; WebP quality85."
+  "implementation": "Desktop atmosphere unchanged. Phone-only portrait room selected through picture (480/800w); eager/high fetch priority without an unconditional desktop preload. Transparent curtain CSS image-set only below 600px. Combined room/curtain: 87,200 bytes at 1x, 196,280 bytes at 2x. Real semantic text and links; no selector, video, scroll listeners or product-image substitution. WebP room quality82; curtain quality80/alpha90. Motion is finite arrival and bounded CSS scroll depth, disabled for reduced motion.",
+  "mobileConcept": "Entre telas (approved portrait extension; desktop preserved)"
 }

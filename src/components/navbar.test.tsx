@@ -4,7 +4,7 @@ import {
   hasResolvedCurrentUserAtom,
 } from "@/domains/auth/states/current_user_atom";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
-import { lightTheme } from "@/styles/mui_theme";
+import { darkTheme, lightTheme } from "@/styles/mui_theme";
 import { createTheme, ThemeProvider } from "@mui/material";
 import {
   fireEvent,
@@ -53,32 +53,38 @@ describe("public landing navigation", () => {
     mockPathname.mockReturnValue("/");
     mockPost.mockResolvedValue({ redirectTo: "/" });
   });
-  it("overrides the theme inline AppBar style and becomes opaque after scrolling in immersive mode", () => {
-    Object.defineProperty(window, "pageYOffset", {
-      configurable: true,
-      value: 0,
-    });
-    const { container } = render(
-      <Provider store={setup()}>
-        <ThemeProvider theme={createTheme(lightTheme)}>
-          <Navbar dictionary={dictionary} immersive />
-        </ThemeProvider>
-      </Provider>,
-    );
-    const header = container.querySelector("header");
-    expect(header?.style.backdropFilter).toBe("none");
-    expect(container.querySelectorAll(".MuiToolbar-root")).toHaveLength(1);
-    Object.defineProperty(window, "pageYOffset", {
-      configurable: true,
-      value: 120,
-    });
-    fireEvent.scroll(window);
-    expect(header).toHaveStyle({ backgroundColor: "rgb(0, 30, 59)" });
-    Object.defineProperty(window, "pageYOffset", {
-      configurable: true,
-      value: 0,
-    });
-  });
+  it.each([
+    { options: lightTheme, expected: "rgb(110, 78, 55)" },
+    { options: darkTheme, expected: "rgb(48, 39, 32)" },
+  ])(
+    "overrides inline AppBar styles with the $options.palette.mode brand surface after scrolling",
+    ({ options, expected }) => {
+      Object.defineProperty(window, "pageYOffset", {
+        configurable: true,
+        value: 0,
+      });
+      const { container } = render(
+        <Provider store={setup()}>
+          <ThemeProvider theme={createTheme(options)}>
+            <Navbar dictionary={dictionary} immersive />
+          </ThemeProvider>
+        </Provider>,
+      );
+      const header = container.querySelector("header");
+      expect(header?.style.backdropFilter).toBe("none");
+      expect(container.querySelectorAll(".MuiToolbar-root")).toHaveLength(1);
+      Object.defineProperty(window, "pageYOffset", {
+        configurable: true,
+        value: 120,
+      });
+      fireEvent.scroll(window);
+      expect(header).toHaveStyle({ backgroundColor: expected });
+      Object.defineProperty(window, "pageYOffset", {
+        configurable: true,
+        value: 0,
+      });
+    },
+  );
   it("uses same-document anchors on landing and preserves cart/auth entry points", () => {
     const { container } = render(
       <Provider store={setup()}>

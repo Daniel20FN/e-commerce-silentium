@@ -72,3 +72,37 @@ Auditoría de fuente: detector Impeccable sin hallazgos y Taste lint sin fallos.
 - La comprobación con Next real es necesaria: un test de render en Jest no detecta funciones pasadas por error a través de la frontera servidor/cliente. El footer usa anclas MUI nativas para evitar ese problema.
 
 Resultado del ciclo anterior, antes del rediseño (19 de octubre de 2026): **450 tests aprobados y 13 pruebas opcionales omitidas**; TypeScript y build de producción aprobados; lint sin errores, con avisos preexistentes de configuración/coverage. Chrome contra `next start` confirmó las fotos cargadas, FAQ por enlace y teclado, regreso desde el detalle a `/#nosotros`, menú móvil y contacto sin desbordamiento horizontal (375 px de contenido y 375 px de ancho desplazable). Las capturas de escritorio y móvil quedan fuera del repositorio. No se enviaron mensajes, realizaron llamadas ni modificaron datos de catálogo.
+
+## Brand alignment (2026-10-20)
+
+The approved layout, room plate, real catalog photography, same-page links and guest WhatsApp cart remain unchanged. Global brand primitives now follow `docs/BRIEF.pdf`: ivory, beige, celeste and chocolate. Semantic surfaces use accessible tone derivatives; dark mode is retained with warm chocolate backgrounds, ivory text and celeste actions.
+
+Official PDF vector outlines supply the wordmark (navbar and mobile drawer), full signature (footer), and crescent/stars favicon, SVG icon and Apple touch icon. Asset origins and source digest are recorded in `public/brand/provenance.json`. Typography uses approved, locally served Cormorant Garamond/Manrope alternatives with retained OFL notices; no runtime font CDN requests or new application dependencies.
+
+Verification includes light/dark palette and action contrast tests, accessible logo variants, mobile navigation, all existing shopping tests, TypeScript/lint, production build, and Chrome responsive visual checks. The existing illustrative hero and legacy category fallback stay labeled as before; no new product claims or imagery are introduced.
+
+### Dark-mode color balance
+
+After visual feedback that the first dark adaptation was too brown, dark surfaces now use deep blue, blue-gray panels and a stronger blue story field. Footer and scrolled navigation follow the same blue system; celeste actions and ivory text remain. Light mode, original logo colors and room photography are unchanged. Theme tests cover body/action contrast plus both text colors on the raised blue story field.
+
+### Official brand copy
+
+The hero now uses the brief headline “Descanso y confort” and the exact slogan “Convertimos tu hogar en un reflejo de quién eres.” The about introduction uses “No vendemos productos, creamos experiencias que transforman espacios.” The existing “para mi hogar” lettering remains in the original footer signature. These copy changes are dictionary-backed and do not replace factual shopping instructions or add new commercial promises.
+
+### Clarified dark-mode balance
+
+The blue-led dark revision was a misinterpretation of feedback. Brown remains the principal canvas, panel, header and footer color. Official celeste is used deliberately on actions, a single brand-story field, active FAQ text and footer signature; chocolate text on celeste retains readable contrast. This clarification takes precedence over the preceding blue-led revision. Light mode and the official brief wording remain unchanged.
+
+### Final hero copy hierarchy
+
+Explicitly approved: “Convertimos tu hogar en un reflejo de quién eres.” is the main H1, replacing “Descanso y confort”; “No vendemos productos, creamos experiencias que transforman espacios.” is the supporting hero paragraph. The about section returns to its concrete catalog introduction to avoid repeating the statement. The heading wraps naturally rather than splitting an artificial accent line; responsive size/measure are tuned for the full approved text.
+
+## Mobile hero: Entre telas
+
+Approved portrait concept implemented below 600px; tablet/desktop photographic composition and semantic copy preserved. Clean generated room plate and a transparent foreground curtain are independent assets; all text, logos and controls remain HTML/SVG. Sources and generation purpose are recorded in public/images/landing/provenance.json.
+
+Room 480/800w WebPs plus curtain 1x/2x WebPs total 87,200 or 196,280 bytes. Native picture selects the portrait only on phones. Eager/high fetch priority deliberately avoids Next Image priority, which would preload the desktop fallback regardless of picture selection. No extra client boundary, animation library, video, observer or scroll handler.
+
+Finite 1150ms curtain entrance and bounded CSS view-timeline depth have a visible static fallback; existing reduced-motion override disables every animation/transition. The curtain is offset 24px right after 320px visual QA to keep bright fabric away from copy. Official three-line slogan, readable 16px support and a 52px primary CTA take precedence over fitting the entire scene into one viewport.
+
+Validation: full Jest 462 passed / 13 optional integration tests skipped; art-direction regression verifies one picture/source/image, eager/high loading and one h1. Taste source lint: 0 failures/warnings; Impeccable detector: no findings. Chrome visual QA at 320x568, 390x844 and 430x932 confirmed portrait selection and no horizontal overflow, with the primary CTA above the fold. Production build and standalone TypeScript check passed; repository lint has no errors (one warning in generated coverage output, plus the pre-existing ignore-file notice). Production Chrome smoke confirmed desktop fallback and hidden curtain at 1440px, tablet fallback at 600px, working product anchor and both theme states. CSS breakpoint uses 599.95px to cover fractional phone widths, matching the MUI breakpoint convention. Reduced-motion behavior is enforced by CSS; no browser preference emulation was available in this control session.

@@ -1,74 +1,74 @@
 import { Theme, ThemeOptions, alpha } from "@mui/material";
-import { Montserrat, Quicksand } from "next/font/google";
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-});
-const quicksand = Quicksand({ subsets: ["latin"] });
-
-// Paleta de colores de la aplicación
-const AppColors = {
-  // Color primario - Azul oscuro profundo
-  primary: "#001E3B",
-  // Color secundario - Beige cálido
-  secondary: "#ECDFD5",
-  // Color de acento/logo - Marrón terracota
-  accent: "#957662",
-  // Variantes claras y oscuras
-  primaryLight: "#0A3A5C",
-  primaryDark: "#001228",
-  secondaryLight: "#F5EBE5",
-  secondaryDark: "#D4C4B8",
-  accentLight: "#B08E7A",
-  accentDark: "#7A5F4E",
-} as const;
+import { brandColors } from "./brand_colors";
+import { displayFont, textFont } from "./brand_fonts";
 
 const coreThemeObj: ThemeOptions = {
   typography: {
+    fontFamily: textFont.style.fontFamily,
     h1: {
-      fontFamily: montserrat.style.fontFamily,
+      fontFamily: displayFont.style.fontFamily,
+      fontWeight: 600,
     },
     h2: {
-      fontFamily: montserrat.style.fontFamily,
+      fontFamily: displayFont.style.fontFamily,
+      fontWeight: 600,
     },
     h3: {
-      fontFamily: montserrat.style.fontFamily,
+      fontFamily: displayFont.style.fontFamily,
+      fontWeight: 600,
     },
     h4: {
-      fontFamily: montserrat.style.fontFamily,
+      fontFamily: displayFont.style.fontFamily,
+      fontWeight: 600,
     },
     h5: {
-      fontFamily: montserrat.style.fontFamily,
+      fontFamily: displayFont.style.fontFamily,
+      fontWeight: 600,
     },
     h6: {
-      fontFamily: montserrat.style.fontFamily,
+      fontFamily: displayFont.style.fontFamily,
+      fontWeight: 600,
     },
     subtitle1: {
-      fontFamily: quicksand.style.fontFamily,
+      fontFamily: textFont.style.fontFamily,
     },
     subtitle2: {
-      fontFamily: quicksand.style.fontFamily,
+      fontFamily: textFont.style.fontFamily,
     },
     body1: {
-      fontFamily: quicksand.style.fontFamily,
+      fontFamily: textFont.style.fontFamily,
     },
     body2: {
-      fontFamily: quicksand.style.fontFamily,
+      fontFamily: textFont.style.fontFamily,
     },
     button: {
-      fontFamily: quicksand.style.fontFamily,
+      fontFamily: textFont.style.fontFamily,
     },
     overline: {
-      fontFamily: quicksand.style.fontFamily,
+      fontFamily: textFont.style.fontFamily,
     },
     caption: {
-      fontFamily: quicksand.style.fontFamily,
+      fontFamily: textFont.style.fontFamily,
     },
   },
   shape: {
     borderRadius: 10,
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: (theme) => ({
+        html: { colorScheme: theme.palette.mode },
+        body: { caretColor: theme.palette.primary.main },
+        "::selection": {
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+        },
+        "a:focus-visible, button:focus-visible": {
+          outline: `3px solid ${theme.palette.primary.main}`,
+          outlineOffset: 3,
+        },
+      }),
+    },
     MuiAppBar: {
       defaultProps: {
         position: "static",
@@ -90,11 +90,11 @@ const coreThemeObj: ThemeOptions = {
     },
     MuiIconButton: {
       styleOverrides: {
-        root: () => ({
-          color: AppColors.accent,
+        root: ({ theme }) => ({
+          color: theme.palette.text.primary,
           transition: "all 0.2s ease",
           "&:hover": {
-            backgroundColor: alpha(AppColors.accent, 0.08),
+            backgroundColor: alpha(theme.palette.primary.main, 0.08),
             transform: "scale(1.05)",
           },
         }),
@@ -117,13 +117,6 @@ const coreThemeObj: ThemeOptions = {
           paddingBlock: 12,
           fontSize: "1rem",
         },
-        containedPrimary: ({ theme }: { theme: Theme }) => ({
-          boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.18)}`,
-          "&:hover": {
-            boxShadow: `0 10px 24px ${alpha(theme.palette.primary.main, 0.26)}`,
-            transform: "translateY(-1px)",
-          },
-        }),
         outlined: ({ theme }: { theme: Theme }) => ({
           borderColor: alpha(theme.palette.info.main, 0.5),
           color: theme.palette.info.main,
@@ -138,23 +131,23 @@ const coreThemeObj: ThemeOptions = {
       styleOverrides: {
         root: ({ theme }: { theme: Theme }) => ({
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: alpha(AppColors.primary, 0.03),
-            borderBottom: `2px solid ${alpha(AppColors.primary, 0.1)}`,
+            backgroundColor: alpha(theme.palette.primary.main, 0.03),
+            borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           },
           "& .MuiDataGrid-cell": {
-            borderColor: alpha(AppColors.primary, 0.05),
+            borderColor: alpha(theme.palette.primary.main, 0.05),
           },
           "& .MuiDataGrid-row:hover": {
-            backgroundColor: alpha(AppColors.primary, 0.02),
+            backgroundColor: alpha(theme.palette.primary.main, 0.02),
           },
           "& .MuiDataGrid-row.Mui-selected": {
-            backgroundColor: alpha(AppColors.primary, 0.08),
+            backgroundColor: alpha(theme.palette.primary.main, 0.08),
             "&:hover": {
-              backgroundColor: alpha(AppColors.primary, 0.12),
+              backgroundColor: alpha(theme.palette.primary.main, 0.12),
             },
           },
           "& .MuiDataGrid-footerContainer": {
-            borderTop: `1px solid ${alpha(AppColors.primary, 0.1)}`,
+            borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           },
           "& .MuiTablePagination-root": {
             color: theme.palette.text.secondary,
@@ -168,74 +161,38 @@ const coreThemeObj: ThemeOptions = {
   },
 };
 
-// Tema claro
 export const lightTheme: ThemeOptions = {
   ...coreThemeObj,
   palette: {
     mode: "light",
     primary: {
-      main: AppColors.primary,
-      light: AppColors.primaryLight,
-      dark: AppColors.primaryDark,
-      contrastText: "#ffffff",
+      main: brandColors.brown,
+      dark: brandColors.brownHover,
+      contrastText: brandColors.ivory,
     },
-    secondary: {
-      main: AppColors.secondary,
-      light: AppColors.secondaryLight,
-      dark: AppColors.secondaryDark,
-      contrastText: AppColors.primary,
-    },
-    // Color de acento disponible como tercer color
-    info: {
-      main: AppColors.accent,
-      light: AppColors.accentLight,
-      dark: AppColors.accentDark,
-      contrastText: "#ffffff",
-    },
-    background: {
-      default: "#F8F6F4",
-      paper: "#ffffff",
-    },
-    text: {
-      primary: AppColors.primary,
-      secondary: alpha(AppColors.primary, 0.7),
-    },
-    divider: alpha(AppColors.primary, 0.12),
+    secondary: { main: brandColors.blue, contrastText: brandColors.brown },
+    info: { main: brandColors.brown, contrastText: brandColors.ivory },
+    background: { default: brandColors.ivory, paper: brandColors.ivory },
+    text: { primary: brandColors.brown, secondary: brandColors.lightMuted },
+    divider: alpha(brandColors.brown, 0.16),
   },
 };
 
-// Tema oscuro
 export const darkTheme: ThemeOptions = {
   ...coreThemeObj,
   palette: {
     mode: "dark",
-    primary: {
-      main: AppColors.secondary,
-      light: AppColors.secondaryLight,
-      dark: AppColors.secondaryDark,
-      contrastText: AppColors.primary,
-    },
+    primary: { main: brandColors.blue, contrastText: brandColors.darkCanvas },
     secondary: {
-      main: AppColors.accent,
-      light: AppColors.accentLight,
-      dark: AppColors.accentDark,
-      contrastText: "#ffffff",
+      main: brandColors.beige,
+      contrastText: brandColors.darkCanvas,
     },
-    // Color de acento disponible como tercer color
-    info: {
-      main: AppColors.accent,
-      light: AppColors.accentLight,
-      dark: AppColors.accentDark,
-      contrastText: "#ffffff",
-    },
+    info: { main: brandColors.blue, contrastText: brandColors.darkCanvas },
     background: {
-      default: AppColors.primaryDark,
-      paper: AppColors.primary,
+      default: brandColors.darkCanvas,
+      paper: brandColors.darkSurface,
     },
-    text: {
-      primary: AppColors.secondary,
-      secondary: alpha(AppColors.secondary, 0.7),
-    },
-    divider: alpha(AppColors.secondary, 0.12),
+    text: { primary: brandColors.ivory, secondary: brandColors.darkMuted },
+    divider: alpha(brandColors.beige, 0.2),
   },
 };

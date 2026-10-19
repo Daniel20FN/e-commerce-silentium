@@ -1,5 +1,8 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand_logo";
+import { brandColors } from "@/styles/brand_colors";
+
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import { canAccessAdmin } from "@/domains/admin/services/admin_roles";
 import {
@@ -192,12 +195,9 @@ export function Navbar({
           mb: 2,
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 700, color: "primary.main" }}
-        >
-          {CompanyValues.name}
-        </Typography>
+        <Box sx={{ color: "text.primary" }}>
+          <BrandLogo width={164} />
+        </Box>
         <IconButton
           onClick={handleDrawerToggle}
           aria-label={dictionary.storefront.closeNavigation}
@@ -267,7 +267,13 @@ export function Navbar({
         style={
           immersive
             ? {
-                background: scrolled ? "#001e3b" : "rgba(0,18,40,.35)",
+                background: scrolled
+                  ? theme.palette.mode === "dark"
+                    ? brandColors.darkSurface
+                    : brandColors.brown
+                  : theme.palette.mode === "dark"
+                    ? "rgba(33,27,23,.6)"
+                    : "rgba(33,27,23,.45)",
                 backdropFilter: "none",
                 WebkitBackdropFilter: "none",
               }
@@ -279,14 +285,20 @@ export function Navbar({
           borderBottom: `1px solid ${theme.palette.divider}`,
           ...(immersive
             ? {
-                backgroundColor: scrolled ? "#001e3b" : "rgba(0,18,40,.35)",
+                backgroundColor: scrolled
+                  ? theme.palette.mode === "dark"
+                    ? brandColors.darkSurface
+                    : brandColors.brown
+                  : theme.palette.mode === "dark"
+                    ? "rgba(33,27,23,.6)"
+                    : "rgba(33,27,23,.45)",
                 backdropFilter: "none",
                 WebkitBackdropFilter: "none",
                 borderBottom: 0,
                 boxShadow: "none",
                 transition: "background-color 220ms ease",
                 "& .MuiTypography-root, & .MuiButton-root, & .MuiIconButton-root":
-                  { color: "#f8f1e9" },
+                  { color: brandColors.ivory },
                 "& .MuiToolbar-root": {
                   flexWrap: "nowrap",
                   justifyContent: "space-between",
@@ -307,36 +319,14 @@ export function Navbar({
                 color: "primary.main",
                 textDecoration: "none",
                 mr: { xs: 2, lg: 4 },
+                width: { xs: 128, sm: 148 },
+                flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
               }}
             >
-              <Box
-                sx={(theme) => ({
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  backgroundColor: theme.palette.info.main,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  ...(immersive ? { display: "none" } : {}),
-                })}
-              >
-                {CompanyValues.name.slice(0, 2).toUpperCase()}
-              </Box>
-              <Box
-                component="span"
-                sx={{
-                  display: immersive ? "block" : { xs: "none", sm: "block" },
-                }}
-              >
-                {CompanyValues.name}
-              </Box>
+              <BrandLogo width={148} />
             </Typography>
 
             <Box
@@ -344,7 +334,7 @@ export function Navbar({
               aria-label={dictionary.landing.mainNavigation}
               sx={{
                 flexGrow: 1,
-                display: { xs: "none", md: "flex" },
+                display: { xs: "none", lg: "flex" },
                 gap: 1,
               }}
             >
@@ -383,7 +373,7 @@ export function Navbar({
                 currentUser ? (
                   <Box
                     sx={{
-                      display: { xs: "none", md: "flex" },
+                      display: { xs: "none", lg: "flex" },
                       alignItems: "center",
                       gap: 1,
                       ml: 1,
@@ -424,7 +414,7 @@ export function Navbar({
                             height: 32,
                             fontSize: 14,
                             bgcolor: theme.palette.info.main,
-                            color: "#fff",
+                            color: "info.contrastText",
                           })}
                         >
                           {(displayName ?? dictionary.auth.navbar.hello)
@@ -437,7 +427,7 @@ export function Navbar({
                 ) : (
                   <Box
                     sx={{
-                      display: { xs: "none", md: "flex" },
+                      display: { xs: "none", lg: "flex" },
                       alignItems: "center",
                       ml: 0.5,
                     }}
@@ -468,7 +458,7 @@ export function Navbar({
               ) : (
                 <Box
                   sx={{
-                    display: { xs: "none", md: "flex" },
+                    display: { xs: "none", lg: "flex" },
                     alignItems: "center",
                     px: 2,
                   }}
@@ -478,7 +468,7 @@ export function Navbar({
               )}
 
               <IconButton
-                sx={{ display: { md: "none" }, color: "text.primary" }}
+                sx={{ display: { lg: "none" }, color: "text.primary" }}
                 onClick={handleDrawerToggle}
                 aria-label={dictionary.storefront.openNavigation}
               >
@@ -552,7 +542,7 @@ export function Navbar({
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
         sx={{
-          display: { xs: "block", md: "none" },
+          display: { xs: "block", lg: "none" },
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
             width: 280,

@@ -18,10 +18,20 @@ import { LandingDisclosures } from "./landing_disclosures";
 
 jest.mock("next/image", () => ({
   __esModule: true,
-  default: ({ src, alt }: { src: string; alt: string }) =>
+  default: ({
+    src,
+    alt,
+    loading,
+    fetchPriority,
+  }: {
+    src: string;
+    alt: string;
+    loading?: "eager" | "lazy";
+    fetchPriority?: "high" | "low" | "auto";
+  }) =>
     jest
       .requireActual<typeof import("react")>("react")
-      .createElement("img", { src, alt }),
+      .createElement("img", { src, alt, loading, fetchPriority }),
 }));
 const copy = dictionary.landing;
 const sections: LandingSection[] = [
@@ -33,6 +43,42 @@ const sections: LandingSection[] = [
 describe("lightweight single-page public information", () => {
   beforeEach(() => window.history.replaceState(null, "", "/"));
   afterEach(() => window.history.replaceState(null, "", "/"));
+  it("art-directs one eager hero image for phones without duplicating semantic content", () => {
+    const { container } = render(
+      <HomePage dictionary={dictionary} categories={[]} products={[]} />,
+    );
+    const picture = container.querySelector("#inicio picture");
+    expect(picture?.querySelectorAll("source")).toHaveLength(1);
+    expect(picture?.querySelector("source")).toHaveAttribute(
+      "media",
+      "(max-width: 599.95px)",
+    );
+    expect(picture?.querySelector("source")).toHaveAttribute(
+      "srcset",
+      "/images/landing/entre-telas-room-480.webp 480w, /images/landing/entre-telas-room-800.webp 800w",
+    );
+    expect(picture?.querySelector("img")).toHaveAttribute("loading", "eager");
+    expect(picture?.querySelector("img")).toHaveAttribute(
+      "fetchpriority",
+      "high",
+    );
+    expect(container.querySelectorAll("#inicio img")).toHaveLength(1);
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+  it("uses the official brief headline, slogan and brand statement", () => {
+    const { container } = render(
+      <HomePage dictionary={dictionary} categories={[]} products={[]} />,
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Convertimos tu hogar en un reflejo de quién eres.",
+    );
+    expect(container.querySelector("#inicio p")).toHaveTextContent(
+      "No vendemos productos, creamos experiencias que transforman espacios.",
+    );
+    expect(container.querySelector("#nosotros")).not.toHaveTextContent(
+      "No vendemos productos, creamos experiencias que transforman espacios.",
+    );
+  });
   it("renders a single main/h1, named sections, native disclosures and no fictitious subscription/testimonials", () => {
     const { container } = render(
       <HomePage dictionary={dictionary} categories={[]} products={[]} />,

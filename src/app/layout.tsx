@@ -1,6 +1,7 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
+import { brandColors } from "@/styles/brand_colors";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -9,6 +10,13 @@ export const metadata: Metadata = {
     template: getDictionary("es").storefront.titleTemplate,
   },
   description: getDictionary("es").storefront.brandDescription,
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: brandColors.ivory },
+    { media: "(prefers-color-scheme: dark)", color: brandColors.darkCanvas },
+  ],
 };
 
 export default function RootLayout({
