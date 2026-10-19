@@ -6,6 +6,7 @@ import type {
   AdminCategoryParentOptionDto,
   AdminCategoryParentOptionsApiResponse,
 } from "@/domains/admin/categories/types/api_responses";
+import { CatalogCostsDialog } from "@/domains/admin/costs/components/catalog_costs_dialog";
 import { CatalogMediaDialog } from "@/domains/admin/media/components/catalog_media_dialog";
 import type {
   AdminProductDetailApiResponse,
@@ -241,6 +242,8 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
   const [mediaProduct, setMediaProduct] =
     useState<AdminProductListItemDto | null>(null);
   const [openingMedia, setOpeningMedia] = useState(false);
+  const [costProduct, setCostProduct] =
+    useState<AdminProductListItemDto | null>(null);
   const [mediaVariants, setMediaVariants] = useState<AdminProductVariantDto[]>(
     [],
   );
@@ -691,6 +694,13 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
           </Button>
           <Button
             size="small"
+            disabled={isSubmitting}
+            onClick={() => setCostProduct(row)}
+          >
+            {dictionary.admin.costs.action}
+          </Button>
+          <Button
+            size="small"
             startIcon={row.inTrash ? <RestoreOutlined /> : <DeleteOutline />}
             disabled={isSubmitting}
             onClick={() => {
@@ -1084,6 +1094,15 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
           product={mediaProduct}
           variants={mediaVariants}
           onClose={() => setMediaProduct(null)}
+        />
+      ) : null}
+
+      {costProduct ? (
+        <CatalogCostsDialog
+          key={costProduct.id}
+          dictionary={dictionary}
+          product={costProduct}
+          onClose={() => setCostProduct(null)}
         />
       ) : null}
 
