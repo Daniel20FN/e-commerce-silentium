@@ -48,7 +48,6 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Stack,
   TextField,
@@ -655,220 +654,215 @@ export function AdminCategoriesPage({ dictionary }: AdminCategoriesPageProps) {
 
   return (
     <Stack spacing={3}>
-      <Paper
-        sx={{
-          p: { xs: 2, md: 2.5 },
-          border: 1,
-          borderColor: "divider",
-          boxShadow: "none",
-        }}
-      >
-        <Stack spacing={2}>
-          <Stack direction="row" justifyContent="flex-end">
-            <Button variant="contained" onClick={openCreateForm}>
-              {dictionary.admin.categories.actions.create}
-            </Button>
-          </Stack>
-
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={1.5}
-            alignItems={{ xs: "stretch", md: "center" }}
-          >
-            <TextField
-              label={dictionary.admin.categories.table.searchLabel}
-              placeholder={dictionary.admin.categories.table.searchPlaceholder}
-              size="small"
-              value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(0);
-              }}
-              sx={{ minWidth: { xs: "100%", md: 320 } }}
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchOutlined fontSize="small" />
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-
-            <FormControl
-              size="small"
-              sx={{ minWidth: { xs: "100%", md: 160 } }}
-            >
-              <InputLabel id="admin-categories-status-label">
-                {dictionary.admin.categories.table.statusFilter}
-              </InputLabel>
-              <Select
-                labelId="admin-categories-status-label"
-                value={status}
-                label={dictionary.admin.categories.table.statusFilter}
-                onChange={(event) => {
-                  setStatus(event.target.value as typeof status);
-                  setPage(0);
-                }}
-              >
-                {ADMIN_CATEGORY_STATUS_VALUES.map((value) => (
-                  <MenuItem key={value} value={value}>
-                    {value === ADMIN_CATEGORY_STATUS.all
-                      ? dictionary.admin.categories.table.allStatuses
-                      : getStatusLabel(
-                          dictionary,
-                          value === ADMIN_CATEGORY_STATUS.active,
-                        )}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl
-              size="small"
-              sx={{ minWidth: { xs: "100%", md: 160 } }}
-            >
-              <InputLabel id="admin-categories-hierarchy-label">
-                {dictionary.admin.categories.table.hierarchyFilter}
-              </InputLabel>
-              <Select
-                labelId="admin-categories-hierarchy-label"
-                value={hierarchy}
-                label={dictionary.admin.categories.table.hierarchyFilter}
-                onChange={(event) => {
-                  setHierarchy(event.target.value as typeof hierarchy);
-                  setPage(0);
-                }}
-              >
-                {ADMIN_CATEGORY_HIERARCHY_VALUES.map((value) => (
-                  <MenuItem key={value} value={value}>
-                    {value === ADMIN_CATEGORY_HIERARCHY.all
-                      ? dictionary.admin.categories.table.allHierarchy
-                      : value === ADMIN_CATEGORY_HIERARCHY.root
-                        ? dictionary.admin.categories.hierarchy.root
-                        : dictionary.admin.categories.hierarchy.child}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Checkbox
-                checked={inTrash}
-                onChange={(event) => {
-                  setInTrash(event.target.checked);
-                  setPage(0);
-                }}
-              />
-              <Typography>
-                {dictionary.admin.categories.table.onlyTrash}
-              </Typography>
-            </Stack>
-
-            <Button
-              variant="outlined"
-              onClick={() => {
-                setSearch("");
-                setStatus(ADMIN_CATEGORY_STATUS.all);
-                setHierarchy(ADMIN_CATEGORY_HIERARCHY.all);
-                setInTrash(false);
-                setPage(0);
-              }}
-            >
-              {dictionary.admin.categories.table.clearFilters}
-            </Button>
-          </Stack>
-
-          <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-            <Button
-              variant="contained"
-              disabled={selectedRows.length === 0}
-              onClick={() => void executeBulk("activate")}
-            >
-              {dictionary.admin.categories.bulk.activate}
-            </Button>
-            <Button
-              variant="outlined"
-              disabled={selectedRows.length === 0}
-              onClick={() => void executeBulk("deactivate")}
-            >
-              {dictionary.admin.categories.bulk.deactivate}
-            </Button>
-            <Button
-              variant="outlined"
-              disabled={selectedRows.length === 0}
-              onClick={() => setIsBulkTrashConfirmOpen(true)}
-            >
-              {dictionary.admin.categories.bulk.trash}
-            </Button>
-            <Button
-              variant="outlined"
-              disabled={selectedRows.length === 0}
-              onClick={() => void executeBulk("restore")}
-            >
-              {dictionary.admin.categories.bulk.restore}
-            </Button>
-          </Stack>
-
-          {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
-
-          <Box sx={{ minHeight: 560 }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              loading={isLoading}
-              rowCount={rowCount}
-              checkboxSelection
-              disableRowSelectionOnClick
-              pagination
-              paginationMode="server"
-              sortingMode="server"
-              pageSizeOptions={
-                ADMIN_CATEGORY_PAGE_SIZE_OPTIONS as unknown as number[]
-              }
-              paginationModel={{ page, pageSize }}
-              onPaginationModelChange={(model: GridPaginationModel) => {
-                setPage(model.page);
-                setPageSize(model.pageSize);
-              }}
-              sortModel={[
-                {
-                  field: sortField,
-                  sort:
-                    sortDirection === ADMIN_CATEGORY_SORT_DIRECTION.desc
-                      ? "desc"
-                      : "asc",
-                },
-              ]}
-              onSortModelChange={(model: GridSortModel) => {
-                const nextSort = model[0];
-                const nextField =
-                  nextSort && isAdminCategorySortField(nextSort.field)
-                    ? nextSort.field
-                    : ADMIN_CATEGORY_SORT_FIELD.sortOrder;
-
-                setSortField(nextField);
-                setSortDirection(
-                  nextSort?.sort === "desc"
-                    ? ADMIN_CATEGORY_SORT_DIRECTION.desc
-                    : ADMIN_CATEGORY_SORT_DIRECTION.asc,
-                );
-                setPage(0);
-              }}
-              onRowSelectionModelChange={(model) => {
-                setSelectedRows(Array.from(model.ids) as string[]);
-              }}
-              localeText={{
-                noRowsLabel: dictionary.admin.categories.table.noRows,
-                toolbarColumns: dictionary.grid.columns,
-                toolbarFilters: dictionary.grid.filters,
-                toolbarDensity: dictionary.grid.density,
-              }}
-            />
-          </Box>
+      <Stack spacing={2}>
+        <Stack direction="row" justifyContent="flex-end">
+          <Button variant="contained" onClick={openCreateForm}>
+            {dictionary.admin.categories.actions.create}
+          </Button>
         </Stack>
-      </Paper>
+
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={1.5}
+          alignItems={{ xs: "stretch", md: "center" }}
+        >
+          <TextField
+            label={dictionary.admin.categories.table.searchLabel}
+            placeholder={dictionary.admin.categories.table.searchPlaceholder}
+            size="small"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(0);
+            }}
+            sx={{ minWidth: { xs: "100%", md: 320 } }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchOutlined fontSize="small" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 160 } }}>
+            <InputLabel id="admin-categories-status-label">
+              {dictionary.admin.categories.table.statusFilter}
+            </InputLabel>
+            <Select
+              labelId="admin-categories-status-label"
+              value={status}
+              label={dictionary.admin.categories.table.statusFilter}
+              onChange={(event) => {
+                setStatus(event.target.value as typeof status);
+                setPage(0);
+              }}
+            >
+              {ADMIN_CATEGORY_STATUS_VALUES.map((value) => (
+                <MenuItem key={value} value={value}>
+                  {value === ADMIN_CATEGORY_STATUS.all
+                    ? dictionary.admin.categories.table.allStatuses
+                    : getStatusLabel(
+                        dictionary,
+                        value === ADMIN_CATEGORY_STATUS.active,
+                      )}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 160 } }}>
+            <InputLabel id="admin-categories-hierarchy-label">
+              {dictionary.admin.categories.table.hierarchyFilter}
+            </InputLabel>
+            <Select
+              labelId="admin-categories-hierarchy-label"
+              value={hierarchy}
+              label={dictionary.admin.categories.table.hierarchyFilter}
+              onChange={(event) => {
+                setHierarchy(event.target.value as typeof hierarchy);
+                setPage(0);
+              }}
+            >
+              {ADMIN_CATEGORY_HIERARCHY_VALUES.map((value) => (
+                <MenuItem key={value} value={value}>
+                  {value === ADMIN_CATEGORY_HIERARCHY.all
+                    ? dictionary.admin.categories.table.allHierarchy
+                    : value === ADMIN_CATEGORY_HIERARCHY.root
+                      ? dictionary.admin.categories.hierarchy.root
+                      : dictionary.admin.categories.hierarchy.child}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Checkbox
+              checked={inTrash}
+              onChange={(event) => {
+                setInTrash(event.target.checked);
+                setPage(0);
+              }}
+            />
+            <Typography>
+              {dictionary.admin.categories.table.onlyTrash}
+            </Typography>
+          </Stack>
+
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setSearch("");
+              setStatus(ADMIN_CATEGORY_STATUS.all);
+              setHierarchy(ADMIN_CATEGORY_HIERARCHY.all);
+              setInTrash(false);
+              setPage(0);
+            }}
+          >
+            {dictionary.admin.categories.table.clearFilters}
+          </Button>
+        </Stack>
+
+        <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+          <Button
+            variant="contained"
+            disabled={selectedRows.length === 0}
+            onClick={() => void executeBulk("activate")}
+          >
+            {dictionary.admin.categories.bulk.activate}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={selectedRows.length === 0}
+            onClick={() => void executeBulk("deactivate")}
+          >
+            {dictionary.admin.categories.bulk.deactivate}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={selectedRows.length === 0}
+            onClick={() => setIsBulkTrashConfirmOpen(true)}
+          >
+            {dictionary.admin.categories.bulk.trash}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={selectedRows.length === 0}
+            onClick={() => void executeBulk("restore")}
+          >
+            {dictionary.admin.categories.bulk.restore}
+          </Button>
+        </Stack>
+
+        {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
+
+        <Box
+          role="region"
+          aria-label={dictionary.admin.categories.title}
+          sx={{ height: 560, minWidth: 0, width: "100%" }}
+        >
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            loading={isLoading}
+            slotProps={{
+              loadingOverlay: {
+                variant: "linear-progress",
+                noRowsVariant: "linear-progress",
+              },
+            }}
+            rowCount={rowCount}
+            checkboxSelection
+            disableRowSelectionOnClick
+            pagination
+            paginationMode="server"
+            sortingMode="server"
+            pageSizeOptions={
+              ADMIN_CATEGORY_PAGE_SIZE_OPTIONS as unknown as number[]
+            }
+            paginationModel={{ page, pageSize }}
+            onPaginationModelChange={(model: GridPaginationModel) => {
+              setPage(model.page);
+              setPageSize(model.pageSize);
+            }}
+            sortModel={[
+              {
+                field: sortField,
+                sort:
+                  sortDirection === ADMIN_CATEGORY_SORT_DIRECTION.desc
+                    ? "desc"
+                    : "asc",
+              },
+            ]}
+            onSortModelChange={(model: GridSortModel) => {
+              const nextSort = model[0];
+              const nextField =
+                nextSort && isAdminCategorySortField(nextSort.field)
+                  ? nextSort.field
+                  : ADMIN_CATEGORY_SORT_FIELD.sortOrder;
+
+              setSortField(nextField);
+              setSortDirection(
+                nextSort?.sort === "desc"
+                  ? ADMIN_CATEGORY_SORT_DIRECTION.desc
+                  : ADMIN_CATEGORY_SORT_DIRECTION.asc,
+              );
+              setPage(0);
+            }}
+            onRowSelectionModelChange={(model) => {
+              setSelectedRows(Array.from(model.ids) as string[]);
+            }}
+            localeText={{
+              noRowsLabel: dictionary.admin.categories.table.noRows,
+              toolbarColumns: dictionary.grid.columns,
+              toolbarFilters: dictionary.grid.filters,
+              toolbarDensity: dictionary.grid.density,
+            }}
+          />
+        </Box>
+      </Stack>
 
       <Dialog
         open={isFormOpen}

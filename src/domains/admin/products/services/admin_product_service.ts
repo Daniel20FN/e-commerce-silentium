@@ -517,24 +517,49 @@ export async function updateAdminProduct(
 ): Promise<AdminProductListItemDto> {
   const currentProduct = await prisma.product.findUnique({
     where: { id: productId },
-    select: { id: true },
+    select: { id: true, status: true, deletedAt: true, updatedAt: true },
   });
 
   if (!currentProduct) {
     throw createMutationError("not_found", "record_not_found");
+  }
+  if (currentProduct.deletedAt || currentProduct.status === "archived") {
+    throw createMutationError("invalid_state", "product_read_only");
+  }
+  if (
+    input.expectedUpdatedAt &&
+    currentProduct.updatedAt.toISOString() !== input.expectedUpdatedAt
+  ) {
+    throw createMutationError("conflict", "product_revision_conflict");
   }
 
   await assertSlugAvailable(input.slug, productId);
   await assertInputCategories(input);
   await assertProductOptionsEditable(productId, input);
 
-  const product = await prisma.product.update({
-    where: { id: productId },
-    data: buildProductUpdateData(input),
-    include: productInclude,
-  });
-
-  return toAdminProductListItem(product);
+  try {
+    const product = await prisma.product.update({
+      where: {
+        id: productId,
+        deletedAt: null,
+        status: { not: "archived" },
+        ...(input.expectedUpdatedAt
+          ? { updatedAt: new Date(input.expectedUpdatedAt) }
+          : {}),
+      },
+      data: buildProductUpdateData(input),
+      include: productInclude,
+    });
+    return toAdminProductListItem(product);
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      throw createMutationError("conflict", "product_revision_conflict");
+    }
+    throw error;
+  }
 }
 
 export async function trashAdminProduct(

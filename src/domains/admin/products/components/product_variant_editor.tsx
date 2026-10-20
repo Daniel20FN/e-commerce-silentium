@@ -2,6 +2,7 @@
 
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import type { AdminEditorState } from "@/domains/admin/components/admin_editor_surface";
 import type {
   AdminVariantLifecycleParams,
   AdminVariantMutationApiResponse,
@@ -32,7 +33,7 @@ import {
   Typography,
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface VariantFormState {
   variantId: string;
@@ -69,6 +70,8 @@ function createEmptyVariantForm(): VariantFormState {
 }
 
 interface ProductVariantEditorProps {
+  onStateChange?: (state: AdminEditorState) => void;
+  onRequestChange?: (action: () => void) => void;
   dictionary: Dictionary;
   productId: string;
   productOptions: AdminProductOptionDto[];
@@ -139,6 +142,8 @@ function isVariantSellable(variant: AdminProductVariantDto): boolean {
 }
 
 export function ProductVariantEditor({
+  onStateChange,
+  onRequestChange,
   dictionary,
   productId,
   productOptions,
@@ -155,6 +160,19 @@ export function ProductVariantEditor({
   const [onlyTrash, setOnlyTrash] = useState(false);
   const [lifecycleVariant, setLifecycleVariant] =
     useState<AdminProductVariantDto | null>(null);
+  const original = variants.find(
+    (variant) => variant.id === formState.variantId,
+  );
+  const dirty =
+    JSON.stringify(formState) !==
+    JSON.stringify(
+      original ? createVariantForm(original) : createEmptyVariantForm(),
+    );
+  useEffect(() => {
+    onStateChange?.({ dirty, busy: isSubmitting });
+  }, [dirty, isSubmitting, onStateChange]);
+  const requestChange = (action: () => void) =>
+    onRequestChange ? onRequestChange(action) : action();
 
   const setNextVariants = (nextVariants: AdminProductVariantDto[]): void => {
     setVariants(nextVariants);
@@ -205,7 +223,11 @@ export function ProductVariantEditor({
           >(
             `admin-products-variant-update-${formState.variantId}`,
             `/admin/products/${productId}/variants`,
-            { ...payload, variantId: formState.variantId },
+            {
+              ...payload,
+              variantId: formState.variantId,
+              expectedUpdatedAt: original?.updatedAt,
+            },
           )
         : await cancellableApi.post<
             AdminVariantMutationApiResponse,
@@ -288,8 +310,16 @@ export function ProductVariantEditor({
 
   return (
     <Paper
+      component="fieldset"
+      disabled={isSubmitting}
       variant="outlined"
-      sx={{ p: 2, borderColor: "divider", boxShadow: "none" }}
+      sx={{
+        p: 2,
+        m: 0,
+        minWidth: 0,
+        borderColor: "divider",
+        boxShadow: "none",
+      }}
     >
       <Stack spacing={2}>
         <Box>
@@ -306,8 +336,11 @@ export function ProductVariantEditor({
             <Checkbox
               checked={onlyTrash}
               onChange={(event) => {
-                setOnlyTrash(event.target.checked);
-                setFormState(createEmptyVariantForm());
+                const checked = event.target.checked;
+                requestChange(() => {
+                  setOnlyTrash(checked);
+                  setFormState(createEmptyVariantForm());
+                });
               }}
             />
           }
@@ -377,14 +410,23 @@ export function ProductVariantEditor({
                   <Button
                     size="small"
                     disabled={variant.inTrash || isSubmitting}
-                    onClick={() => setFormState(createVariantForm(variant))}
+                    onClick={() =>
+                      requestChange(() =>
+                        setFormState(createVariantForm(variant)),
+                      )
+                    }
                   >
                     {dictionary.admin.products.variants.edit}
                   </Button>
                   <Button
                     disabled={isSubmitting}
                     size="small"
-                    onClick={() => setLifecycleVariant(variant)}
+                    onClick={() =>
+                      requestChange(() => {
+                        setFormState(createEmptyVariantForm());
+                        setLifecycleVariant(variant);
+                      })
+                    }
                   >
                     {variant.inTrash
                       ? dictionary.admin.products.variants.restore
@@ -515,7 +557,7 @@ export function ProductVariantEditor({
                 />
               ))}
             </Stack>
-            <Stack direction="row" spacing={1.5}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -562,7 +604,12 @@ export function ProductVariantEditor({
                   : dictionary.admin.products.variants.create}
               </Button>
               {formState.variantId ? (
-                <Button onClick={() => setFormState(createEmptyVariantForm())}>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={() =>
+                    requestChange(() => setFormState(createEmptyVariantForm()))
+                  }
+                >
                   {dictionary.admin.products.variants.cancelEdit}
                 </Button>
               ) : null}

@@ -336,6 +336,9 @@ describe("admin_categories_page", () => {
     });
 
     render(<AdminCategoriesPage dictionary={dictionary as never} />);
+    expect(
+      screen.getByRole("region", { name: dictionary.admin.categories.title }),
+    ).toHaveStyle({ height: "560px" });
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(

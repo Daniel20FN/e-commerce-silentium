@@ -1,7 +1,7 @@
 ﻿import "server-only";
 
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import type { AdminVariantUpsertParams } from "../types/api_params";
 import type { AdminProductVariantDto } from "../types/product_dto";
 import type {
@@ -165,12 +165,14 @@ async function assertProductExists(
 ): Promise<void> {
   const product = await db.product.findUnique({
     where: { id: productId },
-    select: { id: true },
+    select: { id: true, status: true, deletedAt: true },
   });
 
   if (!product) {
     throw createMutationError("not_found", "record_not_found");
   }
+  if (product.deletedAt || product.status === "archived")
+    throw createMutationError("invalid_state", "product_read_only");
 }
 
 async function assertSkuAvailable(
@@ -393,56 +395,82 @@ export async function updateAdminVariant(
   variantId: string,
   input: AdminVariantUpsertParams,
 ): Promise<AdminProductVariantDto> {
-  const currentVariant = (await prisma.productVariant.findUnique({
-    where: { id: variantId },
-    select: {
-      id: true,
-      productId: true,
-      optionCombinationKey: true,
-      deletedAt: true,
-    },
-  })) as Pick<
-    VariantRecord,
-    "id" | "productId" | "optionCombinationKey" | "deletedAt"
-  > | null;
-
-  if (!currentVariant || currentVariant.productId !== productId) {
-    throw createMutationError("not_found", "record_not_found");
-  }
-
-  if (currentVariant.deletedAt)
-    throw createMutationError("invalid_state", "variant_in_trash");
-  await assertSkuAvailable(input.sku, prisma, variantId);
-  assertVariantPrices(input);
-
-  const optionCombinationKey = await buildAvailableCombinationKey(
-    {
-      productId: currentVariant.productId,
-      optionValueIds: input.optionValueIds,
-      variantId,
-      currentCombinationKey: currentVariant.optionCombinationKey,
-    },
-    prisma,
-  );
-
-  if (input.isDefault) {
-    await prisma.productVariant.updateMany({
-      where: {
-        productId: currentVariant.productId,
-        isDefault: true,
-        id: { not: variantId },
+  return prisma.$transaction(async (tx) => {
+    await assertProductExists(productId, tx);
+    const currentVariant = (await tx.productVariant.findUnique({
+      where: { id: variantId },
+      select: {
+        id: true,
+        productId: true,
+        optionCombinationKey: true,
+        deletedAt: true,
+        updatedAt: true,
       },
-      data: { isDefault: false },
-    });
-  }
+    })) as Pick<
+      VariantRecord,
+      "id" | "productId" | "optionCombinationKey" | "deletedAt" | "updatedAt"
+    > | null;
 
-  const variant = (await prisma.productVariant.update({
-    where: { id: variantId },
-    data: buildVariantUpdateData(input, optionCombinationKey),
-    include: variantOptionValuesInclude,
-  })) as VariantRecord;
+    if (!currentVariant || currentVariant.productId !== productId) {
+      throw createMutationError("not_found", "record_not_found");
+    }
 
-  return toAdminVariantDto(variant);
+    if (currentVariant.deletedAt)
+      throw createMutationError("invalid_state", "variant_in_trash");
+    if (
+      input.expectedUpdatedAt &&
+      currentVariant.updatedAt.toISOString() !== input.expectedUpdatedAt
+    )
+      throw createMutationError("conflict", "variant_revision_conflict");
+    await assertSkuAvailable(input.sku, tx, variantId);
+    assertVariantPrices(input);
+
+    const optionCombinationKey = await buildAvailableCombinationKey(
+      {
+        productId: currentVariant.productId,
+        optionValueIds: input.optionValueIds,
+        variantId,
+        currentCombinationKey: currentVariant.optionCombinationKey,
+      },
+      tx,
+    );
+
+    if (input.isDefault) {
+      await tx.productVariant.updateMany({
+        where: {
+          productId: currentVariant.productId,
+          isDefault: true,
+          id: { not: variantId },
+        },
+        data: { isDefault: false },
+      });
+    }
+
+    let variant: VariantRecord;
+    try {
+      variant = (await tx.productVariant.update({
+        where: {
+          id: variantId,
+          productId,
+          deletedAt: null,
+          product: { deletedAt: null, status: { not: "archived" } },
+          ...(input.expectedUpdatedAt
+            ? { updatedAt: new Date(input.expectedUpdatedAt) }
+            : {}),
+        },
+        data: buildVariantUpdateData(input, optionCombinationKey),
+        include: variantOptionValuesInclude,
+      })) as VariantRecord;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      )
+        throw createMutationError("conflict", "variant_revision_conflict");
+      throw error;
+    }
+    return toAdminVariantDto(variant);
+  });
 }
 
 export async function softDeleteAdminVariant(

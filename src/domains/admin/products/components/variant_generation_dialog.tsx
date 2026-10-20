@@ -29,6 +29,8 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
+import { useWorkspaceGuard } from "../hooks/use_workspace_guard";
+import { EditorGuardDialog } from "./editor_guard_dialog";
 
 interface VariantGenerationCombination {
   optionValueIds: string[];
@@ -106,6 +108,19 @@ export function VariantGenerationDialog({
   );
 
   const [isPending, setIsPending] = useState(false);
+  const [initialOptions] = useState(() =>
+    productOptions.map((option) => option.id),
+  );
+  const guard = useWorkspaceGuard({
+    busy: isPending,
+    dirty:
+      skuPrefix !== "" ||
+      priceCents !== "0" ||
+      stock !== "0" ||
+      preview !== null ||
+      JSON.stringify(selectedOptionIds) !== JSON.stringify(initialOptions),
+  });
+  const close = () => guard.request(onClose);
   const reportError = (error: unknown): void => {
     const message = error instanceof Error ? error.message : "";
     const feedback = Object.entries(dictionary.admin.products.feedback).find(
@@ -205,133 +220,138 @@ export function VariantGenerationDialog({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={() => {
-        if (!isPending) onClose();
-      }}
-      fullWidth
-      maxWidth="sm"
-    >
-      <DialogTitle>{dictionary.admin.products.generation.title}</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ pt: 1 }}>
-          <Stack spacing={0.5}>
-            <Typography variant="subtitle2">
-              {dictionary.admin.products.generation.options}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {dictionary.admin.products.generation.optionsHelp}
-            </Typography>
-            <FormGroup row>
-              {productOptions.map((option) => (
-                <FormControlLabel
-                  key={option.id}
-                  control={
-                    <Checkbox
-                      disabled={isPending}
-                      checked={selectedOptionIds.includes(option.id)}
-                      onChange={(event) => {
-                        setPreview(null);
-                        setSelectedOptionIds((current) =>
-                          event.target.checked
-                            ? [...current, option.id]
-                            : current.filter((id) => id !== option.id),
-                        );
-                      }}
-                    />
-                  }
-                  label={option.name}
-                />
-              ))}
-            </FormGroup>
-          </Stack>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-            <TextField
-              fullWidth
-              label={dictionary.admin.products.generation.skuPrefix}
-              size="small"
-              value={skuPrefix}
-              onChange={(event) => setSkuPrefix(event.target.value)}
-            />
-            <TextField
-              fullWidth
-              label={dictionary.admin.products.generation.priceCents}
-              size="small"
-              value={priceCents}
-              onChange={(event) => setPriceCents(event.target.value)}
-            />
-            <TextField
-              fullWidth
-              label={dictionary.admin.products.generation.stock}
-              size="small"
-              value={stock}
-              onChange={(event) => setStock(event.target.value)}
-            />
-          </Stack>
-          <Button
-            variant="outlined"
-            disabled={isPending || !productId || selectedOptionIds.length === 0}
-            onClick={() => void requestPreview()}
-          >
-            {dictionary.admin.products.generation.preview}
-          </Button>
-
-          {preview ? (
-            <Stack spacing={1}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                {dictionary.admin.products.generation.previewTitle}
+    <>
+      <Dialog
+        open={open}
+        onClose={() => {
+          close();
+        }}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{dictionary.admin.products.generation.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <Stack spacing={0.5}>
+              <Typography variant="subtitle2">
+                {dictionary.admin.products.generation.options}
               </Typography>
-              {preview.combinations.length === 0 ? (
-                <Alert severity="info">
-                  {dictionary.admin.products.generation.emptyPreview}
-                </Alert>
-              ) : (
-                <List dense>
-                  {preview.combinations.map((combination, index) => (
-                    <ListItem key={`${combination.label}-${index}`}>
-                      {combination.label}
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-              {preview.duplicateCombinations.length > 0 ? (
-                <Alert severity="warning">
-                  <Typography variant="subtitle2">
-                    {dictionary.admin.products.generation.duplicateTitle}
-                  </Typography>
-                  {preview.duplicateCombinations.map((combination, index) => (
-                    <Typography
-                      key={`${combination.label}-${index}`}
-                      variant="caption"
-                      component="div"
-                    >
-                      {combination.label}
-                    </Typography>
-                  ))}
-                </Alert>
-              ) : null}
+              <Typography variant="caption" color="text.secondary">
+                {dictionary.admin.products.generation.optionsHelp}
+              </Typography>
+              <FormGroup row>
+                {productOptions.map((option) => (
+                  <FormControlLabel
+                    key={option.id}
+                    control={
+                      <Checkbox
+                        disabled={isPending}
+                        checked={selectedOptionIds.includes(option.id)}
+                        onChange={(event) => {
+                          setPreview(null);
+                          setSelectedOptionIds((current) =>
+                            event.target.checked
+                              ? [...current, option.id]
+                              : current.filter((id) => id !== option.id),
+                          );
+                        }}
+                      />
+                    }
+                    label={option.name}
+                  />
+                ))}
+              </FormGroup>
             </Stack>
-          ) : null}
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button disabled={isPending} onClick={onClose}>
-          {dictionary.admin.products.generation.cancel}
-        </Button>
-        <Button
-          variant="contained"
-          disabled={
-            isPending ||
-            !preview ||
-            preview.combinations.length === 0 ||
-            !skuPrefix.trim()
-          }
-          onClick={() => void confirmGeneration()}
-        >
-          {dictionary.admin.products.generation.confirm}
-        </Button>
-      </DialogActions>
-    </Dialog>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+              <TextField
+                fullWidth
+                label={dictionary.admin.products.generation.skuPrefix}
+                size="small"
+                value={skuPrefix}
+                onChange={(event) => setSkuPrefix(event.target.value)}
+              />
+              <TextField
+                fullWidth
+                label={dictionary.admin.products.generation.priceCents}
+                size="small"
+                value={priceCents}
+                onChange={(event) => setPriceCents(event.target.value)}
+              />
+              <TextField
+                fullWidth
+                label={dictionary.admin.products.generation.stock}
+                size="small"
+                value={stock}
+                onChange={(event) => setStock(event.target.value)}
+              />
+            </Stack>
+            <Button
+              variant="outlined"
+              disabled={
+                isPending || !productId || selectedOptionIds.length === 0
+              }
+              onClick={() => void requestPreview()}
+            >
+              {dictionary.admin.products.generation.preview}
+            </Button>
+
+            {preview ? (
+              <Stack spacing={1}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                  {dictionary.admin.products.generation.previewTitle}
+                </Typography>
+                {preview.combinations.length === 0 ? (
+                  <Alert severity="info">
+                    {dictionary.admin.products.generation.emptyPreview}
+                  </Alert>
+                ) : (
+                  <List dense>
+                    {preview.combinations.map((combination, index) => (
+                      <ListItem key={`${combination.label}-${index}`}>
+                        {combination.label}
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+                {preview.duplicateCombinations.length > 0 ? (
+                  <Alert severity="warning">
+                    <Typography variant="subtitle2">
+                      {dictionary.admin.products.generation.duplicateTitle}
+                    </Typography>
+                    {preview.duplicateCombinations.map((combination, index) => (
+                      <Typography
+                        key={`${combination.label}-${index}`}
+                        variant="caption"
+                        component="div"
+                      >
+                        {combination.label}
+                      </Typography>
+                    ))}
+                  </Alert>
+                ) : null}
+              </Stack>
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={isPending} onClick={close}>
+            {dictionary.admin.products.generation.cancel}
+          </Button>
+          <Button
+            variant="contained"
+            disabled={
+              isPending ||
+              !preview ||
+              preview.combinations.length === 0 ||
+              !skuPrefix.trim()
+            }
+            onClick={() => void confirmGeneration()}
+          >
+            {dictionary.admin.products.generation.confirm}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <EditorGuardDialog dictionary={dictionary} guard={guard} />
+    </>
   );
 }

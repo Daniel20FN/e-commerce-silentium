@@ -7,6 +7,7 @@ import {
   resolveAdminRouteMetadata,
   type AdminRouteSection,
 } from "@/domains/admin/services/admin_route_metadata";
+import { createAdminTheme } from "@/domains/admin/services/admin_theme";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import {
   CategoryOutlined,
@@ -36,11 +37,11 @@ import {
   Typography,
 } from "@mui/material";
 import type { CSSObject, Theme } from "@mui/material/styles";
-import { styled, useTheme } from "@mui/material/styles";
+import { styled, ThemeProvider, useTheme } from "@mui/material/styles";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const DRAWER_WIDTH = 240;
 
@@ -144,6 +145,7 @@ export function AdminShell({
   currentUser,
 }: AdminShellProps) {
   const theme = useTheme();
+  const adminTheme = useMemo(() => createAdminTheme(theme), [theme]);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const activeRoute = resolveAdminRouteMetadata(pathname, dictionary);
@@ -171,152 +173,168 @@ export function AdminShell({
   const displayName = currentUser.profile.firstName ?? currentUser.email;
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        height: "100dvh",
-        overflow: "hidden",
-        "& .MuiTypography-h1, & .MuiTypography-h2, & .MuiTypography-h3, & .MuiTypography-h4, & .MuiTypography-h5, & .MuiTypography-h6":
-          {
-            fontFamily: theme.typography.fontFamily,
-          },
-      }}
-    >
-      <AppBar
-        open={open}
-        position="fixed"
-        color="inherit"
-        elevation={0}
-        sx={{ borderBottom: 1, borderColor: "divider" }}
-      >
-        <Toolbar sx={{ gap: 2 }}>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {activeRoute.title}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {activeRoute.description}
-            </Typography>
-          </Box>
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Avatar sx={{ bgcolor: "info.main", color: "info.contrastText" }}>
-              {displayName.slice(0, 1).toUpperCase()}
-            </Avatar>
-            <Box sx={{ display: { xs: "none", sm: "block" } }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {displayName}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {dictionary.admin.layout.welcome}
-              </Typography>
-            </Box>
-          </Stack>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader sx={{ justifyContent: open ? "flex-end" : "center" }}>
-          <Tooltip
-            title={
-              open
-                ? dictionary.admin.layout.collapse
-                : dictionary.admin.layout.expand
-            }
-          >
-            <IconButton
-              aria-label={
-                open
-                  ? dictionary.admin.layout.collapse
-                  : dictionary.admin.layout.menu
-              }
-              onClick={() => setOpen((currentValue) => !currentValue)}
-            >
-              {open ? (
-                theme.direction === "rtl" ? (
-                  <ChevronRight />
-                ) : (
-                  <ChevronLeft />
-                )
-              ) : (
-                <MenuIcon />
-              )}
-            </IconButton>
-          </Tooltip>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {navigationItems.map((item) => (
-            <ListItem key={item.href} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                component={Link}
-                href={item.href}
-                selected={item.isActive}
-                sx={{
-                  minHeight: 48,
-                  px: 2.5,
-                  justifyContent: open ? "initial" : "center",
-                  borderRight: item.isActive
-                    ? `2px solid ${theme.palette.info.main}`
-                    : "2px solid transparent",
-                  backgroundColor: item.isActive
-                    ? "action.selected"
-                    : "transparent",
-                  "&:hover": {
-                    backgroundColor: item.isActive
-                      ? "action.selected"
-                      : "action.hover",
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                    color: item.isActive ? "info.main" : "inherit",
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  sx={{
-                    opacity: open ? 1 : 0,
-                    "& .MuiTypography-root": {
-                      fontWeight: item.isActive ? 700 : 500,
-                      color: item.isActive ? "info.main" : "text.primary",
-                    },
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
+    <ThemeProvider theme={adminTheme}>
       <Box
-        component="main"
         sx={{
-          flexGrow: 1,
-          minWidth: 0,
+          display: "flex",
           height: "100dvh",
           overflow: "hidden",
-          backgroundColor: "background.default",
-          display: "flex",
-          flexDirection: "column",
+          "& .MuiTypography-h1, & .MuiTypography-h2, & .MuiTypography-h3, & .MuiTypography-h4, & .MuiTypography-h5, & .MuiTypography-h6":
+            {
+              fontFamily: theme.typography.fontFamily,
+            },
         }}
       >
-        <DrawerHeader />
+        <AppBar
+          open={open}
+          position="fixed"
+          color="inherit"
+          elevation={0}
+          sx={{ borderBottom: 1, borderColor: "divider" }}
+        >
+          <Toolbar sx={{ gap: 2 }}>
+            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+              <Typography variant="h6" noWrap sx={{ fontWeight: 700 }}>
+                {activeRoute.title}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                noWrap
+                sx={{ display: { xs: "none", sm: "block" } }}
+              >
+                {activeRoute.description}
+              </Typography>
+            </Box>
+            <Stack
+              direction="row"
+              spacing={1.5}
+              alignItems="center"
+              flexShrink={0}
+            >
+              <Avatar sx={{ bgcolor: "info.main", color: "info.contrastText" }}>
+                {displayName.slice(0, 1).toUpperCase()}
+              </Avatar>
+              <Box sx={{ display: { xs: "none", sm: "block" } }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  {displayName}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {dictionary.admin.layout.welcome}
+                </Typography>
+              </Box>
+            </Stack>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader sx={{ justifyContent: open ? "flex-end" : "center" }}>
+            <Tooltip
+              title={
+                open
+                  ? dictionary.admin.layout.collapse
+                  : dictionary.admin.layout.expand
+              }
+            >
+              <IconButton
+                aria-label={
+                  open
+                    ? dictionary.admin.layout.collapse
+                    : dictionary.admin.layout.menu
+                }
+                onClick={() => setOpen((currentValue) => !currentValue)}
+              >
+                {open ? (
+                  theme.direction === "rtl" ? (
+                    <ChevronRight />
+                  ) : (
+                    <ChevronLeft />
+                  )
+                ) : (
+                  <MenuIcon />
+                )}
+              </IconButton>
+            </Tooltip>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {navigationItems.map((item) => (
+              <ListItem
+                key={item.href}
+                disablePadding
+                sx={{ display: "block" }}
+              >
+                <ListItemButton
+                  component={Link}
+                  href={item.href}
+                  selected={item.isActive}
+                  sx={{
+                    minHeight: 48,
+                    px: 2.5,
+                    justifyContent: open ? "initial" : "center",
+                    borderRight: item.isActive
+                      ? `2px solid ${theme.palette.info.main}`
+                      : "2px solid transparent",
+                    backgroundColor: item.isActive
+                      ? "action.selected"
+                      : "transparent",
+                    "&:hover": {
+                      backgroundColor: item.isActive
+                        ? "action.selected"
+                        : "action.hover",
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      color: item.isActive ? "info.main" : "inherit",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    sx={{
+                      opacity: open ? 1 : 0,
+                      "& .MuiTypography-root": {
+                        fontWeight: item.isActive ? 700 : 500,
+                        color: item.isActive ? "info.main" : "text.primary",
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
         <Box
+          component="main"
           sx={{
             flexGrow: 1,
-            minHeight: 0,
-            overflow: "auto",
-            px: { xs: 2, md: 4 },
-            py: { xs: 3, md: 4 },
+            minWidth: 0,
+            height: "100dvh",
+            overflow: "hidden",
+            backgroundColor: "background.default",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          {children}
+          <DrawerHeader />
+          <Box
+            sx={{
+              flexGrow: 1,
+              minHeight: 0,
+              overflow: "auto",
+              px: { xs: 2, md: 4 },
+              py: { xs: 3, md: 4 },
+            }}
+          >
+            {children}
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 }

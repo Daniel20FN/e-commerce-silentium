@@ -950,7 +950,10 @@
         "record_not_found": "El producto ya no existe o no está disponible.",
         "validation_error": "Revisá los campos marcados antes de continuar.",
         "invalid_variant_numbers": "Ingresá números válidos, no negativos; precio, stock y orden deben ser enteros.",
-        "variant_in_trash": "Restaurá la variante antes de editarla."
+        "variant_in_trash": "Restaurá la variante antes de editarla.",
+        "product_revision_conflict": "Otra sesión ha cambiado este producto. Tus cambios siguen en el formulario; recarga los datos guardados para revisar la versión actual antes de reintentarlo.",
+        "product_read_only": "El producto está archivado o en papelera y no admite cambios.",
+        "variant_revision_conflict": "Otra sesión ha cambiado esta variante. Conservamos tus cambios; recarga la ficha para revisar los datos actuales."
       },
       "trashConfirm": {
         "title": "Confirmar envío a papelera",
@@ -963,6 +966,35 @@
         "description": "Vas a procesar {count} productos seleccionados.",
         "confirm": "Confirmar",
         "cancel": "Cancelar"
+      },
+      "workspace": {
+        "title": "Ficha de producto",
+        "back": "Volver a productos",
+        "information": "Información",
+        "variants": "Variantes y precios",
+        "media": "Imágenes",
+        "costs": "Costos",
+        "publication": "Publicación",
+        "saved": "Sin cambios pendientes",
+        "dirty": "Cambios sin guardar",
+        "busy": "Operación en curso",
+        "discardTitle": "¿Descartar los cambios pendientes?",
+        "discardBody": "Los cambios de esta sección no se han guardado. Puedes seguir editando o descartarlos para continuar.",
+        "keep": "Seguir editando",
+        "discard": "Descartar y continuar",
+        "waitTitle": "Espera a que termine la operación",
+        "waitBody": "Hay un guardado o una subida en curso. No abandones la ficha hasta que termine.",
+        "retry": "Reintentar carga",
+        "loadError": "No pudimos cargar la ficha. Revisa tu conexión y vuelve a intentarlo.",
+        "notFound": "El producto no existe o ya no está disponible.",
+        "readOnly": "Este producto está archivado o en papelera. Solo se permite consultar su información y sus costos.",
+        "publicationHelp": "El estado y las alertas corresponden a los datos guardados. La vista previa y la publicación guiada llegarán en la siguiente entrega.",
+        "editInformation": "Revisar información y estado",
+        "reload": "Recargar datos guardados",
+        "invalidOptions": "Completa el nombre y los valores de todas las opciones antes de guardar.",
+        "savedSuccess": "Cambios guardados.",
+        "createDraft": "El producto se creará como borrador. Después podrás completar variantes, imágenes y costos desde su ficha.",
+        "accessError": "Tu sesión ha caducado o ya no tienes permiso para consultar este producto."
       }
     }
   }

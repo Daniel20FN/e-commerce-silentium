@@ -1,15 +1,10 @@
 import spanish from "@/dictionary/es.json";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { AdminProductsPage } from "./admin_products_page";
 import { ProductFormDialog } from "./product_form_dialog";
 import { ProductVariantEditor } from "./product_variant_editor";
+import { VariantGenerationDialog } from "./variant_generation_dialog";
 
 jest.mock("@mui/x-data-grid", () => ({
   DataGrid: ({
@@ -103,11 +98,18 @@ jest.mock("notistack", () => ({
   enqueueSnackbar: (...args: unknown[]) => mockEnqueueSnackbar(...args),
 }));
 
+const mockRouterPush = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockRouterPush }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 const dictionary = {
   admin: {
     costs: spanish.admin.costs,
     media: spanish.admin.media,
     products: {
+      workspace: spanish.admin.products.workspace,
       title: "Productos",
       description: "Gestioná productos y variantes del catálogo.",
       table: {
@@ -362,6 +364,9 @@ describe("admin_products_page", () => {
 
   it("loads products and applies search, trash, and sort filters", async () => {
     render(<AdminProductsPage dictionary={dictionary as never} />);
+    expect(
+      screen.getByRole("region", { name: dictionary.admin.products.title }),
+    ).toHaveStyle({ height: "620px" });
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(
@@ -502,10 +507,17 @@ describe("admin_products_page", () => {
       skippedDuplicateCombinationKeys: [],
     });
 
-    render(<AdminProductsPage dictionary={dictionary as never} />);
+    render(
+      <VariantGenerationDialog
+        dictionary={dictionary as never}
+        open
+        productId="product-1"
+        productOptions={productDetail.options}
+        onClose={jest.fn()}
+        onGenerated={jest.fn()}
+      />,
+    );
 
-    await screen.findAllByText("Sábanas Premium");
-    fireEvent.click(screen.getByRole("button", { name: "Generar variantes" }));
     expect(
       await screen.findByRole("checkbox", { name: "Tamaño" }),
     ).toBeChecked();
@@ -560,68 +572,38 @@ describe("admin_products_page", () => {
   });
 });
 
-describe("admin products asynchronous hydration", () => {
-  it("waits for stored variants before mounting the editor on its first opening", async () => {
+describe("product workspace entry", () => {
+  it("keeps only edit and lifecycle row actions and opens the unified editor", async () => {
     jest.resetAllMocks();
-    let resolveVariants: (value: {
-      items: Array<{
-        id: string;
-        productId: string;
-        sku: string;
-        stock: number;
-        active: boolean;
-        inTrash: boolean;
-        optionValues: [];
-      }>;
-    }) => void = () => {
-      throw new Error("not initialized");
-    };
-    const pending = new Promise<{
-      items: Array<{
-        id: string;
-        productId: string;
-        sku: string;
-        stock: number;
-        active: boolean;
-        inTrash: boolean;
-        optionValues: [];
-      }>;
-    }>((resolve) => {
-      resolveVariants = resolve;
-    });
-    mockGet.mockImplementation((id: string) => {
-      if (id === "admin-products-category-options")
-        return Promise.resolve({ items: [] });
-      if (id === "admin-product-detail-product-1")
-        return Promise.resolve({ product: productDetail });
-      if (id === "admin-product-variants-product-1") return pending;
-      return Promise.resolve({
-        items: [productWithoutSellableVariants],
-        total: 1,
-      });
-    });
+    mockGet.mockImplementation((id: string) =>
+      Promise.resolve(
+        id === "admin-products-category-options"
+          ? { items: [] }
+          : { items: [productWithoutSellableVariants], total: 1 },
+      ),
+    );
     render(<AdminProductsPage dictionary={dictionary as never} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Variantes" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Editar" }));
+    expect(
+      screen.queryByText(dictionary.admin.products.description),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Variantes", exact: true }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", {
+        name: dictionary.admin.products.actions.generateVariants,
+        exact: true,
+      }),
+    ).not.toBeInTheDocument();
+    expect(mockRouterPush).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "/admin/productos/product-1?section=information&returnTo=",
+      ),
+    );
     expect(
       screen.queryByText(dictionary.admin.products.variants.empty),
     ).not.toBeInTheDocument();
-    await act(async () => {
-      resolveVariants({
-        items: [
-          {
-            id: "v-async",
-            productId: "product-1",
-            sku: "ASYNC-STORED",
-            stock: 2,
-            active: true,
-            inTrash: false,
-            optionValues: [],
-          },
-        ],
-      });
-      await pending;
-    });
-    expect(await screen.findByText("ASYNC-STORED")).toBeInTheDocument();
   });
 });
 

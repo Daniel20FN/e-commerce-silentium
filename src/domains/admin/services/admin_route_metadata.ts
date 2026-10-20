@@ -64,7 +64,9 @@ export function resolveAdminRouteMetadata(
       section: ADMIN_ROUTE_SECTION.products,
       title: dictionary.admin.products.title,
       description: dictionary.admin.products.description,
-      matches: (currentPathname) => currentPathname === "/admin/productos",
+      matches: (currentPathname) =>
+        currentPathname === "/admin/productos" ||
+        currentPathname.startsWith("/admin/productos/"),
     },
     {
       href: "/admin/usuarios/[userId]",

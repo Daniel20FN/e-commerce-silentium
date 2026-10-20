@@ -1,6 +1,10 @@
 "use client";
 
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import {
+  AdminEditorSurface,
+  type AdminEditorState,
+} from "@/domains/admin/components/admin_editor_surface";
 import { apiService } from "@/types/api-service/api_service";
 import { priceFormatter } from "@/utils/price_formatter";
 import {
@@ -36,13 +40,21 @@ import type {
 } from "../types/api_params";
 
 type Props = {
+  embedded?: boolean;
+  onStateChange?: (state: AdminEditorState) => void;
   dictionary: Dictionary;
   product: { id: string; name: string };
   onClose: () => void;
 };
 const money = (cents: number) => priceFormatter(cents / 100);
 
-export function CatalogCostsDialog({ dictionary, product, onClose }: Props) {
+export function CatalogCostsDialog({
+  dictionary,
+  product,
+  onClose,
+  embedded = false,
+  onStateChange,
+}: Props) {
   const copy = dictionary.admin.costs;
   const endpoint = `/admin/products/${product.id}/costs`;
   const [data, setData] = useState<CatalogCostsData | null>(null);
@@ -59,6 +71,9 @@ export function CatalogCostsDialog({ dictionary, product, onClose }: Props) {
   const [discard, setDiscard] = useState(false);
   const dirty =
     editing !== null || name !== "" || description !== "" || amount !== "";
+  useEffect(() => {
+    onStateChange?.({ dirty, busy });
+  }, [dirty, busy, onStateChange]);
   const amountCents = parseCostPesos(amount);
   const variant = data?.variants.find(
     (v) =>
@@ -206,7 +221,8 @@ export function CatalogCostsDialog({ dictionary, product, onClose }: Props) {
 
   return (
     <>
-      <Dialog
+      <AdminEditorSurface
+        embedded={embedded}
         open
         maxWidth="lg"
         fullWidth
@@ -514,12 +530,14 @@ export function CatalogCostsDialog({ dictionary, product, onClose }: Props) {
             ) : null}
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={close} disabled={busy}>
-            {copy.close}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {!embedded && (
+          <DialogActions>
+            <Button onClick={close} disabled={busy}>
+              {copy.close}
+            </Button>
+          </DialogActions>
+        )}
+      </AdminEditorSurface>
       <Dialog
         open={removing !== null}
         onClose={() => {

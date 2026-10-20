@@ -271,7 +271,11 @@ describe("admin_product_service", () => {
 
     expect(mockPrisma.product.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "product-1" },
+        where: expect.objectContaining({
+          id: "product-1",
+          deletedAt: null,
+          status: { not: "archived" },
+        }),
         data: expect.objectContaining({
           categories: {
             deleteMany: {},
@@ -377,5 +381,55 @@ describe("admin_product_service", () => {
     );
     expect(result.status).toBe("archived");
     expect(result.archivedAt).toBe("2026-06-10T12:00:00.000Z");
+  });
+  it("rejects stale product revisions before writing", async () => {
+    mockPrisma.product.findUnique
+      .mockReset()
+      .mockResolvedValue({ ...productRecord });
+    await expect(
+      updateAdminProduct("product-1", {
+        ...upsertInput,
+        expectedUpdatedAt: "2026-06-10T10:00:00.000Z",
+      }),
+    ).rejects.toMatchObject({
+      type: "conflict",
+      message: "product_revision_conflict",
+    });
+    expect(mockPrisma.product.update).not.toHaveBeenCalled();
+  });
+  it("includes the expected product revision in the atomic update predicate", async () => {
+    mockPrisma.product.findUnique
+      .mockReset()
+      .mockResolvedValueOnce(productRecord)
+      .mockResolvedValueOnce({ id: "product-1" });
+    mockPrisma.category.findMany.mockResolvedValue([{ id: "cat-sheets" }]);
+    mockPrisma.product.update.mockResolvedValue(productRecord);
+    await updateAdminProduct("product-1", {
+      ...upsertInput,
+      options: undefined,
+      expectedUpdatedAt: productRecord.updatedAt.toISOString(),
+    });
+    expect(mockPrisma.product.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          updatedAt: productRecord.updatedAt,
+          deletedAt: null,
+          status: { not: "archived" },
+        }),
+      }),
+    );
+  });
+  it.each([
+    { ...productRecord, status: "archived" },
+    { ...productRecord, deletedAt: new Date() },
+  ])("does not edit an archived or trashed product", async (record) => {
+    mockPrisma.product.findUnique.mockReset().mockResolvedValue(record);
+    await expect(
+      updateAdminProduct("product-1", upsertInput),
+    ).rejects.toMatchObject({
+      type: "invalid_state",
+      message: "product_read_only",
+    });
+    expect(mockPrisma.product.update).not.toHaveBeenCalled();
   });
 });
