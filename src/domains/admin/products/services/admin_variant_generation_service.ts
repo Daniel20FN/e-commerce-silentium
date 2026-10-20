@@ -1,5 +1,9 @@
 ﻿import "server-only";
 
+import {
+  setInventoryContext,
+  type InventoryActor,
+} from "@/domains/admin/inventory/services/inventory_context";
 import { prisma } from "@/lib/prisma";
 import type {
   AdminVariantGenerationConfirmParams,
@@ -135,6 +139,7 @@ export async function previewAdminVariantGeneration(
 export async function confirmAdminVariantGeneration(
   productId: string,
   input: AdminVariantGenerationConfirmParams,
+  actor?: InventoryActor,
 ): Promise<AdminVariantGenerationConfirmResult> {
   const requestedCombinationKeys = input.variants.map((variant) =>
     buildOptionCombinationKey(variant.optionValueIds),
@@ -159,11 +164,23 @@ export async function confirmAdminVariantGeneration(
     existingCombinationKeys.add(combinationKey);
   }
 
-  await prisma.$transaction(async (transaction) => {
-    for (const variant of variantsToCreate) {
-      created.push(await createAdminVariant(productId, variant, transaction));
-    }
-  });
+  await prisma.$transaction(
+    async (transaction) => {
+      if (actor)
+        await transaction.$queryRaw`SELECT "id" FROM "Product" WHERE "id"=${productId} FOR UPDATE`;
+      if (actor)
+        await setInventoryContext(transaction, {
+          type: "initial",
+          actorId: actor.id,
+          actorLabel: actor.label,
+          reason: "inventory_generated",
+        });
+      for (const variant of variantsToCreate) {
+        created.push(await createAdminVariant(productId, variant, transaction));
+      }
+    },
+    { timeout: 30000 },
+  );
 
   return {
     created,

@@ -252,6 +252,7 @@ describe("admin_variant_service", () => {
         id: "variant-1",
         productId: "product-1",
         optionCombinationKey: "value-queen:value-white",
+        stock: 8,
       })
       .mockResolvedValueOnce({ id: "variant-1" });
     mockPrisma.productOptionValue.findMany.mockResolvedValue([
@@ -281,12 +282,28 @@ describe("admin_variant_service", () => {
           deletedAt: null,
         }),
         data: expect.objectContaining({
-          stock: 8,
           optionValues: expect.objectContaining({ deleteMany: {} }),
         }),
       }),
     );
     expect(result.stock).toBe(8);
+    expect(
+      mockPrisma.productVariant.update.mock.calls[0][0].data,
+    ).not.toHaveProperty("stock");
+  });
+
+  it("rejects stock changes through metadata updates", async () => {
+    mockPrisma.productVariant.findUnique.mockResolvedValue({
+      ...variantRecord,
+      stock: 2,
+    });
+    await expect(
+      updateAdminVariant("product-1", "variant-1", {
+        ...variantInput,
+        stock: 3,
+      }),
+    ).rejects.toMatchObject({ message: "inventory_use_movements" });
+    expect(mockPrisma.productVariant.update).not.toHaveBeenCalled();
   });
 
   it("rejects variant updates when the variant belongs to another product", async () => {

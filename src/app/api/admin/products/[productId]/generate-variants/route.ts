@@ -161,6 +161,7 @@ export async function PUT(
     const data = await confirmAdminVariantGeneration(
       paramsValidation.data.productId,
       payload.data,
+      access.actor,
     );
 
     return createAuthorizedProductJsonResponse(access.supabaseResponse, {

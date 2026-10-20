@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { updateQaStock } from "@/domains/admin/inventory/__fixtures__/update_qa_stock";
 import { getStorefrontProduct } from "@/domains/storefront/services/catalog_service";
 import { prisma } from "@/lib/prisma";
 import { updateAdminProduct } from "./admin_product_service";
@@ -137,10 +138,7 @@ integration(
         section: "information",
       });
       expect(await getStorefrontProduct(prefix)).not.toBeNull();
-      await prisma.productVariant.update({
-        where: { id: variantId },
-        data: { stock: 0 },
-      });
+      await updateQaStock(prisma, variantId, { stock: 0 });
       report = await getProductPublication(productId);
       expect(report).toMatchObject({ visible: true, purchasable: false });
       expect((await getStorefrontProduct(prefix))?.available).toBe(false);

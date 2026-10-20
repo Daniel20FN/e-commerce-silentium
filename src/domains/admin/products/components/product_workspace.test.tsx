@@ -100,6 +100,23 @@ function arrange(nextProduct = product) {
           updatedAt: nextProduct.updatedAt,
         },
       };
+    if (endpoint.endsWith("/inventory"))
+      return {
+        readOnly: false,
+        variants: [
+          {
+            id: variant.id,
+            sku: variant.sku,
+            stock: 2,
+            revision: 0,
+            minimum: null,
+            inTrash: false,
+            active: true,
+          },
+        ],
+        movements: [],
+        nextCursor: null,
+      };
     if (endpoint.endsWith("/variants")) return { items: [variant] };
     if (endpoint.endsWith("/parent-options"))
       return { items: [{ id: "category-1", name: "Dormitorio" }] };
@@ -405,4 +422,32 @@ describe("routed product workspace", () => {
       screen.getByRole("button", { name: copy.retry }),
     ).toBeInTheDocument();
   });
+});
+
+it("guards navigation away from pending inventory proposals", async () => {
+  arrange();
+  sessionStorage.clear();
+  render(
+    <ProductWorkspace
+      dictionary={dictionary}
+      productId={product.id}
+      initialSection="inventory"
+    />,
+  );
+  const inventory = dictionary.admin.inventory;
+  fireEvent.click(await screen.findByRole("button", { name: inventory.add }));
+  fireEvent.change(
+    await screen.findByRole("textbox", {
+      name: `${inventory.quantity} — ${variant.sku}`,
+    }),
+    { target: { value: "3" } },
+  );
+  fireEvent.click(screen.getByRole("tab", { name: copy.information }));
+  expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: copy.keep }));
+  expect(
+    await screen.findByRole("textbox", {
+      name: `${inventory.quantity} — ${variant.sku}`,
+    }),
+  ).toHaveValue("3");
 });

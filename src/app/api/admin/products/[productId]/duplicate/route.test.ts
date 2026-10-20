@@ -122,10 +122,12 @@ describe.each(operations)(
       expect(response.status).toBe(200);
       expect(response.headers.get("Cache-Control")).toBe("private, no-store");
       expect(response.cookies.get("qa-refresh")?.value).toBe("refreshed");
-      expect(label === "duplicate" ? duplicate : batch).toHaveBeenCalledWith(
-        "qa",
-        body,
-      );
+      if (label === "duplicate")
+        expect(duplicate).toHaveBeenCalledWith("qa", body, {
+          id: admin.id,
+          label: "QA",
+        });
+      else expect(batch).toHaveBeenCalledWith("qa", body);
     });
     it("maps conflicts and hides database details on unexpected errors", async () => {
       duplicate

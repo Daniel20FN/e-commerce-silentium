@@ -32,6 +32,7 @@ interface ProductRouteError {
 interface AuthorizedAdminAccess {
   authorized: true;
   supabaseResponse: NextResponse<null>;
+  actor: { id: string; label: string };
 }
 
 interface RejectedAdminAccess<TData> {
@@ -59,6 +60,7 @@ export function createProductJsonResponse<TData>(
 ): NextResponse<ApiResponse<TData>> {
   const response = NextResponse.json(body, { status });
   response.headers.set("Cache-Control", "private, no-store");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   return response;
 }
 
@@ -148,6 +150,13 @@ export async function resolveAdminRouteAccess<TData>(
   return {
     authorized: true,
     supabaseResponse,
+    actor: {
+      id: currentUser.id,
+      label:
+        [currentUser.profile.firstName, currentUser.profile.lastName]
+          .filter(Boolean)
+          .join(" ") || currentUser.email,
+    },
   };
 }
 

@@ -1,6 +1,6 @@
 # Roadmap — Operación diaria de la tienda
 
-**Estado:** alcance de las seis entregas aprobado el 20 de octubre de 2026. PRD 07–08 implementados, verificados y aceptados; PRD 09 (duplicación/precios) implementado, verificado y aceptado; stock rápido diferido a PRD 10; PRD 10–12 siguen en planificación. Las reglas señaladas como propuestas no están aprobadas por implicación.
+**Estado:** alcance de las seis entregas aprobado el 20 de octubre de 2026. PRD 07–08 implementados, verificados y aceptados; PRD 09 (duplicación/precios) implementado, verificado y aceptado; stock rápido diferido a PRD 10; PRD 10 implementado, verificado y aceptado; PRD 11–12 siguen en planificación. Las reglas señaladas como propuestas no están aprobadas por implicación.
 
 El siguiente ciclo mejora el trabajo del gestor: preparar un producto, publicarlo con confianza, repetir operaciones con menos esfuerzo y registrar inventario y ventas cerradas manualmente. No añade checkout ni pasarela.
 
@@ -43,10 +43,11 @@ No bloquean comenzar el PRD 07, pero sí la entrega que las necesita.
 | D-01 | Cancelación antes de entregar          | Revertir una sola vez el descuento del pedido si la mercancía no ha salido; exigir confirmación y motivo. Cancelar no significa reembolsar.                                                | PRD 11               |
 | D-02 | Devoluciones y cancelación tras salida | No reponer automáticamente. Registrar recepción física y cantidad apta para volver a stock, enlazada al pedido original. Definir si habrá devoluciones parciales en la primera versión.    | PRD 11               |
 | D-03 | Datos mínimos del pedido               | Nombre/contacto, líneas y cantidades; dirección solo cuando el envío la requiera. Gastos de envío manuales y separados de los productos. Confirmar entrega/recogida y campos obligatorios. | PRD 11               |
-| D-04 | Mínimos de inventario                  | Umbral opcional por variante; sin umbral no hay aviso de stock bajo, pero sí agotado.                                                                                                      | PRD 10               |
 | D-06 | Carga masiva                           | Evaluar CSV cuando conozcamos tamaño del catálogo y frecuencia de cambios; antes definir plantilla, validación y reporte de errores.                                                       | Ampliación posterior |
 
 D-05 resuelta el 20 de octubre de 2026: reutilizar archivos de imagen con referencias de galería independientes; las copias no heredan destacado. Ver el diseño y las precauciones de purgado en PRD 09.
+
+D-04 resuelta: mínimo opcional por variante; sin mínimo no hay aviso de stock bajo. Productos archivados/papelera y variantes retiradas quedan en solo consulta hasta restaurar antes de ajustar.
 
 ## Restricciones transversales
 

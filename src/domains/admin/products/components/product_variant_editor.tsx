@@ -485,6 +485,12 @@ export function ProductVariantEditor({
                 label={dictionary.admin.products.variants.stock}
                 size="small"
                 value={formState.stock}
+                disabled={!!formState.variantId}
+                helperText={
+                  formState.variantId
+                    ? dictionary.admin.products.feedback.inventory_use_movements
+                    : undefined
+                }
                 onChange={(event) =>
                   setFormState((current) => ({
                     ...current,

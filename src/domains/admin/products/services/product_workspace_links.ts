@@ -8,12 +8,14 @@ import {
 export type ProductWorkspaceSection =
   | "information"
   | "variants"
+  | "inventory"
   | "media"
   | "costs"
   | "publication";
 export const PRODUCT_WORKSPACE_SECTIONS: ProductWorkspaceSection[] = [
   "information",
   "variants",
+  "inventory",
   "media",
   "costs",
   "publication",

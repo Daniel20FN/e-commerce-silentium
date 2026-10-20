@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { updateQaStock } from "@/domains/admin/inventory/__fixtures__/update_qa_stock";
 import { prisma } from "@/lib/prisma";
 import { resolveCart } from "./cart_service";
 jest.mock("@/lib/prisma", () => {
@@ -110,10 +111,7 @@ integration("cart real PostgreSQL public contract", () => {
         })
       ).stock,
     ).toBe(4);
-    await prisma.productVariant.update({
-      where: { id: variantId },
-      data: { priceCents: 22000000, stock: 1 },
-    });
+    await updateQaStock(prisma, variantId, { priceCents: 22000000, stock: 1 });
     const reduced = await resolveCart({ items: [{ variantId, quantity: 2 }] });
     expect(reduced).toMatchObject({
       valid: false,
