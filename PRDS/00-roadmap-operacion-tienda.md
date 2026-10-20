@@ -1,6 +1,6 @@
 # Roadmap — Operación diaria de la tienda
 
-**Estado:** alcance de las seis entregas aprobado el 20 de octubre de 2026. PRD 07 implementado, verificado y aceptado; PRD 08–12 siguen en planificación. Las reglas señaladas como propuestas no están aprobadas por implicación.
+**Estado:** alcance de las seis entregas aprobado el 20 de octubre de 2026. PRD 07–08 implementados, verificados y aceptados; PRD 09–12 siguen en planificación. Las reglas señaladas como propuestas no están aprobadas por implicación.
 
 El siguiente ciclo mejora el trabajo del gestor: preparar un producto, publicarlo con confianza, repetir operaciones con menos esfuerzo y registrar inventario y ventas cerradas manualmente. No añade checkout ni pasarela.
 
@@ -68,8 +68,8 @@ No bloquean comenzar el PRD 07, pero sí la entrega que las necesita.
 
 ## Cierre del ciclo
 
-- [ ] Se crea y publica un producto completo sin alternar entre ventanas inconexas.
-- [ ] Se distinguen bloqueos reales y recomendaciones; borradores privados tienen vista previa segura.
+- [x] Se crea y publica un producto completo sin alternar entre ventanas inconexas.
+- [x] Se distinguen bloqueos reales y recomendaciones; borradores privados tienen vista previa segura.
 - [ ] Duplicar no arrastra SKU ni stock y la edición rápida no pierde cambios concurrentes.
 - [ ] Todo cambio de inventario es explicable y las ventas confirmadas descuentan exactamente una vez.
 - [ ] El gestor registra y consulta pedidos sin depender de memoria o conversaciones dispersas.

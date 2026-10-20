@@ -37,7 +37,7 @@ const images = {
   take: 10,
   select: imageSelect,
 } satisfies Prisma.ProductVariant$imagesArgs;
-const productSelect = {
+export const storefrontProductSelect = {
   id: true,
   slug: true,
   name: true,
@@ -74,18 +74,21 @@ const productSelect = {
     },
   },
 } satisfies Prisma.ProductSelect;
-type ProductRecord = Prisma.ProductGetPayload<{ select: typeof productSelect }>;
+export type StorefrontProductRecord = Prisma.ProductGetPayload<{
+  select: typeof storefrontProductSelect;
+}>;
+type ProductRecord = StorefrontProductRecord;
 const cardSelect = {
-  ...productSelect,
+  ...storefrontProductSelect,
   longDescription: false,
   seoTitle: false,
   seoDescription: false,
   options: false,
-  images: { ...productSelect.images, take: 1 },
+  images: { ...storefrontProductSelect.images, take: 1 },
   variants: {
-    ...productSelect.variants,
+    ...storefrontProductSelect.variants,
     select: {
-      ...productSelect.variants.select,
+      ...storefrontProductSelect.variants.select,
       images: { ...images, take: 1 },
     },
   },
@@ -272,55 +275,80 @@ export async function getStorefrontListing(
   };
 }
 
+export function projectStorefrontProduct(
+  product: StorefrontProductRecord,
+  categories: StorefrontCategory[],
+): StorefrontProduct {
+  const card = productCard(product);
+  const variants = publicVariants(product);
+  const selected = initialVariant(variants);
+  const relatedIds = new Set(
+    product.categories.map((relation) => relation.categoryId),
+  );
+  const related = categories.filter((category) => relatedIds.has(category.id));
+  const primaryId = product.categories.find(
+    (relation) => relation.isPrimary,
+  )?.categoryId;
+  const primary =
+    related.find((category) => category.id === primaryId) ?? related[0];
+  const usedValues = new Set(
+    variants.flatMap((variant) => variant.optionValueIds),
+  );
+
+  return {
+    ...(card ?? {
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      shortDescription: product.shortDescription,
+      brand: product.brand,
+      image: null,
+      priceCents: 0,
+      compareAtPriceCents: null,
+      hasMultiplePrices: false,
+      available: false,
+    }),
+    longDescription: product.longDescription,
+    seoTitle: product.seoTitle,
+    seoDescription: product.seoDescription,
+    categories: related,
+    breadcrumbs: primary ? categoryTrail(primary, categories) : [],
+    options: product.options.map((option) => ({
+      id: option.id,
+      name: option.name,
+      values: option.values
+        .filter((value) => usedValues.has(value.id))
+        .map((value) => ({ id: value.id, value: value.value })),
+    })),
+    variants,
+    images: product.images.map((image) => publicImage(image, product.name)),
+    initialVariantId: selected?.id ?? "",
+  };
+}
+
 export const getStorefrontProduct = cache(
   async (slug: string): Promise<StorefrontProduct | null> => {
     if (!slug || slug.length > 180) return null;
     const categories = await getStorefrontCategories();
     const product = await prisma.product.findFirst({
       where: { ...publicProductWhere(categories), slug },
-      select: productSelect,
+      select: storefrontProductSelect,
     });
     if (!product) return null;
     const card = productCard(product);
     const variants = publicVariants(product);
     const selected = initialVariant(variants);
     if (!card || !selected) return null;
-    const relatedIds = new Set(
-      product.categories.map((relation) => relation.categoryId),
-    );
-    const related = categories.filter((category) =>
-      relatedIds.has(category.id),
-    );
-    const primaryId = product.categories.find(
-      (relation) => relation.isPrimary,
-    )?.categoryId;
-    const primary =
-      related.find((category) => category.id === primaryId) ?? related[0];
-    const usedValues = new Set(
-      variants.flatMap((variant) => variant.optionValueIds),
-    );
+    const projected = projectStorefrontProduct(product, categories);
     const resolvedImages = await listStorefrontCatalogImages(
       product.id,
       selected.id,
     );
-
     return {
-      ...card,
+      ...projected,
       image: resolvedImages[0]
         ? publicImage(resolvedImages[0], product.name)
         : null,
-      longDescription: product.longDescription,
-      seoTitle: product.seoTitle,
-      seoDescription: product.seoDescription,
-      categories: related,
-      breadcrumbs: primary ? categoryTrail(primary, categories) : [],
-      options: product.options.map((option) => ({
-        ...option,
-        values: option.values.filter((value) => usedValues.has(value.id)),
-      })),
-      variants,
-      images: product.images.map((image) => publicImage(image, product.name)),
-      initialVariantId: selected.id,
     };
   },
 );

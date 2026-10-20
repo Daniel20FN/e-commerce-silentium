@@ -1,6 +1,6 @@
 # PRD 08 — Publicación guiada y vista previa
 
-**Estado:** alcance aprobado; reglas nuevas de bloqueo no autorizadas. Depende de la [ficha del PRD 07](07-prd-ficha-producto-admin.md).
+**Estado:** implementado, verificado y aceptado. No añade reglas nuevas de bloqueo. Depende de la [ficha del PRD 07](07-prd-ficha-producto-admin.md). Guía: [Publicación y preview](../docs/admin-publication-preview.md).
 
 ## Objetivo
 
@@ -41,12 +41,14 @@ Que el gestor sepa qué verá el cliente, por qué un producto no aparece o no e
 
 ## Aceptación y pruebas
 
-- [ ] Cada bloqueo real tiene explicación y acceso para corregirlo; las recomendaciones no impiden guardar borradores.
-- [ ] Un producto activo sin stock no se presenta como comprable; las variantes elegibles coinciden con el storefront.
-- [ ] Preview de borrador funciona con sesión y es inaccesible de forma anónima, sin fuga a caché/indexación.
-- [ ] No se puede añadir un borrador al carrito ni iniciar una venta desde preview.
-- [ ] Cambios pendientes y datos guardados no se confunden; producto publicado abre su URL real.
-- [ ] Jest de política/proyección/autorización/caché, integración del catálogo cuando corresponda y Chrome con borrador, publicable, agotado y archivado.
+- [x] Cada bloqueo real tiene explicación y acceso para corregirlo; las recomendaciones no impiden guardar borradores.
+- [x] Un producto activo sin stock no se presenta como comprable; las variantes elegibles coinciden con el storefront.
+- [x] Preview de borrador funciona con sesión y es inaccesible de forma anónima, sin fuga a caché/indexación.
+- [x] No se puede añadir un borrador al carrito ni iniciar una venta desde preview.
+- [x] Cambios pendientes y datos guardados no se confunden; producto publicado abre su URL real.
+- [x] Jest de política/proyección/autorización/caché, integración del catálogo cuando corresponda y Chrome con borrador, publicable, agotado y archivado.
+
+Verificación local: 522 pruebas Jest aprobadas (14 integraciones opcionales omitidas en la ejecución normal), integración PostgreSQL de publicación ejecutada por separado, TypeScript y lint sin errores. Chrome: activación confirmada de QA, enlace público real, agotado visible/no comprable, fixture archivado/retirado de solo lectura, imagen cargada y preview de 390/1200 px; a 320 px no desborda la página. El producto QA de la ficha vuelve a quedar como borrador con stock 3. La muestra usa la ficha compartida y container queries, no un iframe; no se cambia la política de autorización para resolver problemas de incrustación.
 
 ## Fuera de alcance y continuación
 

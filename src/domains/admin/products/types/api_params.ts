@@ -11,6 +11,11 @@ import type {
   AdminProductsListApiResponseData,
   AdminVariantMutationApiResponseData,
 } from "./product_dto";
+import type { PublicationReport } from "./publication";
+
+export type AdminPublicationApiResponse = ApiResponse<{
+  report: PublicationReport;
+}>;
 
 export type {
   AdminProductDetailApiResponseData,

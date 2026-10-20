@@ -6,7 +6,9 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
+import { publicationReport } from "../__fixtures__/publication";
 import type {
   AdminProductDetailDto,
   AdminProductVariantDto,
@@ -89,6 +91,15 @@ const copy = dictionary.admin.products.workspace;
 
 function arrange(nextProduct = product) {
   get.mockImplementation(async (endpoint) => {
+    if (endpoint.endsWith("/publication"))
+      return {
+        report: {
+          ...publicationReport,
+          productId: nextProduct.id,
+          status: nextProduct.status,
+          updatedAt: nextProduct.updatedAt,
+        },
+      };
     if (endpoint.endsWith("/variants")) return { items: [variant] };
     if (endpoint.endsWith("/parent-options"))
       return { items: [{ id: "category-1", name: "Dormitorio" }] };
@@ -285,6 +296,38 @@ describe("routed product workspace", () => {
     ).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("tab", { name: copy.costs }));
     expect(await screen.findByText("cost-editor")).toBeInTheDocument();
+  });
+
+  it("activates through the existing saved product PATCH and retains revision conflict input", async () => {
+    patch.mockReset().mockRejectedValue(new Error("product_revision_conflict"));
+    const publication = dictionary.admin.products.publication;
+    render(
+      <ProductWorkspace
+        dictionary={dictionary}
+        productId={product.id}
+        initialSection="publication"
+      />,
+    );
+    await screen.findByText(publication.hidden);
+    fireEvent.click(screen.getByRole("button", { name: publication.publish }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: publication.confirm }),
+    );
+    await screen.findByText(
+      dictionary.admin.products.feedback.product_revision_conflict,
+    );
+    expect(patch).toHaveBeenCalledWith(
+      `/admin/products/${product.id}`,
+      expect.objectContaining({
+        expectedUpdatedAt: product.updatedAt,
+        status: "active",
+        name: product.name,
+      }),
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      product.name,
+    );
   });
 
   it.each([

@@ -588,12 +588,11 @@ describe("product workspace entry", () => {
       screen.queryByText(dictionary.admin.products.description),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "Variantes", exact: true }),
+      screen.queryByRole("button", { name: "Variantes" }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", {
         name: dictionary.admin.products.actions.generateVariants,
-        exact: true,
       }),
     ).not.toBeInTheDocument();
     expect(mockRouterPush).toHaveBeenCalledWith(

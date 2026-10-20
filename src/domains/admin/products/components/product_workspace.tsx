@@ -28,6 +28,7 @@ import {
   safeProductsReturnUrl,
   type ProductWorkspaceSection,
 } from "../services/product_workspace_links";
+import { publicationPayload } from "../services/publication_rules";
 import type {
   AdminProductDetailApiResponse,
   AdminProductMutationApiResponse,
@@ -40,8 +41,8 @@ import type {
 } from "../types/product_dto";
 import { EditorGuardDialog } from "./editor_guard_dialog";
 import { ProductFormDialog } from "./product_form_dialog";
-import { ProductSellabilityWarnings } from "./product_sellability_warnings";
 import { ProductVariantEditor } from "./product_variant_editor";
+import { PublicationPanel } from "./publication_panel";
 import { VariantGenerationDialog } from "./variant_generation_dialog";
 
 export function ProductWorkspace({
@@ -394,22 +395,18 @@ export function ProductWorkspace({
           />
         )}
         {section === "publication" && (
-          <Stack spacing={2}>
-            <Alert severity="info">{copy.publicationHelp}</Alert>
-            <Typography>
-              {dictionary.admin.products.form.status}:{" "}
-              {dictionary.admin.products.status[product.status]}
-            </Typography>
-            <ProductSellabilityWarnings
-              dictionary={dictionary}
-              warnings={product.warnings}
-            />
-            {!readOnly && (
-              <Button onClick={() => changeSection("information")}>
-                {copy.editInformation}
-              </Button>
-            )}
-          </Stack>
+          <PublicationPanel
+            dictionary={dictionary}
+            productId={productId}
+            revision={product.updatedAt}
+            returnTo={back}
+            saving={saving}
+            onChangeSection={changeSection}
+            onPublish={() => void saveProduct(publicationPayload(product))}
+            onReload={() =>
+              guard.request(() => setReload((value) => value + 1))
+            }
+          />
         )}
       </Paper>
       {generation && !readOnly && (
