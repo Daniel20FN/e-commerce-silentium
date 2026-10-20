@@ -83,6 +83,8 @@
 
 - Optional publication PostgreSQL checks: set `PUBLICATION_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/products/services/publication_service.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL`; creates isolated QA categories/product/variant/cost metadata and soft-retires fixtures afterward. No Storage uploads or real order/stock consumption. Verifies preview projection/privacy, public eligibility parity (ancestors, alternate categories, stock, inactive variants), stale revisions and archived activation denial. Stop Jest/Next before Prisma generation/build on Windows.
 
+- Optional quick catalog operations PostgreSQL checks: set `CATALOG_OPERATIONS_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/products/services/catalog_operations.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL` and the quick-operations migration; creates isolated QA catalog/image metadata and costs, then soft-retires fixtures. No Storage uploads/deletes or changes to real product stock. Verifies independent copies, idempotency, cost remapping, shared-image metadata isolation, atomic price rollback and private operation-table SQL denial. Stop Jest/Next before Prisma generation/build on Windows.
+
 ## Git Hooks
 
 - Husky is enabled via the `prepare` script.

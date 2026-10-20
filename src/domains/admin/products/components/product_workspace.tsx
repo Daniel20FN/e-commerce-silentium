@@ -39,7 +39,9 @@ import type {
   AdminProductDetailDto,
   AdminProductVariantDto,
 } from "../types/product_dto";
+import { DuplicateProductDialog } from "./duplicate_product_dialog";
 import { EditorGuardDialog } from "./editor_guard_dialog";
+import { PriceBatchEditor } from "./price_batch_editor";
 import { ProductFormDialog } from "./product_form_dialog";
 import { ProductVariantEditor } from "./product_variant_editor";
 import { PublicationPanel } from "./publication_panel";
@@ -79,6 +81,8 @@ export function ProductWorkspace({
   const [reload, setReload] = useState(0);
   const [editorKey, setEditorKey] = useState(0);
   const [generation, setGeneration] = useState(initialGenerate);
+  const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [priceBatch, setPriceBatch] = useState(false);
   const [editor, setEditor] = useState<AdminEditorState>({
     busy: false,
     dirty: false,
@@ -88,6 +92,7 @@ export function ProductWorkspace({
     dirty: editor.dirty,
   });
   const reportState = useCallback((state: AdminEditorState) => {
+    if (state.dirty || state.busy) setSaved(false);
     setEditor((current) =>
       current.busy === state.busy && current.dirty === state.dirty
         ? current
@@ -95,7 +100,8 @@ export function ProductWorkspace({
     );
   }, []);
   const back = safeProductsReturnUrl(returnTo);
-  const readOnly = product?.inTrash || product?.status === "archived";
+  const readOnly =
+    product?.inTrash || product?.status === "archived" || !!product?.archivedAt;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -262,6 +268,21 @@ export function ProductWorkspace({
           >
             {copy.reload}
           </Button>
+          {!readOnly && (
+            <Button
+              size="small"
+              disabled={saving || editor.busy}
+              onClick={() =>
+                guard.request(() => {
+                  setEditorKey((value) => value + 1);
+                  reportState({ dirty: false, busy: false });
+                  setDuplicateOpen(true);
+                })
+              }
+            >
+              {dictionary.admin.products.operations.duplicate}
+            </Button>
+          )}
         </Stack>
       </Stack>
       {readOnly && <Alert severity="info">{copy.readOnly}</Alert>}
@@ -326,18 +347,35 @@ export function ProductWorkspace({
         {section === "variants" && (
           <Stack spacing={2}>
             {!readOnly && (
-              <Button
-                sx={{ alignSelf: "flex-start" }}
-                onClick={() =>
-                  guard.request(() => {
-                    setEditorKey((value) => value + 1);
-                    reportState({ dirty: false, busy: false });
-                    setGeneration(true);
-                  })
-                }
-              >
-                {dictionary.admin.products.actions.generateVariants}
-              </Button>
+              <Stack direction={{ xs: "column", sm: "row" }} gap={1}>
+                <Button
+                  onClick={() =>
+                    guard.request(() => {
+                      setEditorKey((value) => value + 1);
+                      reportState({ dirty: false, busy: false });
+                      setPriceBatch((value) => !value);
+                    })
+                  }
+                >
+                  {priceBatch
+                    ? dictionary.admin.products.operations.single
+                    : dictionary.admin.products.operations.batch}
+                </Button>
+                {!priceBatch && (
+                  <Button
+                    sx={{ alignSelf: "flex-start" }}
+                    onClick={() =>
+                      guard.request(() => {
+                        setEditorKey((value) => value + 1);
+                        reportState({ dirty: false, busy: false });
+                        setGeneration(true);
+                      })
+                    }
+                  >
+                    {dictionary.admin.products.actions.generateVariants}
+                  </Button>
+                )}
+              </Stack>
             )}
             {readOnly ? (
               variants.map((variant) => (
@@ -346,6 +384,19 @@ export function ProductWorkspace({
                   {variant.stock}
                 </Typography>
               ))
+            ) : priceBatch ? (
+              <PriceBatchEditor
+                key={editorKey}
+                dictionary={dictionary}
+                productId={productId}
+                revision={product.updatedAt}
+                variants={variants}
+                onStateChange={reportState}
+                onSaved={() => {
+                  setSaved(true);
+                  setReload((value) => value + 1);
+                }}
+              />
             ) : (
               <ProductVariantEditor
                 key={editorKey}
@@ -409,6 +460,16 @@ export function ProductWorkspace({
           />
         )}
       </Paper>
+      {!readOnly && (
+        <DuplicateProductDialog
+          dictionary={dictionary}
+          product={product}
+          open={duplicateOpen}
+          returnTo={back}
+          onClose={() => setDuplicateOpen(false)}
+          onBusyChange={setSaving}
+        />
+      )}
       {generation && !readOnly && (
         <VariantGenerationDialog
           dictionary={dictionary}

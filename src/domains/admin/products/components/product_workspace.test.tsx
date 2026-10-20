@@ -282,6 +282,69 @@ describe("routed product workspace", () => {
     expect(unload.defaultPrevented).toBe(true);
   });
 
+  it("guards batch drafts before switching editors or duplicating the saved product", async () => {
+    const operations = dictionary.admin.products.operations;
+    render(
+      <ProductWorkspace
+        dictionary={dictionary}
+        productId={product.id}
+        initialSection="variants"
+      />,
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: operations.batch }),
+    );
+    fireEvent.change(
+      screen.getByRole("textbox", {
+        name: `${operations.price} — ${variant.sku}`,
+      }),
+      { target: { value: "1234.56" } },
+    );
+    fireEvent.click(screen.getByRole("button", { name: operations.single }));
+    expect(await screen.findByRole("dialog")).toHaveTextContent(
+      copy.discardTitle,
+    );
+    fireEvent.click(screen.getByRole("button", { name: copy.keep }));
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.getByRole("textbox", {
+        name: `${operations.price} — ${variant.sku}`,
+      }),
+    ).toHaveValue("1234.56");
+    fireEvent.click(screen.getByRole("button", { name: operations.duplicate }));
+    fireEvent.click(await screen.findByRole("button", { name: copy.discard }));
+    expect(
+      await screen.findByRole("dialog", { name: operations.duplicateTitle }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", { name: operations.copyCosts }),
+    ).not.toBeChecked();
+  });
+
+  it("treats archivedAt as read-only even if a legacy status is still draft", async () => {
+    arrange({ ...product, archivedAt: "2026-10-20T00:00:00.000Z" });
+    render(
+      <ProductWorkspace
+        dictionary={dictionary}
+        productId={product.id}
+        initialSection="variants"
+      />,
+    );
+    await screen.findByText(copy.readOnly);
+    expect(
+      screen.queryByRole("button", {
+        name: dictionary.admin.products.operations.duplicate,
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", {
+        name: dictionary.admin.products.operations.batch,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   it("keeps archived products read-only and permits cost consultation", async () => {
     arrange({ ...product, status: "archived" });
     render(<ProductWorkspace dictionary={dictionary} productId={product.id} />);
