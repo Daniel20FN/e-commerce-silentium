@@ -1,6 +1,6 @@
 # PRD 10 — Inventario y movimientos por variante
 
-**Estado:** alcance aprobado. Descuento por pedido al confirmar aprobado; mínimos y política de devoluciones pendientes según el [roadmap](00-roadmap-operacion-tienda.md).
+**Estado:** implementado, verificado y aceptado por el usuario; PR y fusión autorizadas. Aprobados mínimo opcional por variante y archivados/papelera solo consulta hasta restaurar. Descuento por pedido al confirmar ya aprobado; política de devoluciones pendiente para PRD 11.
 
 ## Objetivo
 
@@ -30,9 +30,9 @@ Que el gestor pueda explicar de dónde sale la cantidad disponible de una varian
 - Crear variantes con saldo cero; cualquier existencia inicial distinta de cero genera su movimiento. La duplicación del PRD 09 conserva cero.
 - Actualizar todos los escritores: editor individual, generador de variantes con stock inicial, tabla rápida, tareas de seed/administración aplicables y pedidos posteriores. Documentar las excepciones de fixtures de pruebas, nunca una excepción comercial.
 - Lecturas públicas conservan su contrato y solo reciben cantidad/elegibilidad permitida; motivos, actores y movimientos permanecen privados.
-- Ajustes estándar de variantes activas/inactivas según permisos actuales; para papelera/archivado definir antes de diseño si solo se permite consulta/reversión controlada. No reactivar productos por un ajuste.
+- Ajustes en variantes activas/inactivas según permisos actuales. Productos archivados/en papelera y variantes retiradas: solo consultar historial hasta restaurar; no ajustar ni revertir antes. No reactivar productos por un ajuste.
 
-## Alertas de mínimo — propuesta pendiente D-04
+## Alertas de mínimo — D-04 aprobada
 
 - Umbral opcional por variante, entero no negativo. Stock bajo si `0 < stock <= mínimo`; agotado si stock cero. Son grupos distinguibles.
 - Sin mínimo configurado no inventar un umbral global ni avisos de bajo stock. La consulta de agotados sigue funcionando.
@@ -40,13 +40,23 @@ Que el gestor pueda explicar de dónde sale la cantidad disponible de una varian
 
 ## Aceptación y pruebas
 
-- [ ] Entrada/salida/conteo genera movimiento con actor, razón y saldos coherentes; errores no dejan media operación.
-- [ ] Dos salidas simultáneas no producen saldo negativo ni pérdida de movimiento.
-- [ ] Reintentar una operación confirmada devuelve su resultado sin repetir el delta.
-- [ ] Migrar conserva todas las existencias actuales y es repetible sin duplicar saldos iniciales.
-- [ ] Toda escritura comercial de stock deja movimiento, incluida la generación inicial y tabla rápida.
-- [ ] Historial sigue consultable tras archivar un producto y no se expone públicamente.
-- [ ] Jest, integración PostgreSQL de concurrencia/idempotencia/reversión/migración y Chrome con entradas, conteo conflictivo y agotado.
+- [x] Entrada/salida/conteo genera movimiento con actor, razón y saldos coherentes; errores no dejan media operación.
+- [x] Dos salidas simultáneas no producen saldo negativo ni pérdida de movimiento.
+- [x] Reintentar una operación confirmada devuelve su resultado sin repetir el delta.
+- [x] Migrar conserva todas las existencias actuales y es repetible sin duplicar saldos iniciales.
+- [x] Toda escritura comercial de stock deja movimiento, incluida la generación inicial y tabla rápida.
+- [x] Historial sigue consultable tras archivar un producto y no se expone públicamente.
+- [x] Jest, integración PostgreSQL de concurrencia/idempotencia/reversión/migración y Chrome con entradas, conteo conflictivo y agotado.
+
+## Evidencias y límites
+
+- Desarrollo: 136 variantes comparadas antes/después del corte, cantidades idénticas (346 unidades), un saldo inicial por variante. Repetir `migrate deploy` no aplica cambios ni duplica iniciales.
+- PostgreSQL real: 12 pruebas de inventario aprobadas (incluye creación/generación inicial con actor), más 11 de regresión de carrito/publicación/duplicación.
+- Chrome sobre build optimizado con entorno de desarrollo: mínimo opcional, lote de entrada, salida concurrente, conteo obsoleto rechazado, relectura conservando propuestas, confirmación nueva, alerta de mínimo, reversión conservando original, conteo móvil a cero y consulta de producto archivado.
+- Sin desbordamiento de documento a 320/390 píxeles; confirmación móvil comprobada. Filtros por tipo/referencia verificados en Chrome; fechas y orden inválido cubiertos por pruebas de componente/contrato, sin afirmar prueba manual del selector de fecha.
+- Las 136 existencias previas quedaron otra vez idénticas al finalizar QA; ningún producto real consumió stock. Solo el ejemplo QA recibió y compensó movimientos; conserva mínimo de aviso 3 en la primera variante y todo su historial.
+- Migración aplicada solo en desarrollo. En otros entornos requiere ventana sin escritores antiguos; consultas/movimientos administrativos siguen privados. Regresión final: 565 pruebas Jest aprobadas (34 integraciones opcionales omitidas), 101 suites; TypeScript y build aprobados, lint sin errores (un warning previo del JavaScript generado de cobertura).
+- Guía técnica, idempotencia, restricciones y comandos: [Inventario administrativo](../docs/admin-inventory.md).
 
 ## Fuera de alcance y continuación
 

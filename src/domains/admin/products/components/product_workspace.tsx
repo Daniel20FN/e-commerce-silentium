@@ -7,6 +7,7 @@ import type {
 } from "@/domains/admin/categories/types/api_responses";
 import type { AdminEditorState } from "@/domains/admin/components/admin_editor_surface";
 import { CatalogCostsDialog } from "@/domains/admin/costs/components/catalog_costs_dialog";
+import { InventoryPanel } from "@/domains/admin/inventory/components/inventory_panel";
 import { CatalogMediaDialog } from "@/domains/admin/media/components/catalog_media_dialog";
 import { apiService } from "@/types/api-service/api_service";
 import {
@@ -435,6 +436,14 @@ export function ProductWorkspace({
               onClose={resetEditor}
             />
           ))}
+        {section === "inventory" && (
+          <InventoryPanel
+            key={editorKey}
+            dictionary={dictionary}
+            productId={productId}
+            onStateChange={reportState}
+          />
+        )}
         {section === "costs" && (
           <CatalogCostsDialog
             key={editorKey}

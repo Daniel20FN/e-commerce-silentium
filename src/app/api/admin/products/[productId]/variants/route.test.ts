@@ -122,6 +122,8 @@ describe("POST /api/admin/products/[productId]/variants", () => {
     expect(mockCreateAdminVariant).toHaveBeenCalledWith(
       "product-1",
       expect.objectContaining({ sku: "SIL-PILLOW-WHITE" }),
+      undefined,
+      expect.objectContaining({ id: adminUser.id }),
     );
     expect(response.status).toBe(200);
     expect(response.cookies.get("sb-refresh-token")?.value).toBe("refreshed");

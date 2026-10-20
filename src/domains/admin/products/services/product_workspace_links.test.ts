@@ -66,5 +66,6 @@ describe("workspace navigation contracts", () => {
     });
     expect(resolveWorkspaceSection("invalid")).toBe("information");
     expect(resolveWorkspaceSection("costs")).toBe("costs");
+    expect(resolveWorkspaceSection("inventory")).toBe("inventory");
   });
 });

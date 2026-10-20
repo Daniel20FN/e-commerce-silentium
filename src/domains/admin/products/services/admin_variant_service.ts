@@ -1,5 +1,9 @@
 ﻿import "server-only";
 
+import {
+  setInventoryContext,
+  type InventoryActor,
+} from "@/domains/admin/inventory/services/inventory_context";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import type { AdminVariantUpsertParams } from "../types/api_params";
@@ -165,13 +169,13 @@ async function assertProductExists(
 ): Promise<void> {
   const product = await db.product.findUnique({
     where: { id: productId },
-    select: { id: true, status: true, deletedAt: true },
+    select: { id: true, status: true, deletedAt: true, archivedAt: true },
   });
 
   if (!product) {
     throw createMutationError("not_found", "record_not_found");
   }
-  if (product.deletedAt || product.status === "archived")
+  if (product.deletedAt || product.archivedAt || product.status === "archived")
     throw createMutationError("invalid_state", "product_read_only");
 }
 
@@ -308,7 +312,6 @@ function buildVariantUpdateData(
     sku: input.sku,
     priceCents: input.priceCents,
     compareAtPriceCents: input.compareAtPriceCents ?? null,
-    stock: input.stock,
     isActive: input.active,
     isDefault: input.isDefault,
     displayOrder: input.displayOrder,
@@ -362,7 +365,22 @@ export async function createAdminVariant(
   productId: string,
   input: AdminVariantUpsertParams,
   db: AdminVariantPrismaClient = prisma,
+  actor?: InventoryActor,
 ): Promise<AdminProductVariantDto> {
+  if (actor)
+    return prisma.$transaction(
+      async (tx) => {
+        await tx.$queryRaw`SELECT "id" FROM "Product" WHERE "id"=${productId} FOR UPDATE`;
+        await setInventoryContext(tx, {
+          type: "initial",
+          actorId: actor.id,
+          actorLabel: actor.label,
+          reason: "inventory_created",
+        });
+        return createAdminVariant(productId, input, tx);
+      },
+      { timeout: 15000 },
+    );
   await assertProductExists(productId, db);
   await assertSkuAvailable(input.sku, db);
   assertVariantPrices(input);
@@ -405,10 +423,16 @@ export async function updateAdminVariant(
         optionCombinationKey: true,
         deletedAt: true,
         updatedAt: true,
+        stock: true,
       },
     })) as Pick<
       VariantRecord,
-      "id" | "productId" | "optionCombinationKey" | "deletedAt" | "updatedAt"
+      | "id"
+      | "productId"
+      | "optionCombinationKey"
+      | "deletedAt"
+      | "updatedAt"
+      | "stock"
     > | null;
 
     if (!currentVariant || currentVariant.productId !== productId) {
@@ -417,6 +441,8 @@ export async function updateAdminVariant(
 
     if (currentVariant.deletedAt)
       throw createMutationError("invalid_state", "variant_in_trash");
+    if (input.stock !== currentVariant.stock)
+      throw createMutationError("invalid_state", "inventory_use_movements");
     if (
       input.expectedUpdatedAt &&
       currentVariant.updatedAt.toISOString() !== input.expectedUpdatedAt
@@ -453,7 +479,11 @@ export async function updateAdminVariant(
           id: variantId,
           productId,
           deletedAt: null,
-          product: { deletedAt: null, status: { not: "archived" } },
+          product: {
+            deletedAt: null,
+            archivedAt: null,
+            status: { not: "archived" },
+          },
           ...(input.expectedUpdatedAt
             ? { updatedAt: new Date(input.expectedUpdatedAt) }
             : {}),

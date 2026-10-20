@@ -1,3 +1,7 @@
+import {
+  setInventoryContext,
+  type InventoryActor,
+} from "@/domains/admin/inventory/services/inventory_context";
 import "server-only";
 
 import { getDictionary } from "@/dictionary/services/get-dictionary";
@@ -31,10 +35,18 @@ function replay(
 export async function duplicateProduct(
   sourceId: string,
   input: AdminDuplicateProductParams,
+  actor?: InventoryActor,
 ): Promise<AdminDuplicateProductData> {
   try {
     return await prisma.$transaction(
       async (tx) => {
+        if (actor)
+          await setInventoryContext(tx, {
+            type: "initial",
+            actorId: actor.id,
+            actorLabel: actor.label,
+            reason: "inventory_copied",
+          });
         const existing = await tx.catalogDuplication.findUnique({
           where: { operationId: input.operationId },
         });

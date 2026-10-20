@@ -85,6 +85,8 @@
 
 - Optional quick catalog operations PostgreSQL checks: set `CATALOG_OPERATIONS_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/products/services/catalog_operations.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL` and the quick-operations migration; creates isolated QA catalog/image metadata and costs, then soft-retires fixtures. No Storage uploads/deletes or changes to real product stock. Verifies independent copies, idempotency, cost remapping, shared-image metadata isolation, atomic price rollback and private operation-table SQL denial. Stop Jest/Next before Prisma generation/build on Windows.
 
+- Optional inventory PostgreSQL checks: set `INVENTORY_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/inventory/services/inventory_service.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL` and inventory migration. Creates isolated QA products/variants and soft-retires them. Stock UPDATE requires an explicit transaction-local inventory context; fixtures use `updateQaStock`, never unlogged writes. Ledger/operations are immutable; do not physically delete historical fixtures. No Storage operations or real stock changes. Stop Next/Jest before Prisma generation/build on Windows.
+
 ## Git Hooks
 
 - Husky is enabled via the `prepare` script.

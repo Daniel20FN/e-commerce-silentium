@@ -143,6 +143,8 @@ export async function POST(
     const variant = await createAdminVariant(
       paramsValidation.data.productId,
       payload.data,
+      undefined,
+      access.actor,
     );
 
     return createAuthorizedProductJsonResponse(access.supabaseResponse, {

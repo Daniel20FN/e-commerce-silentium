@@ -232,6 +232,9 @@ model ProductVariant {
   priceCents           Int
   compareAtPriceCents  Int?
   stock                Int                         @default(0)
+  stockRevision        Int                         @default(0)
+  inventoryMinimum     Int?
+  inventoryMovements   InventoryMovement[]
   isActive             Boolean                     @default(true)
   isDefault            Boolean                     @default(false)
   displayOrder         Int                         @default(0)
@@ -326,4 +329,47 @@ model ProductVariantOptionValue {
 
   @@id([productVariantId, optionValueId])
   @@index([optionValueId])
+}
+
+enum InventoryMovementType {
+  initial
+  entry
+  exit
+  count
+  reversal
+  maintenance
+}
+
+model InventoryOperation {
+  id          String              @id
+  productId   String
+  actorId     String
+  requestHash String
+  createdAt   DateTime            @default(now())
+  movements   InventoryMovement[]
+}
+
+model InventoryMovement {
+  id          String                @id @default(uuid())
+  variantId   String
+  variant     ProductVariant        @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  revision    Int
+  type        InventoryMovementType
+  delta       Int
+  before      Int
+  after       Int
+  actorId     String?
+  actorLabel  String?
+  reason      String
+  reference   String?
+  operationId String?
+  operation   InventoryOperation?   @relation(fields: [operationId], references: [id], onDelete: Restrict)
+  reversesId  String?               @unique
+  reverses    InventoryMovement?    @relation("InventoryReversal", fields: [reversesId], references: [id], onDelete: Restrict)
+  reversedBy  InventoryMovement?    @relation("InventoryReversal")
+  createdAt   DateTime              @default(now())
+
+  @@unique([variantId, revision])
+  @@index([variantId, createdAt, id])
+  @@index([operationId])
 }

@@ -37,7 +37,11 @@ export async function POST(
       400,
     );
   try {
-    const data = await duplicateProduct(route.data.productId, input.data);
+    const data = await duplicateProduct(
+      route.data.productId,
+      input.data,
+      access.actor,
+    );
     return createAuthorizedProductJsonResponse(access.supabaseResponse, {
       data,
     });

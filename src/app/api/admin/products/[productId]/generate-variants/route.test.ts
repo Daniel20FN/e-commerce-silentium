@@ -165,6 +165,7 @@ describe("/api/admin/products/[productId]/generate-variants", () => {
     expect(mockConfirmAdminVariantGeneration).toHaveBeenCalledWith(
       "product-1",
       { variants: [expect.objectContaining({ sku: "SIL-PILLOW-WHITE" })] },
+      expect.objectContaining({ id: adminUser.id }),
     );
     expect(response.status).toBe(200);
     expect(response.cookies.get("sb-refresh-token")?.value).toBe("refreshed");
