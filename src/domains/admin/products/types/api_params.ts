@@ -118,3 +118,35 @@ export interface AdminVariantLifecycleParams {
   variantId: string;
   action: "trash" | "restore";
 }
+
+export interface AdminDuplicateProductParams {
+  operationId: string;
+  expectedUpdatedAt: string;
+  copyCosts: boolean;
+}
+
+export interface AdminDuplicateProductData {
+  productId: string;
+  skippedCategories: number;
+}
+
+export type AdminDuplicateProductApiResponse =
+  ApiResponse<AdminDuplicateProductData>;
+
+export interface AdminPriceBatchRow {
+  variantId: string;
+  expectedUpdatedAt: string;
+  priceCents: number;
+  compareAtPriceCents: number | null;
+}
+
+export interface AdminPriceBatchParams {
+  expectedProductUpdatedAt: string;
+  rows: AdminPriceBatchRow[];
+}
+
+export interface AdminPriceBatchData {
+  updated: number;
+}
+
+export type AdminPriceBatchApiResponse = ApiResponse<AdminPriceBatchData>;

@@ -151,16 +151,16 @@ model Category {
 }
 
 model Product {
-  id               String            @id @default(cuid())
+  id               String               @id @default(cuid())
   name             String
-  slug             String            @unique
+  slug             String               @unique
   shortDescription String?
   longDescription  String?
   brand            String?
   seoTitle         String?
   seoDescription   String?
-  featured         Boolean           @default(false)
-  status           ProductStatus     @default(draft)
+  featured         Boolean              @default(false)
+  status           ProductStatus        @default(draft)
   deletedAt        DateTime?
   archivedAt       DateTime?
   categories       ProductCategory[]
@@ -168,8 +168,10 @@ model Product {
   variants         ProductVariant[]
   images           CatalogImage[]
   costs            CatalogCost[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  copies           CatalogDuplication[] @relation("DuplicationSource")
+  copiedBy         CatalogDuplication?  @relation("DuplicationTarget")
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 
   @@index([status, deletedAt])
   @@index([deletedAt, updatedAt])
@@ -297,8 +299,23 @@ model CatalogImage {
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
 
-  @@unique([bucket, path])
+  @@unique([productId, bucket, path])
+  @@index([bucket, path])
   @@index([productId, variantId, status, deletedAt, position])
+}
+
+model CatalogDuplication {
+  operationId       String   @id
+  sourceProductId   String
+  targetProductId   String   @unique
+  sourceRevision    DateTime
+  copyCosts         Boolean
+  skippedCategories Int
+  createdAt         DateTime @default(now())
+  source            Product  @relation("DuplicationSource", fields: [sourceProductId], references: [id], onDelete: Restrict)
+  target            Product  @relation("DuplicationTarget", fields: [targetProductId], references: [id], onDelete: Restrict)
+
+  @@index([sourceProductId, createdAt])
 }
 
 model ProductVariantOptionValue {
