@@ -98,6 +98,18 @@ async function choose(label: string, value: string): Promise<void> {
 }
 
 describe("public product variant selection", () => {
+  it("keeps the real presentation and variant selection but never offers cart or public navigation in preview", async () => {
+    render(<ProductDetail product={product} dictionary={dictionary} preview />);
+    expect(
+      screen.getByRole("button", {
+        name: dictionary.admin.products.publication.buyDisabled,
+      }),
+    ).toBeDisabled();
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+    expect(
+      screen.queryByRole("button", { name: dictionary.cart.add }),
+    ).not.toBeInTheDocument();
+  });
   it("renders the initial variant in COP with general fallback and a cart action", () => {
     render(<ProductDetail product={product} dictionary={dictionary} />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(

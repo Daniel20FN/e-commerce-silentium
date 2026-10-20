@@ -17,6 +17,23 @@ function createSessionResponse(): NextResponse {
 }
 
 describe("auth middleware", () => {
+  it.each([
+    "/admin/productos/qa/preview",
+    "/admin/productos/qa/preview/content",
+    "/api/admin/products/qa/publication",
+  ])("never caches or indexes private catalog route %s", async (path) => {
+    mockUpdateSupabaseSession.mockResolvedValue({
+      response: createSessionResponse(),
+      userId: "admin",
+    });
+    const response = await middleware(
+      new NextRequest(`http://localhost${path}`),
+    );
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("X-Robots-Tag")).toBe(
+      "noindex, nofollow, noarchive",
+    );
+  });
   beforeEach(() => {
     jest.clearAllMocks();
   });

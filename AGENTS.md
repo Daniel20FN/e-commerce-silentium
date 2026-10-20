@@ -81,6 +81,8 @@
 - Optional private costs PostgreSQL integration checks: set `CATALOG_COSTS_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/costs/services/cost_service.integration.test.ts`. They require `DATABASE_URL` explicitly in `.env.development`, create isolated draft products/variants/costs and soft-delete fixtures afterward. They verify per-unit calculations, recovery, composite ownership constraints, concurrent revision conflicts and anonymous SQL denial; no Storage operations. Run Prisma generation/build only after Jest exits on Windows to avoid locking the Prisma engine DLL.
 - Optional cart PostgreSQL integration checks: set `CART_INTEGRATION=1` and run `npm run test:file -- src/domains/cart/services/cart_service.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL`; creates isolated QA catalog/image/cost metadata, soft-retires fixtures, and never uploads Storage files or consumes stock. Verifies current prices, stock changes, public eligibility/image fallback and cost privacy. Stop Jest/Next before Prisma generation/build on Windows.
 
+- Optional publication PostgreSQL checks: set `PUBLICATION_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/products/services/publication_service.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL`; creates isolated QA categories/product/variant/cost metadata and soft-retires fixtures afterward. No Storage uploads or real order/stock consumption. Verifies preview projection/privacy, public eligibility parity (ancestors, alternate categories, stock, inactive variants), stale revisions and archived activation denial. Stop Jest/Next before Prisma generation/build on Windows.
+
 ## Git Hooks
 
 - Husky is enabled via the `prepare` script.
