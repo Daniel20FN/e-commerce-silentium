@@ -22,7 +22,11 @@
 2. Apertura sin login confirmada por el usuario.
 3. Mensaje implementado con resumen por variante y enlaces de fotos públicas. Añadir enlaces de ficha cuando se defina el dominio; por ahora se omiten con aviso.
 
-Checkout online, pasarela y pedidos persistidos quedan aplazados. Se definirán mediante nuevos PRD si el negocio los necesita.
+Checkout online y pasarela siguen aplazados. Los pedidos persistidos, inicialmente fuera de esta primera entrega, se planifican ahora como gestión manual en el ciclo operativo siguiente.
+
+### Continuación aprobada: operación administrativa
+
+El [roadmap operativo PRD 07–12](00-roadmap-operacion-tienda.md) desarrolla ahora inventario y pedidos **manuales** posteriores a la conversación. El [PRD 11](11-prd-pedidos-manuales-whatsapp.md) conserva la ausencia de checkout/pasarela: abrir el chat sigue sin crear venta ni consumir stock; el gestor confirma el pedido en el panel y esa confirmación descuenta existencias. El pago inicial solo registra pendiente/pagado. Las políticas de cancelación y devolución siguen pendientes antes de implementar pedidos.
 
 ## Validación
 
