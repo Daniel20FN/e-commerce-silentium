@@ -86,6 +86,17 @@ describe("admin_product_schemas", () => {
     ).toEqual({ productId: "product-1" });
   });
 
+  it("accepts a simple variant without product options", () => {
+    expect(
+      adminVariantUpsertSchema.safeParse({
+        sku: "QA-SIMPLE",
+        priceCents: 12500000,
+        stock: 2,
+        optionValueIds: [],
+      }).success,
+    ).toBe(true);
+  });
+
   it("rejects archived product upserts and invalid variant/generation payloads", () => {
     expect(
       adminProductUpsertSchema.safeParse({

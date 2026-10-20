@@ -2,6 +2,8 @@
 
 > Ciclo de catálogo completado (PRD 01–05). La continuación se define en el [roadmap de compra](00-roadmap-compra.md), empezando por el [PRD 06 — Carrito](06-prd-carrito.md).
 
+> Nuevo ciclo: [Operación diaria de la tienda — PRD 07–12](00-roadmap-operacion-tienda.md): ficha unificada, publicación, operaciones rápidas, inventario, pedidos manuales e inicio operativo.
+
 ## Propósito
 
 Este documento define el orden oficial de implementación para el sistema de categorías, productos, variantes, imágenes, storefront y costos de producción. Cada PRD posterior entrega una fase funcional completa y usable, evitando construir piezas aisladas sin valor operativo.
@@ -29,19 +31,23 @@ Este roadmap no organiza únicamente pantallas. Cada fase debe cerrar la pieza f
 ## Resultado esperado por fases
 
 1. **Fase 1 — Categorías administrativas**
+
    - El equipo puede crear, editar, buscar, ordenar, activar, desactivar, enviar a papelera y restaurar categorías jerárquicas.
    - El negocio obtiene la base de navegación comercial y clasificación de productos.
 
 2. **Fase 2 — Productos, variantes y relaciones de catálogo**
+
    - El equipo puede crear productos, asignarlos a múltiples categorías y administrar variantes como unidad real de venta.
    - El negocio obtiene precios, stock y SKU a nivel variante.
    - Esta fase debe dejar preparado el dominio para costos futuros por producto y variante, aunque la gestión operativa de costos llegue después.
 
 3. **Fase 3 — Imágenes y medios del catálogo**
+
    - El equipo puede cargar imágenes generales del producto y específicas por variante, con fallback automático a imágenes generales.
    - El negocio obtiene catálogo visual publicable y listo para storefront.
 
 4. **Fase 4 — Storefront de categorías y productos**
+
    - Los clientes pueden navegar categorías, ver páginas públicas por slug, seleccionar atributos y resolver la variante correcta con precio y stock.
    - El negocio obtiene la experiencia de exploración y compra del catálogo.
 

@@ -6,15 +6,11 @@ import type {
   AdminCategoryParentOptionDto,
   AdminCategoryParentOptionsApiResponse,
 } from "@/domains/admin/categories/types/api_responses";
-import { CatalogCostsDialog } from "@/domains/admin/costs/components/catalog_costs_dialog";
-import { CatalogMediaDialog } from "@/domains/admin/media/components/catalog_media_dialog";
 import type {
-  AdminProductDetailApiResponse,
   AdminProductMutationApiResponse,
   AdminProductsListApiResponse,
   AdminProductsListParams,
   AdminProductUpsertParams,
-  AdminProductVariantsListApiResponse,
 } from "@/domains/admin/products/types/api_params";
 import {
   ADMIN_PRODUCT_BULK_ACTION,
@@ -27,17 +23,14 @@ import {
   type AdminProductSortDirection,
   type AdminProductSortField,
   type AdminProductStatus,
-  type AdminProductVariantDto,
 } from "@/domains/admin/products/types/product_dto";
 import type { AdminProductErrorCode } from "@/domains/admin/products/types/product_errors";
 import {
   AddOutlined,
   ArchiveOutlined,
   DeleteOutline,
-  Inventory2Outlined,
   RestoreOutlined,
   SearchOutlined,
-  WarningAmberOutlined,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -55,7 +48,6 @@ import {
   InputLabel,
   MenuItem,
   NoSsr,
-  Paper,
   Select,
   Stack,
   TextField,
@@ -69,12 +61,17 @@ import {
   type GridRowSelectionModel,
   type GridSortModel,
 } from "@mui/x-data-grid";
+import { useRouter, useSearchParams } from "next/navigation";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useMemo, useState } from "react";
+import {
+  productsListViewUrl,
+  productWorkspaceHref,
+  readProductsListView,
+  type ProductWorkspaceSection,
+} from "../services/product_workspace_links";
 import { ProductFormDialog } from "./product_form_dialog";
 import { ProductSellabilityWarnings } from "./product_sellability_warnings";
-import { ProductVariantEditor } from "./product_variant_editor";
-import { VariantGenerationDialog } from "./variant_generation_dialog";
 
 const ADMIN_PRODUCTS_REQUEST_ID = "admin-products-list";
 const ADMIN_PRODUCT_CATEGORY_OPTIONS_REQUEST_ID =
@@ -193,32 +190,40 @@ function createProductListParams({
 
 export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
   const { cancellableApi, abort } = useCancellableApiContext();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [initialView] = useState(() => readProductsListView(searchParams));
   const [rows, setRows] = useState<AdminProductListItemDto[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<
     AdminCategoryParentOptionDto[]
   >([]);
   const [rowCount, setRowCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState<number>(
-    ADMIN_PRODUCT_PAGE_SIZE_OPTIONS[0],
+  const [page, setPage] = useState(initialView.page);
+  const [pageSize, setPageSize] = useState<number>(initialView.pageSize);
+  const [search, setSearch] = useState(initialView.search);
+  const [status, setStatus] = useState<AdminProductStatus | "all">(
+    initialView.status,
   );
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<AdminProductStatus | "all">("all");
-  const [categoryId, setCategoryId] = useState("");
-  const [brand, setBrand] = useState("");
-  const [featured, setFeatured] = useState<FeaturedFilter>(FEATURED_FILTER.all);
-  const [inTrash, setInTrash] = useState(false);
-  const [stock, setStock] =
-    useState<NonNullable<AdminProductsListParams["stock"]>>("all");
-  const [discounted, setDiscounted] = useState<FeaturedFilter>("all");
+  const [categoryId, setCategoryId] = useState(initialView.categoryId);
+  const [brand, setBrand] = useState(initialView.brand);
+  const [featured, setFeatured] = useState<FeaturedFilter>(
+    initialView.featured,
+  );
+  const [inTrash, setInTrash] = useState(initialView.inTrash);
+  const [stock, setStock] = useState<
+    NonNullable<AdminProductsListParams["stock"]>
+  >(initialView.stock);
+  const [discounted, setDiscounted] = useState<FeaturedFilter>(
+    initialView.discounted,
+  );
   const [refreshKey, setRefreshKey] = useState(0);
   const refreshProducts = (): void => setRefreshKey((value) => value + 1);
   const [sortField, setSortField] = useState<AdminProductSortField>(
-    ADMIN_PRODUCT_SORT_FIELD.updatedAt,
+    initialView.sortField,
   );
   const [sortDirection, setSortDirection] = useState<AdminProductSortDirection>(
-    ADMIN_PRODUCT_SORT_DIRECTION.desc,
+    initialView.sortDirection,
   );
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const gridSortModel = useMemo<GridSortModel>(
@@ -237,23 +242,38 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] =
     useState<AdminProductDetailDto | null>(null);
-  const [variantProduct, setVariantProduct] =
-    useState<AdminProductDetailDto | null>(null);
-  const [mediaProduct, setMediaProduct] =
-    useState<AdminProductListItemDto | null>(null);
-  const [openingMedia, setOpeningMedia] = useState(false);
-  const [costProduct, setCostProduct] =
-    useState<AdminProductListItemDto | null>(null);
-  const [mediaVariants, setMediaVariants] = useState<AdminProductVariantDto[]>(
-    [],
-  );
-  const [generationProduct, setGenerationProduct] =
-    useState<AdminProductDetailDto | null>(null);
   const [bulkDialog, setBulkDialog] = useState<BulkDialogState | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [variantsByProductId, setVariantsByProductId] = useState<
-    Record<string, AdminProductVariantDto[]>
-  >({});
+  useEffect(() => {
+    const url = productsListViewUrl({
+      page,
+      pageSize,
+      search,
+      status,
+      categoryId,
+      brand,
+      featured,
+      inTrash,
+      stock,
+      discounted,
+      sortField,
+      sortDirection,
+    });
+    window.history.replaceState(window.history.state, "", url);
+  }, [
+    page,
+    pageSize,
+    search,
+    status,
+    categoryId,
+    brand,
+    featured,
+    inTrash,
+    stock,
+    discounted,
+    sortField,
+    sortDirection,
+  ]);
 
   useEffect(() => {
     let mounted = true;
@@ -376,64 +396,16 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
     dictionary.admin.products.feedback.loadCategoriesError,
   ]);
 
-  const loadProductDetail = async (
-    productId: string,
-  ): Promise<AdminProductDetailDto | null> => {
-    try {
-      const response = await cancellableApi.get<
-        AdminProductDetailApiResponse,
-        undefined
-      >(`admin-product-detail-${productId}`, `/admin/products/${productId}`);
-
-      return response?.product ?? null;
-    } catch (error) {
-      enqueueSnackbar(resolveProductFeedbackMessage(dictionary, error), {
-        variant: "error",
-      });
-      return null;
-    }
+  const openWorkspace = (id: string, section: ProductWorkspaceSection) => {
+    router.push(
+      productWorkspaceHref(
+        id,
+        section,
+        window.location.pathname + window.location.search,
+      ),
+    );
   };
-
-  const openProductEditor = async (productId: string): Promise<void> => {
-    const product = await loadProductDetail(productId);
-
-    if (product) {
-      setEditingProduct(product);
-      setIsFormOpen(true);
-    }
-  };
-
-  const openVariantEditor = async (productId: string): Promise<void> => {
-    try {
-      const [product, response] = await Promise.all([
-        loadProductDetail(productId),
-        cancellableApi.get<AdminProductVariantsListApiResponse, undefined>(
-          "admin-product-variants-" + productId,
-          "/admin/products/" + productId + "/variants",
-        ),
-      ]);
-      if (product && response) {
-        setVariantsByProductId((current) => ({
-          ...current,
-          [productId]: response.items,
-        }));
-        setVariantProduct(product);
-      }
-    } catch (error) {
-      enqueueSnackbar(resolveProductFeedbackMessage(dictionary, error), {
-        variant: "error",
-      });
-    }
-  };
-
-  const openVariantGeneration = async (productId: string): Promise<void> => {
-    const product = await loadProductDetail(productId);
-
-    if (product) {
-      setGenerationProduct(product);
-    }
-  };
-
+  const openProductEditor = (id: string) => openWorkspace(id, "information");
   const submitProduct = async (
     payload: AdminProductUpsertParams,
     productId: string | null,
@@ -463,6 +435,7 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
 
       setIsFormOpen(false);
       setEditingProduct(null);
+      if (!productId) openWorkspace(response.product.id, "information");
     } catch (error) {
       enqueueSnackbar(resolveProductFeedbackMessage(dictionary, error), {
         variant: "error",
@@ -637,7 +610,7 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
     {
       field: "actions",
       headerName: dictionary.admin.products.table.columns.actions,
-      minWidth: 650,
+      minWidth: 390,
       sortable: false,
       renderCell: ({ row }: GridRenderCellParams<AdminProductListItemDto>) => (
         <Stack direction="row" spacing={1} sx={{ py: 1 }}>
@@ -648,56 +621,6 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
             }}
           >
             {dictionary.admin.products.actions.edit}
-          </Button>
-          <Button
-            size="small"
-            startIcon={<Inventory2Outlined />}
-            onClick={() => void openVariantEditor(row.id)}
-          >
-            {dictionary.admin.products.actions.variants}
-          </Button>
-          <Button
-            size="small"
-            onClick={() => void openVariantGeneration(row.id)}
-          >
-            {dictionary.admin.products.actions.generateVariants}
-          </Button>
-          <Button
-            size="small"
-            disabled={row.inTrash || openingMedia}
-            onClick={() => {
-              setOpeningMedia(true);
-              void (async () => {
-                try {
-                  const response = await cancellableApi.get<
-                    AdminProductVariantsListApiResponse,
-                    undefined
-                  >(
-                    "admin-media-variants-" + row.id,
-                    "/admin/products/" + row.id + "/variants",
-                  );
-                  if (response) {
-                    setMediaVariants(
-                      response.items.filter((variant) => !variant.inTrash),
-                    );
-                    setMediaProduct(row);
-                  }
-                } catch {
-                  setErrorMessage(dictionary.admin.media.errors.unexpected);
-                } finally {
-                  setOpeningMedia(false);
-                }
-              })();
-            }}
-          >
-            {dictionary.admin.media.action}
-          </Button>
-          <Button
-            size="small"
-            disabled={isSubmitting}
-            onClick={() => setCostProduct(row)}
-          >
-            {dictionary.admin.costs.action}
           </Button>
           <Button
             size="small"
@@ -734,342 +657,320 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
 
   return (
     <Stack spacing={3}>
-      <Paper
-        sx={{
-          p: { xs: 2, md: 2.5 },
-          border: 1,
-          borderColor: "divider",
-          boxShadow: "none",
-        }}
-      >
-        <Stack spacing={2}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
+      <Stack spacing={2}>
+        <Stack direction="row" justifyContent="flex-end" alignItems="center">
+          <Button
+            variant="contained"
+            startIcon={<AddOutlined />}
+            onClick={() => {
+              setEditingProduct(null);
+              setIsFormOpen(true);
+            }}
           >
-            <Stack direction="row" spacing={1} alignItems="center">
-              <WarningAmberOutlined color="warning" fontSize="small" />
-              <Typography variant="body2" color="text.secondary">
-                {dictionary.admin.products.description}
-              </Typography>
-            </Stack>
-            <Button
-              variant="contained"
-              startIcon={<AddOutlined />}
-              onClick={() => {
-                setEditingProduct(null);
-                setIsFormOpen(true);
-              }}
-            >
-              {dictionary.admin.products.actions.create}
-            </Button>
-          </Stack>
+            {dictionary.admin.products.actions.create}
+          </Button>
+        </Stack>
 
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={1.5}
-            alignItems={{ xs: "stretch", md: "center" }}
-            useFlexGap
-            sx={{ flexWrap: "wrap" }}
-          >
-            <TextField
-              label={dictionary.admin.products.table.searchLabel}
-              placeholder={dictionary.admin.products.table.searchPlaceholder}
-              size="small"
-              value={search}
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={1.5}
+          alignItems={{ xs: "stretch", md: "center" }}
+          useFlexGap
+          sx={{ flexWrap: "wrap" }}
+        >
+          <TextField
+            label={dictionary.admin.products.table.searchLabel}
+            placeholder={dictionary.admin.products.table.searchPlaceholder}
+            size="small"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(0);
+            }}
+            sx={{ minWidth: { xs: "100%", md: 280 } }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchOutlined fontSize="small" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 170 } }}>
+            <InputLabel id="admin-products-status-filter-label">
+              {dictionary.admin.products.table.statusFilter}
+            </InputLabel>
+            <Select
+              labelId="admin-products-status-filter-label"
+              value={status}
+              label={dictionary.admin.products.table.statusFilter}
               onChange={(event) => {
-                setSearch(event.target.value);
+                const nextStatus = event.target.value;
+
+                setStatus(
+                  nextStatus === "all" ||
+                    ADMIN_PRODUCT_STATUS_VALUES.some(
+                      (value) => value === nextStatus,
+                    )
+                    ? nextStatus
+                    : "all",
+                );
                 setPage(0);
               }}
-              sx={{ minWidth: { xs: "100%", md: 280 } }}
+            >
+              <MenuItem value="all">
+                {dictionary.admin.products.table.allStatuses}
+              </MenuItem>
+              {ADMIN_PRODUCT_STATUS_VALUES.map((statusValue) => (
+                <MenuItem key={statusValue} value={statusValue}>
+                  {getStatusLabel(dictionary, statusValue)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Autocomplete
+            options={categoryOptions}
+            value={
+              categoryOptions.find((option) => option.id === categoryId) ?? null
+            }
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            onChange={(_event, category) => {
+              setCategoryId(category?.id ?? "");
+              setPage(0);
+            }}
+            sx={{ minWidth: { xs: "100%", md: 210 } }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={dictionary.admin.products.table.categoryFilter}
+                size="small"
+              />
+            )}
+          />
+          <TextField
+            label={dictionary.admin.products.table.brandFilter}
+            size="small"
+            value={brand}
+            onChange={(event) => {
+              setBrand(event.target.value);
+              setPage(0);
+            }}
+          />
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 160 } }}>
+            <InputLabel id="admin-products-featured-filter-label">
+              {dictionary.admin.products.table.featuredFilter}
+            </InputLabel>
+            <Select
+              labelId="admin-products-featured-filter-label"
+              value={featured}
+              label={dictionary.admin.products.table.featuredFilter}
+              onChange={(event) => {
+                const nextFeatured = event.target.value;
+
+                if (
+                  nextFeatured === FEATURED_FILTER.all ||
+                  nextFeatured === FEATURED_FILTER.yes ||
+                  nextFeatured === FEATURED_FILTER.no
+                ) {
+                  setFeatured(nextFeatured);
+                }
+                setPage(0);
+              }}
+            >
+              <MenuItem value={FEATURED_FILTER.all}>
+                {dictionary.admin.products.table.featuredAll}
+              </MenuItem>
+              <MenuItem value={FEATURED_FILTER.yes}>
+                {dictionary.admin.products.table.featuredYes}
+              </MenuItem>
+              <MenuItem value={FEATURED_FILTER.no}>
+                {dictionary.admin.products.table.featuredNo}
+              </MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 190 } }}>
+            <InputLabel id="products-stock-filter">
+              {dictionary.admin.products.table.stockFilter}
+            </InputLabel>
+            <Select
+              labelId="products-stock-filter"
+              label={dictionary.admin.products.table.stockFilter}
+              value={stock}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (
+                  value === "all" ||
+                  value === "in_stock" ||
+                  value === "out_of_stock"
+                )
+                  setStock(value);
+                setPage(0);
+              }}
+            >
+              <MenuItem value="all">
+                {dictionary.admin.products.table.stockAll}
+              </MenuItem>
+              <MenuItem value="in_stock">
+                {dictionary.admin.products.table.stockYes}
+              </MenuItem>
+              <MenuItem value="out_of_stock">
+                {dictionary.admin.products.table.stockNo}
+              </MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", md: 180 } }}>
+            <InputLabel id="products-discount-filter">
+              {dictionary.admin.products.table.discountFilter}
+            </InputLabel>
+            <Select
+              labelId="products-discount-filter"
+              label={dictionary.admin.products.table.discountFilter}
+              value={discounted}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (value === "all" || value === "yes" || value === "no")
+                  setDiscounted(value);
+                setPage(0);
+              }}
+            >
+              <MenuItem value="all">
+                {dictionary.admin.products.table.discountAll}
+              </MenuItem>
+              <MenuItem value="yes">
+                {dictionary.admin.products.table.discountYes}
+              </MenuItem>
+              <MenuItem value="no">
+                {dictionary.admin.products.table.discountNo}
+              </MenuItem>
+            </Select>
+          </FormControl>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={inTrash}
+                onChange={(event) => {
+                  setInTrash(event.target.checked);
+                  setPage(0);
+                }}
+              />
+            }
+            label={dictionary.admin.products.table.onlyTrash}
+          />
+          <Button variant="outlined" onClick={clearFilters}>
+            {dictionary.admin.products.table.clearFilters}
+          </Button>
+        </Stack>
+
+        <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+          <Button
+            variant="outlined"
+            disabled={selectedRows.length === 0 || isSubmitting}
+            onClick={() =>
+              setBulkDialog({ action: ADMIN_PRODUCT_BULK_ACTION.trash })
+            }
+          >
+            {dictionary.admin.products.bulk.trash}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={selectedRows.length === 0 || isSubmitting}
+            onClick={() =>
+              setBulkDialog({ action: ADMIN_PRODUCT_BULK_ACTION.restore })
+            }
+          >
+            {dictionary.admin.products.bulk.restore}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={selectedRows.length === 0 || isSubmitting}
+            onClick={() =>
+              setBulkDialog({ action: ADMIN_PRODUCT_BULK_ACTION.archive })
+            }
+          >
+            {dictionary.admin.products.bulk.archive}
+          </Button>
+        </Stack>
+
+        <Typography variant="body2" color="text.secondary">
+          {dictionary.admin.products.table.results}: {rowCount}
+        </Typography>
+
+        {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
+
+        <Box
+          role="region"
+          aria-label={dictionary.admin.products.title}
+          sx={{ height: 620, minWidth: 0, width: "100%" }}
+        >
+          <NoSsr>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              loading={isLoading}
               slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchOutlined fontSize="small" />
-                    </InputAdornment>
-                  ),
+                loadingOverlay: {
+                  variant: "linear-progress",
+                  noRowsVariant: "linear-progress",
+                },
+              }}
+              rowCount={rowCount}
+              checkboxSelection
+              rowSelectionModel={gridSelectionModel}
+              disableRowSelectionOnClick
+              pagination
+              paginationMode="server"
+              sortingMode="server"
+              pageSizeOptions={ADMIN_PRODUCT_PAGE_SIZE_OPTIONS}
+              paginationModel={gridPaginationModel}
+              onPaginationModelChange={(model: GridPaginationModel) => {
+                setPage(model.page);
+                setPageSize(model.pageSize);
+              }}
+              sortModel={gridSortModel}
+              onSortModelChange={(model: GridSortModel) => {
+                const nextSort = model[0];
+                const nextField =
+                  nextSort && isSupportedSortField(nextSort.field)
+                    ? nextSort.field
+                    : ADMIN_PRODUCT_SORT_FIELD.updatedAt;
+
+                setSortField(nextField);
+                setSortDirection(
+                  nextSort?.sort === ADMIN_PRODUCT_SORT_DIRECTION.asc
+                    ? ADMIN_PRODUCT_SORT_DIRECTION.asc
+                    : ADMIN_PRODUCT_SORT_DIRECTION.desc,
+                );
+                setPage(0);
+              }}
+              onRowSelectionModelChange={(model) => {
+                setSelectedRows(
+                  model.type === "exclude"
+                    ? rows
+                        .filter((row) => !model.ids.has(row.id))
+                        .map((row) => row.id)
+                    : Array.from(model.ids).filter(isString),
+                );
+              }}
+              localeText={{
+                noRowsLabel: dictionary.admin.products.table.noRows,
+                toolbarColumns: dictionary.grid.columns,
+                toolbarFilters: dictionary.grid.filters,
+                toolbarDensity: dictionary.grid.density,
+              }}
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: 700,
                 },
               }}
             />
-            <FormControl
-              size="small"
-              sx={{ minWidth: { xs: "100%", md: 170 } }}
-            >
-              <InputLabel id="admin-products-status-filter-label">
-                {dictionary.admin.products.table.statusFilter}
-              </InputLabel>
-              <Select
-                labelId="admin-products-status-filter-label"
-                value={status}
-                label={dictionary.admin.products.table.statusFilter}
-                onChange={(event) => {
-                  const nextStatus = event.target.value;
-
-                  setStatus(
-                    nextStatus === "all" ||
-                      ADMIN_PRODUCT_STATUS_VALUES.some(
-                        (value) => value === nextStatus,
-                      )
-                      ? nextStatus
-                      : "all",
-                  );
-                  setPage(0);
-                }}
-              >
-                <MenuItem value="all">
-                  {dictionary.admin.products.table.allStatuses}
-                </MenuItem>
-                {ADMIN_PRODUCT_STATUS_VALUES.map((statusValue) => (
-                  <MenuItem key={statusValue} value={statusValue}>
-                    {getStatusLabel(dictionary, statusValue)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Autocomplete
-              options={categoryOptions}
-              value={
-                categoryOptions.find((option) => option.id === categoryId) ??
-                null
-              }
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              onChange={(_event, category) => {
-                setCategoryId(category?.id ?? "");
-                setPage(0);
-              }}
-              sx={{ minWidth: { xs: "100%", md: 210 } }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={dictionary.admin.products.table.categoryFilter}
-                  size="small"
-                />
-              )}
-            />
-            <TextField
-              label={dictionary.admin.products.table.brandFilter}
-              size="small"
-              value={brand}
-              onChange={(event) => {
-                setBrand(event.target.value);
-                setPage(0);
-              }}
-            />
-            <FormControl
-              size="small"
-              sx={{ minWidth: { xs: "100%", md: 160 } }}
-            >
-              <InputLabel id="admin-products-featured-filter-label">
-                {dictionary.admin.products.table.featuredFilter}
-              </InputLabel>
-              <Select
-                labelId="admin-products-featured-filter-label"
-                value={featured}
-                label={dictionary.admin.products.table.featuredFilter}
-                onChange={(event) => {
-                  const nextFeatured = event.target.value;
-
-                  if (
-                    nextFeatured === FEATURED_FILTER.all ||
-                    nextFeatured === FEATURED_FILTER.yes ||
-                    nextFeatured === FEATURED_FILTER.no
-                  ) {
-                    setFeatured(nextFeatured);
-                  }
-                  setPage(0);
-                }}
-              >
-                <MenuItem value={FEATURED_FILTER.all}>
-                  {dictionary.admin.products.table.featuredAll}
-                </MenuItem>
-                <MenuItem value={FEATURED_FILTER.yes}>
-                  {dictionary.admin.products.table.featuredYes}
-                </MenuItem>
-                <MenuItem value={FEATURED_FILTER.no}>
-                  {dictionary.admin.products.table.featuredNo}
-                </MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl
-              size="small"
-              sx={{ minWidth: { xs: "100%", md: 190 } }}
-            >
-              <InputLabel id="products-stock-filter">
-                {dictionary.admin.products.table.stockFilter}
-              </InputLabel>
-              <Select
-                labelId="products-stock-filter"
-                label={dictionary.admin.products.table.stockFilter}
-                value={stock}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  if (
-                    value === "all" ||
-                    value === "in_stock" ||
-                    value === "out_of_stock"
-                  )
-                    setStock(value);
-                  setPage(0);
-                }}
-              >
-                <MenuItem value="all">
-                  {dictionary.admin.products.table.stockAll}
-                </MenuItem>
-                <MenuItem value="in_stock">
-                  {dictionary.admin.products.table.stockYes}
-                </MenuItem>
-                <MenuItem value="out_of_stock">
-                  {dictionary.admin.products.table.stockNo}
-                </MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl
-              size="small"
-              sx={{ minWidth: { xs: "100%", md: 180 } }}
-            >
-              <InputLabel id="products-discount-filter">
-                {dictionary.admin.products.table.discountFilter}
-              </InputLabel>
-              <Select
-                labelId="products-discount-filter"
-                label={dictionary.admin.products.table.discountFilter}
-                value={discounted}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  if (value === "all" || value === "yes" || value === "no")
-                    setDiscounted(value);
-                  setPage(0);
-                }}
-              >
-                <MenuItem value="all">
-                  {dictionary.admin.products.table.discountAll}
-                </MenuItem>
-                <MenuItem value="yes">
-                  {dictionary.admin.products.table.discountYes}
-                </MenuItem>
-                <MenuItem value="no">
-                  {dictionary.admin.products.table.discountNo}
-                </MenuItem>
-              </Select>
-            </FormControl>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={inTrash}
-                  onChange={(event) => {
-                    setInTrash(event.target.checked);
-                    setPage(0);
-                  }}
-                />
-              }
-              label={dictionary.admin.products.table.onlyTrash}
-            />
-            <Button variant="outlined" onClick={clearFilters}>
-              {dictionary.admin.products.table.clearFilters}
-            </Button>
-          </Stack>
-
-          <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
-            <Button
-              variant="outlined"
-              disabled={selectedRows.length === 0 || isSubmitting}
-              onClick={() =>
-                setBulkDialog({ action: ADMIN_PRODUCT_BULK_ACTION.trash })
-              }
-            >
-              {dictionary.admin.products.bulk.trash}
-            </Button>
-            <Button
-              variant="outlined"
-              disabled={selectedRows.length === 0 || isSubmitting}
-              onClick={() =>
-                setBulkDialog({ action: ADMIN_PRODUCT_BULK_ACTION.restore })
-              }
-            >
-              {dictionary.admin.products.bulk.restore}
-            </Button>
-            <Button
-              variant="outlined"
-              disabled={selectedRows.length === 0 || isSubmitting}
-              onClick={() =>
-                setBulkDialog({ action: ADMIN_PRODUCT_BULK_ACTION.archive })
-              }
-            >
-              {dictionary.admin.products.bulk.archive}
-            </Button>
-          </Stack>
-
-          <Typography variant="body2" color="text.secondary">
-            {dictionary.admin.products.table.results}: {rowCount}
-          </Typography>
-
-          {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
-
-          <Box sx={{ minHeight: 620 }}>
-            <NoSsr>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                loading={isLoading}
-                rowCount={rowCount}
-                checkboxSelection
-                rowSelectionModel={gridSelectionModel}
-                disableRowSelectionOnClick
-                pagination
-                paginationMode="server"
-                sortingMode="server"
-                pageSizeOptions={ADMIN_PRODUCT_PAGE_SIZE_OPTIONS}
-                paginationModel={gridPaginationModel}
-                onPaginationModelChange={(model: GridPaginationModel) => {
-                  setPage(model.page);
-                  setPageSize(model.pageSize);
-                }}
-                sortModel={gridSortModel}
-                onSortModelChange={(model: GridSortModel) => {
-                  const nextSort = model[0];
-                  const nextField =
-                    nextSort && isSupportedSortField(nextSort.field)
-                      ? nextSort.field
-                      : ADMIN_PRODUCT_SORT_FIELD.updatedAt;
-
-                  setSortField(nextField);
-                  setSortDirection(
-                    nextSort?.sort === ADMIN_PRODUCT_SORT_DIRECTION.asc
-                      ? ADMIN_PRODUCT_SORT_DIRECTION.asc
-                      : ADMIN_PRODUCT_SORT_DIRECTION.desc,
-                  );
-                  setPage(0);
-                }}
-                onRowSelectionModelChange={(model) => {
-                  setSelectedRows(
-                    model.type === "exclude"
-                      ? rows
-                          .filter((row) => !model.ids.has(row.id))
-                          .map((row) => row.id)
-                      : Array.from(model.ids).filter(isString),
-                  );
-                }}
-                localeText={{
-                  noRowsLabel: dictionary.admin.products.table.noRows,
-                  toolbarColumns: dictionary.grid.columns,
-                  toolbarFilters: dictionary.grid.filters,
-                  toolbarDensity: dictionary.grid.density,
-                }}
-                sx={{
-                  border: 1,
-                  borderColor: "divider",
-                  "& .MuiDataGrid-columnHeaderTitle": {
-                    fontWeight: 700,
-                  },
-                }}
-              />
-            </NoSsr>
-          </Box>
-        </Stack>
-      </Paper>
+          </NoSsr>
+        </Box>
+      </Stack>
 
       {isFormOpen ? (
         <ProductFormDialog
@@ -1085,75 +986,6 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
           onSubmit={(payload, productId) =>
             void submitProduct(payload, productId)
           }
-        />
-      ) : null}
-
-      {mediaProduct ? (
-        <CatalogMediaDialog
-          dictionary={dictionary}
-          product={mediaProduct}
-          variants={mediaVariants}
-          onClose={() => setMediaProduct(null)}
-        />
-      ) : null}
-
-      {costProduct ? (
-        <CatalogCostsDialog
-          key={costProduct.id}
-          dictionary={dictionary}
-          product={costProduct}
-          onClose={() => setCostProduct(null)}
-        />
-      ) : null}
-
-      <Dialog
-        open={variantProduct !== null}
-        onClose={() => setVariantProduct(null)}
-        fullWidth
-        maxWidth="md"
-      >
-        <DialogTitle>{dictionary.admin.products.variants.title}</DialogTitle>
-        <DialogContent>
-          {variantProduct ? (
-            <ProductVariantEditor
-              dictionary={dictionary}
-              productId={variantProduct.id}
-              productOptions={variantProduct.options}
-              initialVariants={variantsByProductId[variantProduct.id] ?? []}
-              onVariantsChange={(variants) => {
-                setVariantsByProductId((currentValue) => ({
-                  ...currentValue,
-                  [variantProduct.id]: variants,
-                }));
-                refreshProducts();
-              }}
-            />
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setVariantProduct(null)}>
-            {dictionary.admin.products.generation.cancel}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {generationProduct ? (
-        <VariantGenerationDialog
-          dictionary={dictionary}
-          open
-          productId={generationProduct.id}
-          productOptions={generationProduct.options}
-          onClose={() => setGenerationProduct(null)}
-          onGenerated={(variants) => {
-            refreshProducts();
-            setVariantsByProductId((currentValue) => ({
-              ...currentValue,
-              [generationProduct.id]: [
-                ...variants,
-                ...(currentValue[generationProduct.id] ?? []),
-              ],
-            }));
-          }}
         />
       ) : null}
 

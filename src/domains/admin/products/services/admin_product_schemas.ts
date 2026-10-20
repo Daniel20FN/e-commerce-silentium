@@ -86,6 +86,7 @@ const productOptionSchema = z.object({
 
 export const adminProductUpsertSchema = z
   .object({
+    expectedUpdatedAt: z.string().datetime().optional(),
     name: z.string().trim().min(1, { error: "product_name_required" }).max(160),
     slug: slugSchema,
     shortDescription: nullableTrimmedText(280),
@@ -117,6 +118,7 @@ export const adminProductLifecycleSchema = z.object({
 
 export const adminVariantUpsertSchema = z
   .object({
+    expectedUpdatedAt: z.string().datetime().optional(),
     sku: z.string().trim().min(1, { error: "variant_sku_required" }).max(80),
     priceCents: z.coerce.number().int().min(0).max(999999999),
     compareAtPriceCents: z.coerce
@@ -163,7 +165,7 @@ export const adminVariantUpsertSchema = z
       .nullable()
       .optional()
       .default(null),
-    optionValueIds: z.array(idSchema).min(1).max(20),
+    optionValueIds: z.array(idSchema).max(20),
   })
   .superRefine((value, ctx) => {
     if (

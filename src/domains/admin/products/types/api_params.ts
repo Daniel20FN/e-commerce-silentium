@@ -49,6 +49,7 @@ export interface AdminProductOptionParams {
 }
 
 export interface AdminProductUpsertParams {
+  expectedUpdatedAt?: string;
   name: string;
   slug: string;
   shortDescription?: string | null;
@@ -64,6 +65,7 @@ export interface AdminProductUpsertParams {
 }
 
 export interface AdminVariantUpsertParams {
+  expectedUpdatedAt?: string;
   sku: string;
   priceCents: number;
   compareAtPriceCents?: number | null;

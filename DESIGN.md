@@ -264,6 +264,8 @@ Future admin nav should optimize for frequent reuse, not flourish.
 - Secondary buttons should reduce emphasis without disappearing.
 - Storefront hero may use two CTAs: one primary, one quieter companion.
 - Admin actions should favor compact height and explicit labels.
+- Admin buttons default to `outlined` through the scoped admin theme, including editor dialogs. Primary save/create actions keep `contained`; do not change storefront defaults.
+- Product list rows expose only Edit, Trash (Restore in trash view), and Archive. Variants, generation, images, and costs live inside the unified product editor.
 
 ### Cards
 
@@ -271,6 +273,7 @@ Future admin nav should optimize for frequent reuse, not flourish.
 - Category cards should read instantly at a glance.
 - Product cards must align consistently across rows.
 - Admin cards should behave like information panels, not promo tiles.
+- Product/category lists sit directly on the page surface: no outer card around the filters/table and no repeated introduction beneath the admin header.
 
 ### Forms
 

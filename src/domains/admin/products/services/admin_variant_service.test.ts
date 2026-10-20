@@ -1,4 +1,5 @@
-﻿import { ADMIN_PRODUCT_ERROR } from "../types/product_errors";
+﻿import { Prisma } from "@prisma/client";
+import { ADMIN_PRODUCT_ERROR } from "../types/product_errors";
 import {
   createAdminVariant,
   listAdminProductVariants,
@@ -11,6 +12,7 @@ import {
 
 jest.mock("@/lib/prisma", () => ({
   prisma: {
+    $transaction: jest.fn(),
     product: {
       findUnique: jest.fn(),
     },
@@ -97,6 +99,11 @@ describe("admin_variant_service", () => {
   });
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(prisma.$transaction).mockImplementation(async (fn) => {
+      if (typeof fn !== "function")
+        throw new Error("Expected transaction callback");
+      return fn(prisma);
+    });
   });
 
   it("creates variants with validated same-product option combination keys", async () => {
@@ -268,7 +275,11 @@ describe("admin_variant_service", () => {
 
     expect(mockPrisma.productVariant.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: "variant-1" },
+        where: expect.objectContaining({
+          id: "variant-1",
+          productId: "product-1",
+          deletedAt: null,
+        }),
         data: expect.objectContaining({
           stock: 8,
           optionValues: expect.objectContaining({ deleteMany: {} }),
@@ -347,5 +358,78 @@ describe("admin_variant_service", () => {
       }),
     );
     expect(result.inTrash).toBe(true);
+  });
+  it("rejects a stale variant before changing it or the default selection", async () => {
+    mockPrisma.productVariant.findUnique
+      .mockReset()
+      .mockResolvedValue(variantRecord);
+    await expect(
+      updateAdminVariant("product-1", "variant-1", {
+        ...variantInput,
+        isDefault: true,
+        expectedUpdatedAt: "2026-06-10T10:00:00.000Z",
+      }),
+    ).rejects.toMatchObject({
+      type: "conflict",
+      message: "variant_revision_conflict",
+    });
+    expect(mockPrisma.productVariant.update).not.toHaveBeenCalled();
+    expect(mockPrisma.productVariant.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("rejects a second simple variant with the same empty combination", async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({
+      id: "product-1",
+      status: "draft",
+      deletedAt: null,
+    });
+    mockPrisma.productVariant.findUnique.mockReset().mockResolvedValue(null);
+    mockPrisma.productOptionValue.findMany.mockResolvedValue([]);
+    mockPrisma.productVariant.findMany.mockResolvedValue([
+      { optionCombinationKey: "" },
+    ]);
+    await expect(
+      createAdminVariant("product-1", { ...variantInput, optionValueIds: [] }),
+    ).rejects.toMatchObject({
+      type: "conflict",
+      message: "variant_combination_conflict",
+    });
+    expect(mockPrisma.productVariant.create).not.toHaveBeenCalled();
+  });
+
+  it("maps an atomic revision race to a conflict inside the transaction", async () => {
+    mockPrisma.product.findUnique.mockResolvedValue({
+      id: "product-1",
+      status: "draft",
+      deletedAt: null,
+    });
+    mockPrisma.productVariant.findUnique
+      .mockReset()
+      .mockResolvedValueOnce(variantRecord)
+      .mockResolvedValueOnce({ id: variantRecord.id });
+    mockPrisma.productOptionValue.findMany.mockResolvedValue([]);
+    mockPrisma.productVariant.findMany.mockResolvedValue([]);
+    mockPrisma.productVariant.update.mockRejectedValueOnce(
+      new Prisma.PrismaClientKnownRequestError("Stale revision", {
+        code: "P2025",
+        clientVersion: "6.19.2",
+      }),
+    );
+    await expect(
+      updateAdminVariant("product-1", "variant-1", {
+        ...variantInput,
+        optionValueIds: [],
+        expectedUpdatedAt: variantRecord.updatedAt.toISOString(),
+      }),
+    ).rejects.toMatchObject({
+      type: "conflict",
+      message: "variant_revision_conflict",
+    });
+    expect(prisma.$transaction).toHaveBeenCalled();
+    expect(mockPrisma.productVariant.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ updatedAt: variantRecord.updatedAt }),
+      }),
+    );
   });
 });

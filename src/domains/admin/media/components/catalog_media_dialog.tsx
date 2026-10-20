@@ -4,6 +4,10 @@ import { FilesUploader } from "@/components/files-uploader/files_uploader";
 import type { DocumentType } from "@/components/files-uploader/types";
 import { FilesViewer } from "@/components/files-viewer/files_viewer";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import {
+  AdminEditorSurface,
+  type AdminEditorState,
+} from "@/domains/admin/components/admin_editor_surface";
 import { validateAdminStorageImageFile } from "@/domains/admin/storage/services/admin_storage_image";
 import {
   ADMIN_STORAGE_ALLOWED_IMAGE_MIME_TYPE_VALUES,
@@ -41,6 +45,8 @@ import type {
 } from "../types/api_params";
 
 interface Props {
+  embedded?: boolean;
+  onStateChange?: (state: AdminEditorState) => void;
   dictionary: Dictionary;
   product: { id: string; name: string };
   variants: { id: string; sku: string }[];
@@ -61,6 +67,8 @@ function documentFor(image: CatalogImageDto): DocumentType {
 }
 
 export function CatalogMediaDialog({
+  embedded = false,
+  onStateChange,
   dictionary,
   product,
   variants,
@@ -72,6 +80,9 @@ export function CatalogMediaDialog({
     busy: false,
     dirty: false,
   });
+  useEffect(() => {
+    onStateChange?.(state);
+  }, [state, onStateChange]);
   const [discard, setDiscard] = useState<
     { target: string | null } | "close" | null
   >(null);
@@ -83,20 +94,27 @@ export function CatalogMediaDialog({
   };
   return (
     <>
-      <Dialog open fullWidth maxWidth="md" onClose={close}>
+      <AdminEditorSurface
+        embedded={embedded}
+        open
+        fullWidth
+        maxWidth="md"
+        onClose={close}
+      >
         <DialogTitle>
           {copy.title} — {product.name}
         </DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2}>
             <FormControl fullWidth size="small">
-              <InputLabel id="catalog-media-target-label">
+              <InputLabel id="catalog-media-target-label" shrink>
                 {copy.target}
               </InputLabel>
               <Select
                 labelId="catalog-media-target-label"
                 label={copy.target}
                 value={variantId ?? ""}
+                displayEmpty
                 disabled={state.busy}
                 onChange={(event) => {
                   const target = event.target.value || null;
@@ -120,12 +138,14 @@ export function CatalogMediaDialog({
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button disabled={state.busy} onClick={close}>
-            {copy.close}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        {!embedded && (
+          <DialogActions>
+            <Button disabled={state.busy} onClick={close}>
+              {copy.close}
+            </Button>
+          </DialogActions>
+        )}
+      </AdminEditorSurface>
       <Dialog
         open={discard !== null}
         onClose={() => setDiscard(null)}
