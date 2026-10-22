@@ -507,7 +507,8 @@
       "storefront": "Ver tienda",
       "products": "Productos",
       "orders": "Pedidos",
-      "analysis": "Análisis"
+      "analysis": "Análisis",
+      "guide": "Guía de uso"
     },
     "layout": {
       "title": "Administración",
@@ -1481,6 +1482,404 @@
       "rankingTotal": "Unidades de los 5 primeros",
       "chartUnavailable": "El gráfico no pudo abrirse. Puedes consultar los datos de abajo.",
       "unknownScope": "«Fecha por revisar» incluye confirmaciones ausentes o posteriores al corte."
+    },
+    "guide": {
+      "title": "Guía de uso",
+      "description": "Aprende a preparar el catálogo, gestionar pedidos y entender tu tienda.",
+      "intro": "Consulta un tema o busca la tarea que necesitas. La guía explica las funciones actuales de Silentium y no modifica los datos de tu tienda.",
+      "searchLabel": "Buscar en la guía",
+      "searchPlaceholder": "Fotos, stock, cancelar pedido…",
+      "searchButton": "Buscar",
+      "clearSearch": "Limpiar búsqueda",
+      "contents": "Temas de la guía",
+      "stepsTitle": "Paso a paso",
+      "notesTitle": "Cómo funciona",
+      "warningTitle": "Ten en cuenta",
+      "exampleTitle": "Ejemplo",
+      "relatedTitle": "También te puede ayudar",
+      "back": "Todos los temas",
+      "resultsTitle": "Resultados de búsqueda",
+      "resultsCount": "Temas encontrados: {count} para «{query}».",
+      "emptyTitle": "No encontramos ese tema",
+      "emptyBody": "Prueba con una palabra más corta, como fotos, variante o pedido, o elige un tema del índice.",
+      "unknownTitle": "Este tema no existe",
+      "unknownBody": "Elige un tema del índice para continuar.",
+      "read": "Leer guía",
+      "contextHelp": "Ayuda de esta sección (abre otra pestaña)",
+      "privacy": "Solo para administración. Los ejemplos son ilustrativos: no crean productos ni realizan operaciones.",
+      "articles": [
+        {
+          "id": "primeros-pasos",
+          "title": "Tu primer producto, de principio a fin",
+          "summary": "El recorrido completo para preparar el catálogo y comprobar lo que verá el cliente.",
+          "steps": [
+            "En Categorías, crea una categoría activa. Si es una subcategoría, comprueba que su categoría padre también sea visible.",
+            "En Productos pulsa Crear producto, completa nombre y categorías. Al guardarlo se crea un borrador.",
+            "Completa Información y Variantes y precios. Cada combinación vendible necesita su SKU y precio.",
+            "En Inventario registra las existencias físicas. En Imágenes sube las fotos y guarda orden y textos.",
+            "Registra costos si quieres consultar el margen. Guarda cada sección por separado.",
+            "En Publicación revisa diagnóstico y Vista previa privada. Activa el producto y comprueba Ver en la tienda."
+          ],
+          "notes": [
+            "La ficha concentra Información, Variantes y precios, Inventario, Imágenes, Costos y Publicación.",
+            "En la tienda comprueba fotos, precio, tamaño/color, disponibilidad y carrito. Abrir WhatsApp no registra un pedido administrativo."
+          ],
+          "warning": "No hay autoguardado ni un guardado global. Guarda cada sección antes de cambiar de tarea.",
+          "example": "Ejemplo ilustrativo: categoría Ropa de cama, Juego de sábanas Aurora y variantes Doble / Arena y Queen / Blanco. Usa SKU propios y existencias reales.",
+          "href": "/admin/productos",
+          "action": "Ir a Productos",
+          "related": ["categorias", "variantes", "publicacion"]
+        },
+        {
+          "id": "categorias",
+          "title": "Organizar categorías y subcategorías",
+          "summary": "Las colecciones de la landing usan las categorías que gestionas aquí.",
+          "steps": [
+            "Abre Categorías y pulsa Crear categoría. Completa nombre, slug y, si corresponde, descripción e imagen.",
+            "Deja Categoría padre vacía para una principal o selecciona una para crear una subcategoría. Usa Orden para organizarla y guarda su estado.",
+            "En Información del producto selecciona sus categorías asociadas y elige la principal.",
+            "Desactiva una categoría para ocultarla. Enviar a papelera permite retirarla; desde la papelera puedes restaurarla."
+          ],
+          "notes": [
+            "El slug es la parte legible de la dirección. Cambiarlo modifica el enlace público.",
+            "Una categoría oculta puede ocultar sus descendientes. Un producto puede seguir visible por otra categoría válida.",
+            "La landing muestra hasta tres categorías principales públicas. Ver todas las categorías abre el índice completo."
+          ],
+          "warning": "Retirar una categoría no elimina productos, pero puede afectar su visibilidad. Revisa Publicación después de reorganizarlas.",
+          "example": "Ropa de cama → Sábanas: asocia el juego de sábanas a Sábanas y mantén visible toda la rama.",
+          "href": "/admin/categorias",
+          "action": "Ir a Categorías",
+          "related": ["productos", "publicacion", "tienda"]
+        },
+        {
+          "id": "productos",
+          "title": "Crear y editar productos",
+          "summary": "El producto describe la pieza; sus variantes son las combinaciones que vendes.",
+          "steps": [
+            "Abre Productos. Usa búsqueda y filtros para encontrar una ficha o pulsa Crear producto.",
+            "Completa nombre, descripciones, marca si aplica, categorías y categoría principal. El slug identifica el enlace público.",
+            "Define opciones como Tamaño o Color y sus valores. Guarda Información antes de generar combinaciones.",
+            "Completa y guarda cada sección. Producto destacado permite aparecer en la selección destacada cuando se cumplen las condiciones públicas.",
+            "Volver a productos recupera el listado de origen. Para retirarlo de la tienda revisa estado, archivado o papelera."
+          ],
+          "notes": [
+            "Borrador permite preparar. Activo participa en el catálogo público si cumple las demás condiciones. Inactivo lo oculta.",
+            "Editar abre la ficha. Las operaciones de preparación están dentro de ella; el listado ofrece también Archivar y Enviar a papelera."
+          ],
+          "warning": "Si otra sesión cambia la ficha, revisa los datos actuales antes de reintentar. Descartar elimina lo que todavía no guardaste en esa sección.",
+          "example": "Juego de sábanas Aurora es un producto. Tamaño y Color son opciones; Doble / Arena es una variante.",
+          "href": "/admin/productos",
+          "action": "Abrir el catálogo administrativo",
+          "related": ["variantes", "duplicar", "problemas"]
+        },
+        {
+          "id": "variantes",
+          "title": "Preparar variantes, SKU y precios",
+          "summary": "Cada variante tiene identidad, precio y existencias propias.",
+          "steps": [
+            "Guarda opciones y valores en Información y abre Variantes y precios.",
+            "Usa Generar variantes para preparar combinaciones y revisa la propuesta antes de confirmar. Sin opciones crea una variante simple.",
+            "Asigna SKU únicos y revisa precio, precio anterior si hay oferta, atributos y estado de cada variante.",
+            "Revisa la variante predeterminada. Para ajustes de cantidades después de crearla utiliza Inventario.",
+            "Guarda y comprueba el selector en la vista previa."
+          ],
+          "notes": [
+            "SKU es el código único de la variante en inventario, pedidos y mensajes de compra.",
+            "El precio anterior debe superar al actual; déjalo vacío si no hay oferta.",
+            "Una variante activa necesita stock positivo para comprarse. Una inactiva no se ofrece al cliente."
+          ],
+          "warning": "No todas las combinaciones generadas tienen por qué existir físicamente. Revisa cada una y no inventes stock para publicar.",
+          "example": "Aurora / Doble / Arena y Aurora / Queen / Blanco tienen SKU y saldos independientes. Los precios se expresan en pesos colombianos (COP).",
+          "href": "/admin/productos",
+          "action": "Elegir un producto",
+          "related": ["precios", "inventario", "imagenes"]
+        },
+        {
+          "id": "imagenes",
+          "title": "Subir, ordenar y recuperar imágenes",
+          "summary": "Prepara la galería general y las fotos específicas de cada variante.",
+          "steps": [
+            "Abre Imágenes en la ficha y elige la galería general o una variante.",
+            "Usa el uploader para arrastrar o seleccionar fotos. Espera a que terminen y revisa posibles errores.",
+            "Ordena las fotos y añade textos alternativos descriptivos. La primera imagen activa es la principal.",
+            "Guarda los cambios de orden y textos. Recupera imágenes retiradas desde la papelera de la galería.",
+            "Comprueba la vista previa en variantes con y sin fotos propias."
+          ],
+          "notes": [
+            "Hasta 10 imágenes generales y 10 por variante. JPEG, PNG, WebP y AVIF, hasta 5 MiB por archivo.",
+            "Una variante sin fotos propias hereda las generales. Con propias usa solo esas, no una mezcla.",
+            "Las fotos tienen URL públicas. Retirar una de la galería no elimina el archivo ni revoca su dirección."
+          ],
+          "warning": "No subas material confidencial. Ante un fallo parcial comprueba cuáles terminaron antes de volver a subirlas.",
+          "example": "Texto alternativo: Juego de sábanas Aurora color arena, vista de la cama completa. Usa fotos fieles al artículo; una foto de ambiente no prueba el aspecto de una variante.",
+          "href": "/admin/productos",
+          "action": "Gestionar fotos de un producto",
+          "related": ["variantes", "publicacion", "problemas"]
+        },
+        {
+          "id": "publicacion",
+          "title": "Revisar y publicar sin sorpresas",
+          "summary": "Visible y comprable son cosas diferentes; Publicación explica ambas.",
+          "steps": [
+            "Guarda Información, Variantes e Imágenes antes de consultar el diagnóstico.",
+            "En Publicación revisa bloqueos, advertencias y recomendaciones. Usa los accesos para corregir lo necesario.",
+            "Abre Vista previa privada y revisa fotos, textos, variantes y precios en móvil y escritorio.",
+            "Confirma la activación. Revisa el diagnóstico actualizado y abre Ver en la tienda si está disponible."
+          ],
+          "notes": [
+            "Visible: activo, no archivado ni en papelera, con categoría pública válida y una variante activa no retirada.",
+            "Comprable: además de visible, tiene una variante activa con stock positivo.",
+            "Fotos, SEO y costos incompletos son recomendaciones, no bloqueos por sí solos.",
+            "La vista previa requiere sesión administrativa y no permite comprar."
+          ],
+          "warning": "Un producto agotado puede seguir visible. Revisa los ancestros de su categoría. No compartas enlaces de vista previa con clientes.",
+          "example": "Un producto activo sin stock puede verse, pero necesita reponer una variante activa para poder comprarse.",
+          "href": "/admin/productos",
+          "action": "Revisar un producto",
+          "related": ["imagenes", "inventario", "categorias"]
+        },
+        {
+          "id": "duplicar",
+          "title": "Duplicar, archivar y usar la papelera",
+          "summary": "Reutiliza preparación sin arrastrar existencias ni perder el historial.",
+          "steps": [
+            "Abre una ficha editable y guarda o descarta cambios pendientes. Pulsa Duplicar como borrador.",
+            "Revisa las reglas. Los costos solo se copian si lo eliges expresamente. Confirma y abre la copia creada.",
+            "Ajusta nombre, slug, categorías, SKU y precios. Registra inventario y revisa Publicación antes de activarla.",
+            "Archivar retira el producto y deja la ficha en consulta. En esta versión no hay una acción para desarchivar. Si solo quieres una pausa reversible, usa el estado Inactivo en Información.",
+            "Enviar a papelera retira el producto. Activa la vista de papelera para consultar o restaurar y revisa su estado al recuperarlo."
+          ],
+          "notes": [
+            "La copia conserva información, opciones, variantes activas e imágenes utilizables; no copia SKU originales ni existencias.",
+            "Empieza en borrador, con stock cero, sin destacado y sin mínimo configurado.",
+            "Las galerías copiadas tienen registros independientes aunque reutilicen el mismo archivo.",
+            "Archivar o enviar a papelera no borra pedidos históricos ni sus movimientos."
+          ],
+          "warning": "No uses Archivar para una pausa temporal: no hay desarchivado desde el panel. Restaurar desde la papelera solo quita la retirada; no elimina un archivado previo.",
+          "example": "Al duplicar Aurora revisa cada SKU, foto y precio: las existencias físicas del original no corresponden automáticamente a la copia.",
+          "href": "/admin/productos",
+          "action": "Ir a Productos",
+          "related": ["productos", "inventario", "publicacion"]
+        },
+        {
+          "id": "precios",
+          "title": "Cambiar varios precios a la vez",
+          "summary": "Compara los importes por SKU antes de aplicar un lote.",
+          "steps": [
+            "En Variantes y precios abre Editar precios por lote.",
+            "Escribe COP sin separadores de miles; se admiten hasta dos decimales con coma o punto.",
+            "Deja vacío el precio anterior para quitarlo; si existe debe superar al nuevo.",
+            "Pulsa Revisar cambios, compara cada SKU y confirma Aplicar todos los cambios."
+          ],
+          "notes": [
+            "Solo se incluyen filas modificadas. Si una falla, el lote no se aplica parcialmente.",
+            "Ante un conflicto revisa datos actuales y prepara otra propuesta.",
+            "El catálogo no reescribe precios de pedidos ya registrados."
+          ],
+          "warning": "No escribas 125.000 para decir ciento veinticinco mil. Escribe 125000: el punto y la coma se interpretan como decimales, no miles.",
+          "example": "125000 equivale a $125.000 COP; 125000,50 equivale a $125.000,50 COP.",
+          "href": "/admin/productos",
+          "action": "Elegir variantes y precios",
+          "related": ["variantes", "costos", "pedidos"]
+        },
+        {
+          "id": "inventario",
+          "title": "Registrar existencias y corregir movimientos",
+          "summary": "Cada ajuste deja cantidades, motivo y responsable en el historial.",
+          "steps": [
+            "Abre Inventario en la ficha. Elige Entrada, Salida o Conteo y añade las variantes que vas a ajustar.",
+            "En entrada o salida indica unidades del movimiento. En conteo indica el total físico. Añade motivo y referencia si ayuda.",
+            "Revisa saldos anteriores y propuestos. Confirma el lote y comprueba su historial.",
+            "Configura un mínimo opcional por variante para avisos de stock bajo. Vaciarlo elimina el aviso, no cambia existencias.",
+            "Para corregir un movimiento permitido usa Revertir movimiento y explica el motivo. Se crea una compensación enlazada."
+          ],
+          "notes": [
+            "Con saldo 8, entrada de 3 deja 11 y salida de 3 deja 5. Un conteo de 3 deja 3: es el total físico, no una suma.",
+            "Agotado significa cero. Bajo mínimo significa saldo positivo menor o igual al mínimo. Sin mínimo no hay ese aviso.",
+            "Hasta 25 variantes por lote; si una fila falla no se aplica parcialmente. No se permiten saldos negativos.",
+            "La reversión es completa y una sola vez, sobre el saldo actual; exige saldo suficiente. No se revierten saldos iniciales ni reversiones. El historial no se edita ni borra."
+          ],
+          "warning": "No corrijas ventas desde inventario: confirmaciones, cancelaciones y devoluciones se gestionan desde el pedido. Restaura productos en papelera antes de ajustar; los archivados solo permiten consulta.",
+          "example": "Si registraste una entrada de 5 por error, revisa la reversión del movimiento. No uses un conteo antiguo sin verificar el saldo físico de hoy.",
+          "href": "/admin/productos",
+          "action": "Abrir el inventario de un producto",
+          "related": ["pedidos", "devoluciones", "dashboard"]
+        },
+        {
+          "id": "costos",
+          "title": "Registrar costos y entender el margen",
+          "summary": "Los costos son privados y se calculan por cada unidad vendida.",
+          "steps": [
+            "Abre Costos en la ficha. Elige Producto general o una variante concreta como ámbito.",
+            "Añade concepto, monto por unidad y descripción opcional. Escribe COP sin separadores de miles.",
+            "Consulta el resumen de una variante: precio, costos generales, específicos, total y margen estimado.",
+            "Edita o retira conceptos que ya no apliquen. Ver costos retirados permite restaurarlos y recalcular."
+          ],
+          "notes": [
+            "Cada variante suma completos los costos generales por unidad. No se reparten entre stock, lotes o variantes.",
+            "Los específicos solo se añaden a la variante correspondiente.",
+            "Margen estimado = precio de venta menos costo total. Su porcentaje se calcula sobre precio de venta, no sobre costo."
+          ],
+          "warning": "El cálculo depende de que registres todos los conceptos pertinentes. No es contabilidad, dinero cobrado ni beneficio neto.",
+          "example": "Generales $70.000 + extra Queen $10.000 = costo Queen $80.000 por unidad. Vendida a $100.000, su margen estimado es $20.000: 20%.",
+          "href": "/admin/productos",
+          "action": "Consultar costos de un producto",
+          "related": ["precios", "duplicar", "analisis"]
+        },
+        {
+          "id": "pedidos",
+          "title": "Registrar y atender un pedido",
+          "summary": "Registra la compra acordada con el cliente; WhatsApp no lo hace automáticamente.",
+          "steps": [
+            "Abre Pedidos y registra un pedido. Completa cliente, WhatsApp y entrega: envío o recogida. Para envío añade dirección.",
+            "Busca variantes vendibles, revisa cantidades y precios COP. El envío va separado; un precio negociado necesita motivo.",
+            "Guarda el borrador y revisa el resumen con el cliente. Todavía no reserva ni descuenta stock.",
+            "Confirma cuando corresponda. Se valida disponibilidad y se descuentan todas las líneas juntas, o ninguna si hay un problema.",
+            "Registra Pendiente o Pagado según lo verificado fuera del sistema. Avanza preparación: pendiente → preparación → enviado o listo para recoger → entregado.",
+            "Comprueba el historial. Después de confirmar, las líneas y los importes quedan fijados."
+          ],
+          "notes": [
+            "El stock se descuenta al confirmar, no al guardar borrador ni al marcar pagado.",
+            "Otro pedido puede agotar stock mientras este está en borrador. Revisa el aviso y corrige antes de confirmar.",
+            "Solo hay pendiente/pagado. Marcar pagado es tu declaración, no una verificación bancaria.",
+            "La entrega avanza paso a paso, sin retrocesos. El borrador puede editarse o cancelarse."
+          ],
+          "warning": "No hay pasarela, abonos, factura fiscal ni mensajes automáticos. Registrar un pago no mueve dinero: compruébalo por tus medios.",
+          "example": "Guarda un pedido de dos variantes en borrador para acordar entrega. Al confirmar se descuentan sus unidades. El envío no altera el precio unitario del producto.",
+          "href": "/admin/pedidos",
+          "action": "Ir a Pedidos",
+          "related": ["devoluciones", "inventario", "tienda"]
+        },
+        {
+          "id": "devoluciones",
+          "title": "Cancelar pedidos y registrar devoluciones",
+          "summary": "La reposición física y la devolución de dinero son operaciones diferentes.",
+          "steps": [
+            "Abre el pedido y comprueba su estado y entrega.",
+            "Un borrador se cancela sin reponer stock: nunca se descontó. Un confirmado aún no salido físicamente se cancela con motivo y repone una sola vez lo descontado.",
+            "Listo para recoger todavía permite cancelar. Enviado o entregado ya no se cancela: se registra la devolución recibida cuando corresponda.",
+            "En envío registra devoluciones después de enviado o entregado; en recogida, después de entregado. Indica unidades recibidas y cuáles son aptas para reventa.",
+            "Revisa historial y saldo. Solo lo apto vuelve a inventario; las devoluciones acumuladas no pueden superar lo vendido."
+          ],
+          "notes": [
+            "Puedes devolver parte o todas las unidades. No declares devolución antes de recibirla.",
+            "Cancelar o devolver no ejecuta reembolsos y conserva pendiente/pagado.",
+            "Una devolución no reactiva un producto archivado o en papelera."
+          ],
+          "warning": "Resuelve el dinero fuera del sistema. No uses Revertir movimiento en inventario para deshacer un pedido: actúa desde el pedido.",
+          "example": "Vendiste tres unidades y recibes dos, pero solo una puede revenderse: registra dos recibidas y una apta. Solo una vuelve al stock.",
+          "href": "/admin/pedidos",
+          "action": "Revisar un pedido",
+          "related": ["pedidos", "inventario", "analisis"]
+        },
+        {
+          "id": "dashboard",
+          "title": "Leer las prioridades del inicio",
+          "summary": "El inicio responde qué necesita atención ahora, no cuánto has vendido hoy.",
+          "steps": [
+            "Revisa Pedidos por atender: preparación, entrega y pago pendiente. Abre un ejemplo o Ver todos para la cola completa.",
+            "En Inventario por reponer consulta variantes agotadas y bajo mínimo. Abre su ficha para revisar o ajustar con motivo.",
+            "En Catálogo por preparar consulta borradores, bloqueos de publicación y visibles sin stock vendible.",
+            "Pulsa Actualizar para consultar de nuevo y comprueba la hora de Bogotá al pie de cada bloque."
+          ],
+          "notes": [
+            "Los grupos se solapan: no se suman. Un pedido puede estar por preparar y pendiente de pago; un borrador puede tener bloqueo.",
+            "Son pendientes actuales de todas las fechas, no solo de hoy.",
+            "Las listas usan los mismos criterios que los contadores. Un fallo de carga no significa cero."
+          ],
+          "warning": "Pago pendiente no es ingreso. Los contadores se consultan al cargar o actualizar; no prometen tiempo real.",
+          "example": "Un pedido confirmado sin pagar puede aparecer en dos grupos. No son dos pedidos distintos.",
+          "href": "/admin",
+          "action": "Abrir el inicio operativo",
+          "related": ["analisis", "pedidos", "publicacion"]
+        },
+        {
+          "id": "analisis",
+          "title": "Interpretar los gráficos",
+          "summary": "Actividad y tareas pendientes no son lo mismo que contabilidad.",
+          "steps": [
+            "Abre Análisis y elige 7, 30 o 90 días. Calendario y corte usan hora de Colombia.",
+            "En Evolución alterna cantidad e importe acordado de productos. Cuenta pedidos actualmente confirmados según su primera confirmación.",
+            "En Top 5 cambia entre productos y variantes para ver unidades brutas de líneas confirmadas.",
+            "Inventario muestra el estado actual. Antigüedad agrupa pedidos abiertos por días desde su primera confirmación.",
+            "Abre Ver datos del gráfico para leer su tabla. Los enlaces llevan a fichas o colas; Actualizar vuelve a consultar."
+          ],
+          "notes": [
+            "El importe es subtotal de productos sin envío. No representa cobros, ingreso neto ni beneficio y no descuenta devoluciones físicas.",
+            "Cancelar pedidos puede cambiar cifras históricas. Archivar productos no borra su histórico.",
+            "Evolución y Top 5 usan el período elegido. Inventario y antigüedad son estado actual de todas las fechas."
+          ],
+          "warning": "No se mide conversión desde WhatsApp ni histórico de existencias. Vacío o error no equivale a una cifra inventada.",
+          "example": "$300.000 de productos confirmados no significa $300.000 cobrados: puede incluir pagos pendientes y no incluye envío.",
+          "href": "/admin/analisis",
+          "action": "Abrir Análisis",
+          "related": ["dashboard", "pedidos", "costos"]
+        },
+        {
+          "id": "tienda",
+          "title": "El recorrido del cliente y WhatsApp",
+          "summary": "El cliente explora, prepara su carrito y te envía una solicitud.",
+          "steps": [
+            "Abre Ver tienda. Productos y colecciones usan catálogo público; la escena visual de compra es ilustrativa, no otro carrito.",
+            "El cliente busca, filtra por categoría, precio, disponibilidad u ofertas y ordena. En móvil abre Filtros.",
+            "En una ficha elige variante y cantidad y añade al carrito. El carrito de invitado se conserva en ese navegador, no se sincroniza entre dispositivos.",
+            "Revisa fotos, cantidades y precios actuales. Deben corregirse las líneas no disponibles o sin stock antes de continuar.",
+            "Prepara el resumen y abre WhatsApp. El cliente decide cuándo enviarlo. Acordad disponibilidad, entrega y pago.",
+            "Después del acuerdo registra el pedido manualmente en el administrador y sigue confirmación y entrega."
+          ],
+          "notes": [
+            "El mensaje puede incluir enlaces públicos de fotos, no adjuntos automáticos. WhatsApp puede no mostrar sus vistas previas.",
+            "Los enlaces de producto solo se incluyen con dominio público configurado; nunca se envía localhost.",
+            "Si el resumen es demasiado largo, el carrito ofrece el mensaje completo para copiar y abre un saludo breve para pegarlo."
+          ],
+          "warning": "Abrir WhatsApp no registra ni confirma pedido, no verifica pago, no reserva ni descuenta stock y no vacía el carrito. No hay pasarela.",
+          "example": "Recibes una solicitud por dos sábanas: revisa stock y registra el pedido antes de prometer entrega. La conversación no garantiza existencias.",
+          "href": "/",
+          "action": "Abrir la tienda",
+          "related": ["pedidos", "publicacion", "categorias"]
+        },
+        {
+          "id": "usuarios",
+          "title": "Gestionar acceso de usuarios",
+          "summary": "Consulta perfiles, roles y estados; los clientes de pedidos se registran en el pedido.",
+          "steps": [
+            "Abre Usuarios y usa búsqueda y filtros para localizar a la persona.",
+            "Abre Ver detalle y comprueba perfil, rol y estado antes de cambiarlo.",
+            "Usa Editar rol, Bloquear o Activar según tus permisos y restricciones de la pantalla. Revisa la confirmación antes de guardar."
+          ],
+          "notes": [
+            "La guía y el panel requieren permisos administrativos. No compartas tu sesión para enseñar a otra persona.",
+            "Registrar nombre y WhatsApp en un pedido no crea automáticamente una cuenta de usuario.",
+            "La aplicación puede impedir cambios sensibles según tus permisos y la cuenta afectada."
+          ],
+          "warning": "Cambiar roles o bloquear usuarios afecta su acceso. No lo uses como prueba sin tener claro a quién modificas.",
+          "example": "Si un compañero necesita gestionar catálogo, revisa su cuenta y permisos con el responsable. No compartas la contraseña del administrador.",
+          "href": "/admin/usuarios",
+          "action": "Abrir Usuarios",
+          "related": ["pedidos", "problemas", "primeros-pasos"]
+        },
+        {
+          "id": "problemas",
+          "title": "Resolver dudas sin duplicar operaciones",
+          "summary": "Comprueba lo guardado antes de repetir una venta, ajuste o subida.",
+          "steps": [
+            "Si no ves un producto revisa Publicación: estado, categorías y ancestros, variante activa, archivo y papelera. Si se ve pero no se compra, revisa stock.",
+            "Si faltan fotos revisa la galería de esa variante. Las propias no se mezclan con las generales; comprueba que terminaron las subidas y guardaste cambios.",
+            "Ante un conflicto entre sesiones conserva el formulario y revisa datos actuales antes de preparar otro intento.",
+            "Si se pierde conexión al confirmar un pedido o ajustar stock mira primero el historial: puede haberse guardado aunque falle la recarga.",
+            "Si caduca la sesión inicia sesión de nuevo. No supongas que un formulario sin guardar se recuperará al cerrar la pestaña."
+          ],
+          "notes": [
+            "Usa la recuperación del mismo intento que ofrece la pantalla. No registres otra venta o entrada para resolver un fallo de recarga.",
+            "La ayuda del encabezado abre el tema de la sección actual. Consultar la guía no modifica datos."
+          ],
+          "warning": "Distingue un error al guardar de un error al recargar. Revisar el historial evita descontar o reponer dos veces.",
+          "example": "Después de confirmar aparece un error de conexión: abre el pedido y mira el historial antes de volver a crearlo.",
+          "href": "/admin",
+          "action": "Volver al inicio operativo",
+          "related": ["publicacion", "inventario", "pedidos"]
+        }
+      ]
     }
   }
 }
