@@ -4,6 +4,16 @@ import type {
   OrderStatus,
 } from "../types/api_params";
 
+export const PREPARATION_FULFILLMENTS: OrderFulfillment[] = [
+  "pending",
+  "preparing",
+];
+export const DELIVERY_FULFILLMENTS: OrderFulfillment[] = ["ready", "shipped"];
+export const OPEN_FULFILLMENTS: OrderFulfillment[] = [
+  ...PREPARATION_FULFILLMENTS,
+  ...DELIVERY_FULFILLMENTS,
+];
+
 export function canCancelOrder(
   status: OrderStatus,
   fulfillment: OrderFulfillment,

@@ -1,5 +1,6 @@
 "use client";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { safePriorityReturn } from "@/domains/admin/home/services/operational_rules";
 import { apiService } from "@/types/api-service/api_service";
 import {
   Alert,
@@ -73,12 +74,20 @@ export function OrderWorkspace({
   dictionary,
   actorId,
   orderId,
+  returnTo,
 }: {
   dictionary: Dictionary;
   actorId: string;
   orderId?: string;
+  returnTo?: string;
 }) {
   const c = dictionary.admin.orders;
+  const back = safePriorityReturn(returnTo, "/admin/pedidos");
+  const backLabel = back.startsWith("/admin/pendientes?")
+    ? dictionary.admin.dashboard.operations.backToQueue
+    : back === "/admin"
+      ? dictionary.admin.dashboard.operations.back
+      : c.back;
   const router = useRouter();
   const key = orderId ?? "new";
   const [order, setOrder] = useState<OrderDetailDto | null>(null);
@@ -308,12 +317,10 @@ export function OrderWorkspace({
         <Button
           disabled={busy}
           onClick={() =>
-            dirty || pending
-              ? setLeave("/admin/pedidos")
-              : router.push("/admin/pedidos")
+            dirty || pending ? setLeave(back) : router.push(back)
           }
         >
-          {c.back}
+          {backLabel}
         </Button>
         {orderId && (
           <Button

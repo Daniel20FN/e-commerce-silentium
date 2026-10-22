@@ -31,6 +31,23 @@ jest.mock("next/navigation", () => ({ useRouter: () => ({ push, replace }) }));
 const get = jest.mocked(apiService.get),
   post = jest.mocked(apiService.post);
 const c = dictionary.admin.orders;
+it("labels and preserves an internal priority return destination", async () => {
+  render(
+    <OrderWorkspace
+      dictionary={dictionary}
+      actorId="admin"
+      returnTo="/admin/pendientes?group=unpaid"
+    />,
+  );
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: dictionary.admin.dashboard.operations.backToQueue,
+    }),
+  );
+  await waitFor(() =>
+    expect(push).toHaveBeenCalledWith("/admin/pendientes?group=unpaid"),
+  );
+});
 const order: OrderDetailDto = {
   id: "order-a",
   number: 12,

@@ -10,6 +10,7 @@ import {
 import { createAdminTheme } from "@/domains/admin/services/admin_theme";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import {
+  BarChartOutlined,
   CategoryOutlined,
   ChevronLeft,
   ChevronRight,
@@ -151,6 +152,7 @@ export function AdminShell({
   const [open, setOpen] = useState(false);
   const activeRoute = resolveAdminRouteMetadata(pathname, dictionary);
   const navigationIcons: Partial<Record<AdminRouteSection, ReactNode>> = {
+    [ADMIN_ROUTE_SECTION.analysis]: <BarChartOutlined />,
     [ADMIN_ROUTE_SECTION.dashboard]: <DashboardOutlined />,
     [ADMIN_ROUTE_SECTION.users]: <PeopleOutlined />,
     [ADMIN_ROUTE_SECTION.categories]: <CategoryOutlined />,

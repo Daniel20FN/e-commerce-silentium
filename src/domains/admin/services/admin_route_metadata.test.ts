@@ -25,3 +25,16 @@ it("resolves order list, new and detail under the same operational navigation", 
     resolveAdminRouteMetadata("/admin/pedidos-extra", dictionary).section,
   ).toBe(ADMIN_ROUTE_SECTION.dashboard);
 });
+
+it("keeps analysis separate from operational home and lookalike paths", () => {
+  expect(
+    resolveAdminRouteMetadata("/admin/analisis", dictionary),
+  ).toMatchObject({
+    section: ADMIN_ROUTE_SECTION.analysis,
+    navigationHref: "/admin/analisis",
+  });
+  expect(
+    resolveAdminRouteMetadata("/admin/analisis-extra", dictionary).section,
+  ).toBe(ADMIN_ROUTE_SECTION.dashboard);
+  expect(getAdminNavigationSections(dictionary)[0].href).toBe("/admin");
+});

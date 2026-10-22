@@ -239,7 +239,9 @@ export function AdminProductsPage({ dictionary }: AdminProductsPageProps) {
     [selectedRows],
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(
+    searchParams.get("create") === "1",
+  );
   const [editingProduct, setEditingProduct] =
     useState<AdminProductDetailDto | null>(null);
   const [bulkDialog, setBulkDialog] = useState<BulkDialogState | null>(null);

@@ -2,6 +2,7 @@ import type { Dictionary } from "@/dictionary/services/get-dictionary";
 
 export const ADMIN_ROUTE_SECTION = {
   dashboard: "dashboard",
+  analysis: "analysis",
   users: "users",
   userDetail: "user-detail",
   categories: "categories",
@@ -37,6 +38,11 @@ export function getAdminNavigationSections(
       section: ADMIN_ROUTE_SECTION.dashboard,
     },
     {
+      href: "/admin/analisis",
+      label: dictionary.admin.navigation.analysis,
+      section: ADMIN_ROUTE_SECTION.analysis,
+    },
+    {
       href: "/admin/usuarios",
       label: dictionary.admin.navigation.users,
       section: ADMIN_ROUTE_SECTION.users,
@@ -64,6 +70,22 @@ export function resolveAdminRouteMetadata(
   dictionary: Dictionary,
 ): AdminRouteMetadata {
   const routes: AdminRouteMetadata[] = [
+    {
+      href: "/admin/analisis",
+      navigationHref: "/admin/analisis",
+      section: ADMIN_ROUTE_SECTION.analysis,
+      title: dictionary.admin.analysis.title,
+      description: dictionary.admin.analysis.description,
+      matches: (path) => path === "/admin/analisis",
+    },
+    {
+      href: "/admin/pendientes",
+      navigationHref: "/admin",
+      section: ADMIN_ROUTE_SECTION.dashboard,
+      title: dictionary.admin.dashboard.operations.queueTitle,
+      description: dictionary.admin.dashboard.operations.queueDescription,
+      matches: (path) => path === "/admin/pendientes",
+    },
     {
       href: "/admin/pedidos",
       navigationHref: "/admin/pedidos",

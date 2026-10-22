@@ -7,6 +7,7 @@ import { AuthSessionBootstrap } from "@/domains/auth/components/auth_session_boo
 import { CartBootstrap } from "@/domains/cart/components/cart_bootstrap";
 import CustomThemeProvider from "@/styles/custom_theme_provider";
 import { ThemeProvider } from "@/styles/theme_context";
+import type { ThemeMode } from "@/styles/theme_mode";
 import { CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -14,11 +15,17 @@ import { Provider } from "jotai";
 import { SnackbarProvider } from "notistack";
 import { ReactNode } from "react";
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({
+  children,
+  initialTheme,
+}: {
+  children: ReactNode;
+  initialTheme: ThemeMode;
+}) {
   return (
     <Provider>
       <CustomDialogProvider>
-        <ThemeProvider>
+        <ThemeProvider initialTheme={initialTheme}>
           <CustomThemeProvider>
             <LanguageProvider>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
