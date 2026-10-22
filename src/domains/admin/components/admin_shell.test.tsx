@@ -34,15 +34,44 @@ afterEach(() => {
   jest.useRealTimers();
   window.matchMedia = originalMatchMedia;
 });
-function setup() {
+function setup(role: CurrentUserDto["role"] = "admin") {
   render(
     <ThemeProvider theme={createTheme()}>
-      <AdminShell dictionary={dictionary} currentUser={user}>
+      <AdminShell dictionary={dictionary} currentUser={{ ...user, role }}>
         <div />
       </AdminShell>
     </ThemeProvider>,
   );
 }
+it.each([true, false])(
+  "hides users only for admin, desktop=%s",
+  (isDesktop) => {
+    desktop = isDesktop;
+    setup();
+    expect(
+      screen.queryByRole("link", {
+        name: dictionary.admin.navigation.users,
+      }),
+    ).not.toBeInTheDocument();
+    for (const name of [
+      dictionary.admin.navigation.products,
+      dictionary.admin.navigation.orders,
+      dictionary.admin.navigation.categories,
+      dictionary.admin.navigation.analysis,
+      dictionary.admin.navigation.guide,
+    ]) {
+      expect(screen.getByRole("link", { name })).toBeInTheDocument();
+    }
+  },
+);
+it("shows users for super admins", () => {
+  setup("super_admin");
+  expect(
+    screen.getByRole("link", {
+      name: dictionary.admin.navigation.users,
+    }),
+  ).toHaveAttribute("href", "/admin/usuarios");
+});
 it("opens contextual help without replacing an unsaved editing tab", () => {
   setup();
   const help = screen.getByRole("link", {
@@ -59,7 +88,6 @@ it("labels collapsed links and shows their tooltip on desktop hover", () => {
   setup();
   const products = screen.getByRole("link", {
     name: dictionary.admin.navigation.products,
-    exact: true,
   });
   expect(products).toHaveAttribute("aria-current", "page");
   fireEvent.mouseOver(products);
@@ -74,7 +102,6 @@ it("shows tooltips for keyboard focus without changing the link name", () => {
   setup();
   const orders = screen.getByRole("link", {
     name: dictionary.admin.navigation.orders,
-    exact: true,
   });
   fireEvent.keyDown(document.body, { key: "Tab" });
   act(() => {
@@ -99,7 +126,6 @@ it("does not suppress desktop tooltips based on the primary pointer type", () =>
   fireEvent.mouseOver(
     screen.getByRole("link", {
       name: dictionary.admin.navigation.categories,
-      exact: true,
     }),
   );
   act(() => {
@@ -117,7 +143,6 @@ it("does not show redundant tooltips when the desktop drawer is expanded", () =>
   fireEvent.mouseOver(
     screen.getByRole("link", {
       name: dictionary.admin.navigation.products,
-      exact: true,
     }),
   );
   act(() => {
@@ -130,7 +155,6 @@ it("disables navigation tooltips for mobile/touch even on hover or long press", 
   setup();
   const orders = screen.getByRole("link", {
     name: dictionary.admin.navigation.orders,
-    exact: true,
   });
   fireEvent.mouseOver(orders);
   fireEvent.touchStart(orders);

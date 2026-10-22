@@ -40,7 +40,51 @@ describe("PATCH /api/admin/users/[userId]", () => {
     mockCreateRouteHandlerSupabaseClient.mockReturnValue({ auth: {} });
   });
 
-  it("updates the requested user for admins", async () => {
+  it.each([UserRole.admin, UserRole.support, UserRole.customer])(
+    "rejects role and status changes from %s, including self promotion",
+    async (role) => {
+      mockResolveCurrentUser.mockResolvedValue({
+        id: "actor",
+        authUserId: "auth-actor",
+        email: "actor@example.invalid",
+        role,
+        status: UserStatus.active,
+        emailVerified: true,
+        profile: { firstName: "Ada", lastName: "Admin" },
+      });
+      for (const userId of ["actor", "another-user"]) {
+        for (const payload of [
+          { role: UserRole.super_admin },
+          { status: UserStatus.blocked },
+        ]) {
+          const response = await PATCH(
+            new NextRequest(`http://localhost/api/admin/users/${userId}`, {
+              method: "PATCH",
+              body: JSON.stringify(payload),
+            }),
+            { params: Promise.resolve({ userId }) },
+          );
+          expect(response.status).toBe(403);
+          expect(mockUpdateAdminUser).not.toHaveBeenCalled();
+        }
+      }
+    },
+  );
+
+  it("requires authentication before modifying users", async () => {
+    mockResolveCurrentUser.mockResolvedValue(null);
+    const response = await PATCH(
+      new NextRequest("http://localhost/api/admin/users/user-1", {
+        method: "PATCH",
+        body: JSON.stringify({ role: UserRole.admin }),
+      }),
+      { params: Promise.resolve({ userId: "user-1" }) },
+    );
+    expect(response.status).toBe(401);
+    expect(mockUpdateAdminUser).not.toHaveBeenCalled();
+  });
+
+  it("updates the requested user for super admins", async () => {
     mockResolveCurrentUser.mockResolvedValue({
       id: "admin-1",
       authUserId: "auth-admin-1",

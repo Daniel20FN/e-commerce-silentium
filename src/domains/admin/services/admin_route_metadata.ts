@@ -1,4 +1,6 @@
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import type { CurrentUserDto } from "@/domains/auth/types/current_user";
+import { canManageUsers } from "./admin_roles";
 
 export type AdminNavigationDictionary = Omit<Dictionary, "admin"> & {
   admin: Omit<Dictionary["admin"], "guide"> & {
@@ -50,8 +52,9 @@ export interface AdminNavigationSection {
 
 export function getAdminNavigationSections(
   dictionary: AdminNavigationDictionary,
+  user: Pick<CurrentUserDto, "role">,
 ): AdminNavigationSection[] {
-  return [
+  const sections: AdminNavigationSection[] = [
     {
       href: "/admin",
       label: dictionary.admin.navigation.dashboard,
@@ -88,6 +91,10 @@ export function getAdminNavigationSections(
       section: ADMIN_ROUTE_SECTION.guide,
     },
   ];
+  return sections.filter(
+    (item) =>
+      item.section !== ADMIN_ROUTE_SECTION.users || canManageUsers(user),
+  );
 }
 
 export function resolveAdminRouteMetadata(

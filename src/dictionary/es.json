@@ -1841,7 +1841,7 @@
         {
           "id": "usuarios",
           "title": "Gestionar acceso de usuarios",
-          "summary": "Consulta perfiles, roles y estados; los clientes de pedidos se registran en el pedido.",
+          "summary": "Solo el superadministrador puede consultar y gestionar usuarios, roles y estados. El resto del panel es igual para administradores y superadministradores.",
           "steps": [
             "Abre Usuarios y usa búsqueda y filtros para localizar a la persona.",
             "Abre Ver detalle y comprueba perfil, rol y estado antes de cambiarlo.",

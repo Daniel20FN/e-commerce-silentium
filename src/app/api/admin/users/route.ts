@@ -1,4 +1,4 @@
-import { canAccessAdmin } from "@/domains/admin/services/admin_roles";
+import { canManageUsers } from "@/domains/admin/services/admin_roles";
 import { listAdminUsers } from "@/domains/admin/users/services/admin_user_queries";
 import { adminUsersListParamsSchema } from "@/domains/admin/users/services/admin_user_schemas";
 import type { AdminUsersListApiResponse } from "@/domains/admin/users/types/api_responses";
@@ -69,7 +69,7 @@ export async function GET(
       );
     }
 
-    if (!canAccessAdmin(currentUser)) {
+    if (!canManageUsers(currentUser)) {
       return copySupabaseResponseCookies(
         supabaseResponse,
         createJsonResponse(

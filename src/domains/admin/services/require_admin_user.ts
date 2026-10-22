@@ -5,7 +5,7 @@ import { resolveCurrentUser } from "@/domains/auth/services/resolve_current_user
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { canAccessAdmin } from "./admin_roles";
+import { canAccessAdmin, canManageUsers } from "./admin_roles";
 
 export async function requireAdminUser(
   returnTo = "/admin",
@@ -18,6 +18,18 @@ export async function requireAdminUser(
   }
 
   if (!canAccessAdmin(user)) {
+    redirect("/admin/forbidden");
+  }
+
+  return user;
+}
+
+export async function requireSuperAdminUser(
+  returnTo = "/admin/usuarios",
+): Promise<CurrentUserDto> {
+  const user = await requireAdminUser(returnTo);
+
+  if (!canManageUsers(user)) {
     redirect("/admin/forbidden");
   }
 
