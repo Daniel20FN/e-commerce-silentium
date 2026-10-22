@@ -1,6 +1,8 @@
 # PRD 12 — Inicio administrativo con prioridades reales
 
-**Estado:** alcance aprobado; fórmulas y filtros detallados se validan contra los servicios de PRD 08, 10 y 11.
+**Estado:** implementado, verificado y aceptado por el usuario.
+
+**Decisiones aprobadas:** hora de negocio `America/Bogota`. La primera versión muestra pendientes actuales de todas las fechas, sin métricas diarias ni corte temporal implícito. Políticas y navegación se documentan en [Inicio operativo](../docs/admin-home.md).
 
 ## Objetivo
 
@@ -36,13 +38,19 @@ El panel puede entregar primero catálogo/inventario si una capacidad posterior 
 
 ## Aceptación y pruebas
 
-- [ ] Contadores y listados coinciden sobre fixtures con borradores, activos, agotados, papelera y pedidos en distintos estados.
-- [ ] Un producto con varias variantes no infla un contador de productos ni oculta el de variantes agotadas.
-- [ ] Se puede pasar de una alerta a resolverla y volver con el resultado actualizado.
-- [ ] No hay cifras ficticias, enlaces muertos ni consultas públicas con información administrativa.
-- [ ] Un fallo de datos no dice «0 pendientes»; no existe acceso a contactos o importes sin autorización.
-- [ ] Jest de políticas/estados, integración de agregaciones/permisos y Chrome móvil/escritorio con datos QA reales, sin escrituras de producción.
+- [x] Contadores y listados coinciden sobre fixtures con borradores, activos, agotados, papelera y pedidos en distintos estados.
+- [x] Un producto con varias variantes no infla un contador de productos ni oculta el de variantes agotadas.
+- [x] Se puede pasar de una alerta a resolverla y volver con el resultado actualizado.
+- [x] No hay cifras ficticias, enlaces muertos ni consultas públicas con información administrativa.
+- [x] Un fallo de datos no dice «0 pendientes»; no existe acceso a contactos o importes sin autorización.
+- [x] Jest de políticas/estados, integración de agregaciones/permisos y Chrome móvil/escritorio con datos QA reales, sin escrituras de producción.
+
+Verificación: 625 pruebas Jest superadas (54 integraciones opcionales omitidas), cuatro comprobaciones PostgreSQL reales de inicio operativo superadas, build optimizado y lint sin errores (un aviso previo en cobertura generada). Chrome real: escritorio, tablet y móvil 320/390, claro/oscuro, filtros, atajos, alerta resuelta y retornos. Se corrigieron el tema inicial de los paneles enviados progresivamente y una diferencia de formato de fecha entre servidor/navegador. Las 296 existencias preexistentes permanecen intactas; fixtures retirados lógicamente e historial conservado.
 
 ## Fuera de alcance
 
 Analítica de marketing, previsiones de ventas, informes fiscales, contabilidad, BI y notificaciones externas. Este PRD cierra el [roadmap operativo](00-roadmap-operacion-tienda.md), no impide ampliaciones posteriores basadas en uso real.
+
+## Ampliación aprobada: Análisis
+
+Tras aceptar el inicio operativo, se aprobó una sección adicional `/admin/analisis` con cuatro gráficos: evolución de pedidos confirmados (cantidad/importe de productos COP), top 5 productos/variantes por unidades, estado actual de inventario y antigüedad de pendientes. MUI X Charts Community; períodos 7/30/90 días de Colombia solo para los dos primeros. Los importes son brutos acordados, no cobros ni beneficios, y excluyen envío; cancelaciones se excluyen y devoluciones físicas no se descuentan. Ver `docs/admin-analysis.md` para políticas, accesibilidad, carga por ruta y pruebas. No sustituye el inicio operativo ni habilita pasarela/contabilidad.

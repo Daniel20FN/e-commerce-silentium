@@ -1,6 +1,6 @@
 # Roadmap — Operación diaria de la tienda
 
-**Estado:** alcance de las seis entregas aprobado el 20 de octubre de 2026. PRD 07–08 implementados, verificados y aceptados; PRD 09 (duplicación/precios) implementado, verificado y aceptado; stock rápido diferido a PRD 10; PRD 10 implementado, verificado y aceptado; PRD 11 implementado, verificado y aceptado; PRD 12 sigue en planificación. Las reglas señaladas como propuestas no están aprobadas por implicación.
+**Estado:** alcance de las seis entregas aprobado el 20 de octubre de 2026. PRD 07–08 implementados, verificados y aceptados; PRD 09 (duplicación/precios) implementado, verificado y aceptado; stock rápido diferido a PRD 10; PRD 10 implementado, verificado y aceptado; PRD 11 implementado, verificado y aceptado; PRD 12 y ampliación de Análisis implementados, verificados y aceptados por el usuario. Las reglas señaladas como propuestas no están aprobadas por implicación.
 
 El siguiente ciclo mejora el trabajo del gestor: preparar un producto, publicarlo con confianza, repetir operaciones con menos esfuerzo y registrar inventario y ventas cerradas manualmente. No añade checkout ni pasarela.
 
@@ -38,12 +38,12 @@ El PRD 09 puede entregar duplicación y precios sin esperar inventario; no debe 
 
 D-01–03 aprobadas el 21 de octubre de 2026; detalle en PRD 11. D-06 sigue pendiente para una ampliación futura.
 
-| ID   | Decisión                               | Propuesta para revisar                                                                                                                                                                     | Antes de             |
-| ---- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------- |
-| D-01 | Aprobada: cancelación antes de salida          | Revertir una sola vez el descuento del pedido si la mercancía no ha salido; exigir confirmación y motivo. Cancelar no significa reembolsar.                                                | PRD 11               |
-| D-02 | Aprobada: devolución total/parcial tras salida | No reponer automáticamente. Registrar recepción física y cantidad apta para volver a stock, enlazada al pedido original. Incluye devoluciones parciales; solo unidades recibidas y aptas reponen stock, con límite acumulado de lo vendido.    | PRD 11               |
-| D-03 | Aprobada: datos mínimos del pedido               | Nombre/contacto, líneas y cantidades; dirección solo cuando el envío la requiera. Gastos de envío manuales y separados de los productos. Nombre y WhatsApp obligatorios; envío o recogida, dirección solo para envío. | PRD 11               |
-| D-06 | Carga masiva                           | Evaluar CSV cuando conozcamos tamaño del catálogo y frecuencia de cambios; antes definir plantilla, validación y reporte de errores.                                                       | Ampliación posterior |
+| ID   | Decisión                                       | Propuesta para revisar                                                                                                                                                                                                                      | Antes de             |
+| ---- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| D-01 | Aprobada: cancelación antes de salida          | Revertir una sola vez el descuento del pedido si la mercancía no ha salido; exigir confirmación y motivo. Cancelar no significa reembolsar.                                                                                                 | PRD 11               |
+| D-02 | Aprobada: devolución total/parcial tras salida | No reponer automáticamente. Registrar recepción física y cantidad apta para volver a stock, enlazada al pedido original. Incluye devoluciones parciales; solo unidades recibidas y aptas reponen stock, con límite acumulado de lo vendido. | PRD 11               |
+| D-03 | Aprobada: datos mínimos del pedido             | Nombre/contacto, líneas y cantidades; dirección solo cuando el envío la requiera. Gastos de envío manuales y separados de los productos. Nombre y WhatsApp obligatorios; envío o recogida, dirección solo para envío.                       | PRD 11               |
+| D-06 | Carga masiva                                   | Evaluar CSV cuando conozcamos tamaño del catálogo y frecuencia de cambios; antes definir plantilla, validación y reporte de errores.                                                                                                        | Ampliación posterior |
 
 D-05 resuelta el 20 de octubre de 2026: reutilizar archivos de imagen con referencias de galería independientes; las copias no heredan destacado. Ver el diseño y las precauciones de purgado en PRD 09.
 
@@ -75,8 +75,10 @@ D-04 resuelta: mínimo opcional por variante; sin mínimo no hay aviso de stock 
 - [x] Duplicar no arrastra SKU ni stock y la edición rápida no pierde cambios concurrentes.
 - [x] Todo cambio de inventario es explicable y las ventas confirmadas descuentan exactamente una vez.
 - [x] El gestor registra y consulta pedidos sin depender de memoria o conversaciones dispersas.
-- [ ] El inicio muestra trabajo real pendiente, no tarjetas decorativas ni cifras ficticias.
+- [x] El inicio muestra trabajo real pendiente, no tarjetas decorativas ni cifras ficticias.
 
 ## Continuidad
 
 Este ciclo desarrolla las capacidades que quedaron fuera del [roadmap de catálogo](00-roadmap-catalogo-admin.md) y amplía el [roadmap de compra](00-roadmap-compra.md) únicamente con gestión administrativa posterior al cierre manual. No cambia las garantías del [PRD 06](06-prd-carrito.md).
+
+Ampliación aprobada del PRD12: sección privada Análisis con cuatro gráficos y filtros 7/30/90 días; reglas y límites en `docs/admin-analysis.md`. No añade gráficos contables ni conversión de WhatsApp.

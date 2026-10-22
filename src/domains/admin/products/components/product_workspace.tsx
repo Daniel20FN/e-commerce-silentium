@@ -101,6 +101,11 @@ export function ProductWorkspace({
     );
   }, []);
   const back = safeProductsReturnUrl(returnTo);
+  const backLabel = back.startsWith("/admin/pendientes?")
+    ? dictionary.admin.dashboard.operations.backToQueue
+    : back === "/admin"
+      ? dictionary.admin.dashboard.operations.back
+      : copy.back;
   const readOnly =
     product?.inTrash || product?.status === "archived" || !!product?.archivedAt;
 
@@ -229,7 +234,7 @@ export function ProductWorkspace({
           {copy.retry}
         </Button>
         <Button component="a" href={back}>
-          {copy.back}
+          {backLabel}
         </Button>
       </Stack>
     );
@@ -241,7 +246,7 @@ export function ProductWorkspace({
       sx={{ minWidth: 0, maxWidth: 1120 }}
     >
       <Button component="a" href={back} sx={{ alignSelf: "flex-start" }}>
-        {copy.back}
+        {backLabel}
       </Button>
       <Stack spacing={1}>
         <Typography

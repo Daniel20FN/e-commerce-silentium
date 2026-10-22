@@ -1,7 +1,9 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { brandColors } from "@/styles/brand_colors";
+import { resolveThemeMode } from "@/styles/theme_mode";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -19,16 +21,17 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialTheme = resolveThemeMode((await cookies()).get("theme")?.value);
   return (
     <html lang="es">
       <body>
         <AppRouterCacheProvider>
-          <Providers>{children}</Providers>
+          <Providers initialTheme={initialTheme}>{children}</Providers>
         </AppRouterCacheProvider>
       </body>
     </html>

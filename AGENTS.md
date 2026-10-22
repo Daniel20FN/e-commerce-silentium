@@ -91,6 +91,10 @@
 
 - Set `ORDERS_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/orders/services/order_service.integration.test.ts` for optional PostgreSQL order checks. Requires explicit `.env.development` `DATABASE_URL` and both inventory/order migrations. Creates isolated QA catalog, order and immutable ledger data; soft-retires catalog fixtures, never physically deletes history, uploads Storage files or sends WhatsApp messages. Never run against production. Stop Next/Jest before Prisma generation/build on Windows. See `docs/admin-orders.md`.
 
+### Operative admin home integration checks
+
+- Set `OPERATIONS_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/home/services/operational_service.integration.test.ts` for optional PostgreSQL priority-queue checks. Requires explicit `.env.development` `DATABASE_URL` and inventory/order migrations; never production. Creates isolated QA catalog/orders/ledger, soft-retires catalog and closes/cancels its own orders, retaining immutable history. No Storage, WhatsApp or real stock writes. Stop Next/Jest before Prisma generation/build on Windows. See `docs/admin-home.md`. Business timestamps use approved `America/Bogota`; current queues cover all dates, not a daily sales cutoff.
+
 ## Git Hooks
 
 - Husky is enabled via the `prepare` script.
@@ -241,3 +245,8 @@
 ## Source Asset Safety
 
 - Keep PDF briefs binary in `.gitattributes` (`*.pdf binary`); with Windows `core.autocrlf=true`, text classification can corrupt source PDFs. Do not format or normalize source binary files.
+
+### Admin analysis checks
+
+- `/admin/analisis` uses MUI X Charts Community, loaded only on that route. Preserve shared first-confirmation cohort and Colombia calendar semantics; inventory/aging are current snapshots, not period-filtered. See `docs/admin-analysis.md`.
+- Optional `ANALYSIS_INTEGRATION=1` with `npm run test:file -- src/domains/admin/analysis/services/analysis_service.integration.test.ts` requires explicit development DATABASE_URL. Uses isolated QA orders/catalog, cancels/soft-retires fixtures and verifies preexisting stock unchanged; never production, Storage uploads or WhatsApp messages. Stop Next/Jest before Prisma/build on Windows.

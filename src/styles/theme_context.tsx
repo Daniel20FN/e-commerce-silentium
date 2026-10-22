@@ -1,58 +1,31 @@
-import { getClientCookie, setClientCookie } from "@/utils/cookies_helper";
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useState,
-  useSyncExternalStore,
-} from "react";
-
-export type ThemeMode = "light" | "dark";
-
+import { setClientCookie } from "@/utils/cookies_helper";
+import { ReactNode, createContext, useContext, useState } from "react";
+import type { ThemeMode } from "./theme_mode";
+export type { ThemeMode } from "./theme_mode";
 interface ThemeContextProps {
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
 }
-
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
-
 export const useThemeMode = () => {
   const context = useContext(ThemeContext);
-  if (!context) {
+  if (!context)
     throw new Error("useThemeMode must be used within a ThemeProvider");
-  }
   return context;
 };
-
 interface ThemeProviderProps {
   children: ReactNode;
+  initialTheme?: ThemeMode;
 }
-
-function getInitialTheme(): ThemeMode {
-  if (typeof window !== "undefined") {
-    const cookieTheme = getClientCookie("theme");
-    if (cookieTheme === "light" || cookieTheme === "dark") {
-      return cookieTheme;
-    }
-  }
-
-  return "light";
-}
-
-export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const hasHydrated = useSyncExternalStore(
-    subscribeToHydration,
-    getClientHydrationSnapshot,
-    getServerHydrationSnapshot,
-  );
-  const [themeMode, setThemeModeState] = useState<ThemeMode>(() =>
-    getInitialTheme(),
-  );
-
+export const ThemeProvider = ({
+  children,
+  initialTheme = "light",
+}: ThemeProviderProps) => {
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(initialTheme);
   return (
     <ThemeContext.Provider
       value={{
-        themeMode: hasHydrated ? themeMode : "light",
+        themeMode,
         setThemeMode: (mode) => {
           setClientCookie("theme", mode);
           setThemeModeState(mode);
@@ -63,15 +36,3 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     </ThemeContext.Provider>
   );
 };
-
-function subscribeToHydration(): () => void {
-  return () => {};
-}
-
-function getClientHydrationSnapshot(): boolean {
-  return true;
-}
-
-function getServerHydrationSnapshot(): boolean {
-  return false;
-}

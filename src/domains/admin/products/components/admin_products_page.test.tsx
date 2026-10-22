@@ -99,9 +99,10 @@ jest.mock("notistack", () => ({
 }));
 
 const mockRouterPush = jest.fn();
+let mockSearchQuery = "";
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockRouterPush }),
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => new URLSearchParams(mockSearchQuery),
 }));
 
 const dictionary = {
@@ -344,6 +345,7 @@ const productDetail = {
 describe("admin_products_page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    mockSearchQuery = "";
     mockGet.mockImplementation((requestId: string) => {
       if (requestId === "admin-products-category-options") {
         return Promise.resolve({
@@ -360,6 +362,17 @@ describe("admin_products_page", () => {
         pageSize: 10,
       });
     });
+  });
+
+  it("opens the existing new product editor from the operative-home shortcut without creating data", async () => {
+    mockSearchQuery = "create=1";
+    render(<AdminProductsPage dictionary={spanish} />);
+    expect(
+      await screen.findByRole("dialog", {
+        name: spanish.admin.products.form.createTitle,
+      }),
+    ).toBeInTheDocument();
+    expect(mockPost).not.toHaveBeenCalled();
   });
 
   it("loads products and applies search, trash, and sort filters", async () => {

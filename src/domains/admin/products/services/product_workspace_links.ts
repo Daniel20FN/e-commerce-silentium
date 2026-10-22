@@ -1,4 +1,8 @@
 import {
+  priorityHref,
+  resolvePriorityGroup,
+} from "@/domains/admin/home/services/operational_rules";
+import {
   ADMIN_PRODUCT_SORT_FIELD,
   ADMIN_PRODUCT_STATUS_VALUES,
   type AdminProductSortField,
@@ -36,6 +40,17 @@ export function safeProductsReturnUrl(
   if (!value) return "/admin/productos";
   try {
     const url = new URL(value, "https://workspace.invalid");
+    if (url.origin === "https://workspace.invalid" && url.pathname === "/admin")
+      return "/admin";
+    if (
+      url.origin === "https://workspace.invalid" &&
+      url.pathname === "/admin/pendientes"
+    ) {
+      const group = resolvePriorityGroup(
+        url.searchParams.get("group") ?? undefined,
+      );
+      if (group) return priorityHref(group);
+    }
     return url.origin === "https://workspace.invalid" &&
       url.pathname === "/admin/productos"
       ? url.pathname + url.search

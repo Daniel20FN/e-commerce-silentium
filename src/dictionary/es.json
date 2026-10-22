@@ -458,7 +458,8 @@
       "categories": "Categorías",
       "storefront": "Ver tienda",
       "products": "Productos",
-      "orders": "Pedidos"
+      "orders": "Pedidos",
+      "analysis": "Análisis"
     },
     "layout": {
       "title": "Administración",
@@ -470,8 +471,8 @@
     },
     "dashboard": {
       "eyebrow": "Centro de control",
-      "title": "Panel de Administración",
-      "subtitle": "Gestiona la operación principal de Silentium desde un único espacio de trabajo.",
+      "title": "Inicio operativo",
+      "subtitle": "Prioridades de catálogo, inventario y pedidos para atender ahora.",
       "summaryTitle": "Módulos iniciales",
       "summaryDescription": "Esta base deja listo el acceso privado y la estructura principal para seguir incorporando herramientas administrativas.",
       "cards": {
@@ -483,6 +484,71 @@
         "customersDescription": "Consulta cuentas, roles y atención postventa en una vista administrativa.",
         "settingsTitle": "Configuración",
         "settingsDescription": "Mantén permisos, procesos internos y ajustes clave bajo control."
+      },
+      "operations": {
+        "newOrder": "Registrar pedido",
+        "newProduct": "Crear producto",
+        "inventory": "Consultar agotados",
+        "refresh": "Actualizar",
+        "refreshing": "Actualizando…",
+        "retry": "Volver a intentar",
+        "back": "Volver al inicio",
+        "queueTitle": "Pendientes",
+        "queueDescription": "Listas de trabajo con los mismos criterios del inicio.",
+        "scope": "Pendientes actuales, de todas las fechas. Los grupos pueden solaparse: no se suman. Actualización manual; hora de Bogotá.",
+        "updated": "Consultado: {date} · Bogotá",
+        "loading": "Consultando pendientes…",
+        "error": "No se pudieron consultar estos pendientes. No es un saldo de cero. Vuelve a intentar o regresa a la primera página si la lista cambió.",
+        "empty": "Sin pendientes en este grupo.",
+        "viewAll": "Ver todos",
+        "firstPage": "Primera página",
+        "next": "Siguiente página",
+        "oldestFirst": "Más antiguos primero · hasta 20 por página.",
+        "orderNumber": "Pedido #{number}",
+        "stock": "Stock: {stock}",
+        "minimum": "Mínimo: {minimum}",
+        "blocks": {
+          "orders": "Pedidos por atender",
+          "inventory": "Inventario por reponer",
+          "catalog": "Catálogo por preparar"
+        },
+        "groups": {
+          "prepare": {
+            "title": "Por preparar",
+            "description": "Pedidos confirmados con preparación pendiente o en curso."
+          },
+          "deliver": {
+            "title": "Por entregar",
+            "description": "Pedidos enviados o listos para recoger, aún sin marcar entregados."
+          },
+          "unpaid": {
+            "title": "Pago pendiente",
+            "description": "Confirmados sin marcar pagados, incluso si ya se entregaron. No equivale a ingresos."
+          },
+          "out": {
+            "title": "Variantes agotadas",
+            "description": "Stock cero en productos editables. Incluye variantes inactivas; excluye archivados y papelera."
+          },
+          "low": {
+            "title": "Variantes bajo mínimo",
+            "description": "Stock mayor que cero y menor o igual al mínimo configurado. Sin mínimo no hay alerta."
+          },
+          "drafts": {
+            "title": "Productos en borrador",
+            "description": "Borradores editables. También se incluyen en bloqueos de publicación."
+          },
+          "publication": {
+            "title": "Con bloqueo de publicación",
+            "description": "Producto no activo, sin categoría visible o sin variantes activas. No exige fotos, SEO ni costos."
+          },
+          "unavailable": {
+            "title": "Visibles sin stock vendible",
+            "description": "Productos públicos cuyas variantes activas están agotadas. No es un bloqueo de publicación."
+          }
+        },
+        "heading": "¿Qué necesita atención?",
+        "backToQueue": "Volver a pendientes",
+        "analysis": "Ver análisis"
       }
     },
     "forbidden": {
@@ -1313,6 +1379,60 @@
       "stockError": "Stock insuficiente o variante no vendible. No se descontó ninguna línea. Revisa el borrador.",
       "restocked": "Repuestas acumuladas",
       "discardPending": "No se enviará automáticamente ninguna operación recuperada. Revisa y reintenta con la misma clave."
+    },
+    "analysis": {
+      "title": "Análisis",
+      "description": "Pedidos confirmados, inventario y pendientes.",
+      "period": "Período de pedidos",
+      "days": {
+        "7": "7 días",
+        "30": "30 días",
+        "90": "90 días"
+      },
+      "back": "Volver al inicio",
+      "refresh": "Actualizar",
+      "refreshing": "Actualizando…",
+      "updated": "Corte de datos",
+      "timezone": "Hora de Colombia · America/Bogota",
+      "activity": "Evolución de pedidos",
+      "top": "Los 5 más pedidos",
+      "inventory": "Estado del inventario",
+      "aging": "Antigüedad de pendientes",
+      "count": "Pedidos",
+      "amount": "Importe de productos (COP)",
+      "products": "Productos",
+      "variants": "Variantes",
+      "units": "Unidades",
+      "quantity": "Cantidad",
+      "label": "Concepto",
+      "date": "Día",
+      "data": "Ver datos del gráfico",
+      "loading": "Cargando datos…",
+      "error": "No pudimos cargar este gráfico. Actualiza para reintentar.",
+      "empty": "No hay pedidos confirmados en este período. Prueba un período más amplio.",
+      "emptyInventory": "No hay variantes editables para analizar.",
+      "emptyAging": "No hay pedidos confirmados pendientes de entrega.",
+      "current": "Estado actual · todos los períodos",
+      "periodScope": "Solo los dos primeros gráficos cambian con el período. El día de hoy puede estar incompleto.",
+      "cohortScope": "Según la primera confirmación, no la creación del borrador. Se excluyen borradores y pedidos actualmente cancelados; una cancelación posterior cambia el histórico.",
+      "moneyScope": "Importe acordado de productos, sin envío. No representa dinero cobrado ni beneficio. Las devoluciones físicas no se descuentan de estas cifras brutas.",
+      "topScope": "Unidades confirmadas. El nombre y SKU mostrados son la última descripción registrada en los pedidos, también para productos archivados.",
+      "inventoryScope": "Variantes no eliminadas de productos editables, incluidas las inactivas. «Sin alerta» no significa publicable: incluye mínimos sin configurar.",
+      "agingScope": "Pedidos confirmados pendientes, en preparación, listos o enviados. Días de calendario desde la primera confirmación, en Colombia. Los tramos son orientativos, no plazos de entrega.",
+      "out": "Agotadas",
+      "low": "Stock bajo",
+      "other": "Sin alerta",
+      "age0": "0–2 días",
+      "age3": "3–7 días",
+      "age8": "8 días o más",
+      "ageUnknown": "Fecha por revisar",
+      "open": "Abrir ficha",
+      "queue": "Ver pendientes",
+      "total": "Total del período",
+      "totalCurrent": "Total actual",
+      "rankingTotal": "Unidades de los 5 primeros",
+      "chartUnavailable": "El gráfico no pudo abrirse. Puedes consultar los datos de abajo.",
+      "unknownScope": "«Fecha por revisar» incluye confirmaciones ausentes o posteriores al corte."
     }
   }
 }

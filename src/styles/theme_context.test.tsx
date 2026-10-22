@@ -51,15 +51,15 @@ describe("ThemeProvider hydration", () => {
     expect(screen.getByRole("button")).toHaveTextContent("light");
   });
 
-  it("uses the server snapshot first, then restores the saved theme without hydration errors", async () => {
+  it("hydrates the validated server theme without a forced-light first paint", async () => {
     document.cookie = "theme=dark; path=/";
     const tree = (
-      <ThemeProvider>
+      <ThemeProvider initialTheme="dark">
         <ThemeProbe />
       </ThemeProvider>
     );
     const markup = renderToString(tree);
-    expect(markup).toContain("light");
+    expect(markup).toContain("dark");
 
     const container = document.createElement("div");
     container.innerHTML = markup;
