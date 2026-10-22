@@ -34,6 +34,40 @@ const data: InventoryData = {
   ],
   nextCursor: null,
 };
+
+test("order-linked exits explain their source and cannot be reversed generically", () => {
+  render(
+    <InventoryHistory
+      dictionary={dictionary}
+      data={{
+        ...data,
+        movements: [
+          {
+            ...data.movements[0],
+            type: "exit",
+            orderLinked: true,
+            reason: "order_confirmation",
+          },
+        ],
+      }}
+      busy={false}
+      disableReversal={false}
+      onFilter={jest.fn()}
+      onMore={jest.fn()}
+      onReverse={jest.fn()}
+    />,
+  );
+  expect(
+    screen.getByText(dictionary.admin.inventory.orderLinkedHint),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(new RegExp(dictionary.admin.inventory.orderConfirmation)),
+  ).toBeInTheDocument();
+  expect(screen.queryByText(/order_confirmation/)).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: dictionary.admin.inventory.reverse }),
+  ).not.toBeInTheDocument();
+});
 test("filters dates as local day bounds and prevents reversed intervals", () => {
   const onFilter = jest.fn();
   render(

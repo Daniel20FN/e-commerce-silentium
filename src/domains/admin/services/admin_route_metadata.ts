@@ -6,6 +6,7 @@ export const ADMIN_ROUTE_SECTION = {
   userDetail: "user-detail",
   categories: "categories",
   products: "products",
+  orders: "orders",
 } as const;
 
 export type AdminRouteSection =
@@ -46,6 +47,11 @@ export function getAdminNavigationSections(
       section: ADMIN_ROUTE_SECTION.categories,
     },
     {
+      href: "/admin/pedidos",
+      label: dictionary.admin.navigation.orders,
+      section: ADMIN_ROUTE_SECTION.orders,
+    },
+    {
       href: "/admin/productos",
       label: dictionary.admin.navigation.products,
       section: ADMIN_ROUTE_SECTION.products,
@@ -58,6 +64,15 @@ export function resolveAdminRouteMetadata(
   dictionary: Dictionary,
 ): AdminRouteMetadata {
   const routes: AdminRouteMetadata[] = [
+    {
+      href: "/admin/pedidos",
+      navigationHref: "/admin/pedidos",
+      section: ADMIN_ROUTE_SECTION.orders,
+      title: dictionary.admin.orders.title,
+      description: dictionary.admin.orders.description,
+      matches: (path) =>
+        path === "/admin/pedidos" || path.startsWith("/admin/pedidos/"),
+    },
     {
       href: "/admin/productos",
       navigationHref: "/admin/productos",

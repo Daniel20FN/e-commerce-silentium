@@ -80,6 +80,7 @@ export async function getInventory(
     include: {
       variant: { select: { sku: true } },
       reversedBy: { select: { id: true } },
+      orderLink: { select: { id: true } },
     },
   });
   return {
@@ -108,6 +109,7 @@ export async function getInventory(
       reason: m.reason,
       reference: m.reference,
       reversedById: m.reversedBy?.id ?? null,
+      orderLinked: !!m.orderLink,
       createdAt: m.createdAt.toISOString(),
     })),
     nextCursor: movements.length > 50 ? movements[49].id : null,
@@ -234,14 +236,15 @@ export async function mutateInventory(
       if (input.kind === "reversal") {
         const original = await tx.inventoryMovement.findUnique({
           where: { id: row.reversesId },
-          include: { reversedBy: true },
+          include: { reversedBy: true, orderLink: { select: { id: true } } },
         });
         if (
           !original ||
           original.variantId !== v.id ||
           original.type === "initial" ||
           original.type === "reversal" ||
-          original.reversedBy
+          original.reversedBy ||
+          original.orderLink
         )
           return fail("inventory_reversal_invalid", "invalid_state");
         delta = -original.delta;

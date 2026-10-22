@@ -197,7 +197,7 @@ function productCard(product: CardRecord): StorefrontProductCard | null {
 }
 
 export function publicProductWhere(
-  categories: StorefrontCategory[],
+  categories: Pick<StorefrontCategory, "id">[],
 ): Prisma.ProductWhereInput {
   return {
     status: "active",

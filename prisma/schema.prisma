@@ -235,6 +235,7 @@ model ProductVariant {
   stockRevision        Int                         @default(0)
   inventoryMinimum     Int?
   inventoryMovements   InventoryMovement[]
+  orderLines           ManualOrderLine[]
   isActive             Boolean                     @default(true)
   isDefault            Boolean                     @default(false)
   displayOrder         Int                         @default(0)
@@ -368,8 +369,165 @@ model InventoryMovement {
   reverses    InventoryMovement?    @relation("InventoryReversal", fields: [reversesId], references: [id], onDelete: Restrict)
   reversedBy  InventoryMovement?    @relation("InventoryReversal")
   createdAt   DateTime              @default(now())
+  orderLink   OrderStockLink?
 
   @@unique([variantId, revision])
   @@index([variantId, createdAt, id])
   @@index([operationId])
+}
+
+enum ManualOrderStatus {
+  draft
+  confirmed
+  cancelled
+}
+
+enum ManualOrderPayment {
+  pending
+  paid
+}
+
+enum ManualOrderDelivery {
+  shipping
+  pickup
+}
+
+enum ManualOrderFulfillment {
+  pending
+  preparing
+  shipped
+  ready
+  delivered
+}
+
+enum OrderEventKind {
+  created
+  edited
+  confirmed
+  cancelled
+  payment
+  fulfillment
+  returned
+}
+
+enum OrderStockPurpose {
+  confirmation
+  cancellation
+  return
+}
+
+model ManualOrder {
+  id             String                 @id @default(uuid())
+  number         Int                    @unique @default(autoincrement())
+  revision       Int                    @default(0)
+  status         ManualOrderStatus      @default(draft)
+  payment        ManualOrderPayment     @default(pending)
+  delivery       ManualOrderDelivery
+  fulfillment    ManualOrderFulfillment @default(pending)
+  customerName   String
+  customerPhone  String
+  address        String?
+  notes          String?
+  subtotalCents  Int
+  shippingCents  Int
+  totalCents     Int
+  createdById    String
+  createdByLabel String
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  lines          ManualOrderLine[]
+  events         OrderEvent[]
+  operations     OrderOperation[]
+  returns        OrderReturn[]
+  stockLinks     OrderStockLink[]
+
+  @@index([createdAt, id])
+  @@index([status, fulfillment, payment])
+}
+
+model ManualOrderLine {
+  id                String           @id @default(uuid())
+  orderId           String
+  variantId         String
+  productId         String
+  productName       String
+  sku               String
+  attributes        String
+  quantity          Int
+  unitPriceCents    Int
+  catalogPriceCents Int
+  priceReason       String?
+  order             ManualOrder      @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  variant           ProductVariant   @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  returns           OrderReturn[]
+  stockLinks        OrderStockLink[]
+
+  @@unique([orderId, variantId])
+  @@unique([id, orderId])
+  @@index([variantId])
+}
+
+model OrderOperation {
+  id          String      @id
+  orderId     String
+  actorId     String
+  requestHash String
+  createdAt   DateTime    @default(now())
+  order       ManualOrder @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  event       OrderEvent?
+
+  @@unique([id, orderId])
+  @@index([orderId, createdAt])
+}
+
+model OrderEvent {
+  id          String           @id @default(uuid())
+  orderId     String
+  operationId String           @unique
+  kind        OrderEventKind
+  actorId     String
+  actorLabel  String
+  reason      String?
+  from        String?
+  to          String?
+  createdAt   DateTime         @default(now())
+  order       ManualOrder      @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  operation   OrderOperation   @relation(fields: [operationId, orderId], references: [id, orderId], onDelete: Restrict)
+  returns     OrderReturn[]
+  stockLinks  OrderStockLink[]
+
+  @@unique([id, orderId])
+  @@unique([operationId, orderId])
+  @@index([orderId, createdAt, id])
+}
+
+model OrderReturn {
+  id         String          @id @default(uuid())
+  orderId    String
+  eventId    String
+  lineId     String
+  received   Int
+  resellable Int
+  order      ManualOrder     @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  event      OrderEvent      @relation(fields: [eventId, orderId], references: [id, orderId], onDelete: Restrict)
+  line       ManualOrderLine @relation(fields: [lineId, orderId], references: [id, orderId], onDelete: Restrict)
+
+  @@unique([eventId, lineId])
+  @@index([lineId])
+}
+
+model OrderStockLink {
+  id         String            @id @default(uuid())
+  orderId    String
+  eventId    String
+  lineId     String
+  movementId String            @unique
+  purpose    OrderStockPurpose
+  order      ManualOrder       @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  event      OrderEvent        @relation(fields: [eventId, orderId], references: [id, orderId], onDelete: Restrict)
+  line       ManualOrderLine   @relation(fields: [lineId, orderId], references: [id, orderId], onDelete: Restrict)
+  movement   InventoryMovement @relation(fields: [movementId], references: [id], onDelete: Restrict)
+
+  @@unique([eventId, lineId])
+  @@index([orderId])
 }

@@ -49,6 +49,7 @@ export interface InventoryMovementDto {
   reason: string;
   reference: string | null;
   reversedById: string | null;
+  orderLinked?: boolean;
   createdAt: string;
 }
 export interface InventoryData {
