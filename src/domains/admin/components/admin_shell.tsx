@@ -37,6 +37,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import type { CSSObject, Theme } from "@mui/material/styles";
 import { styled, ThemeProvider, useTheme } from "@mui/material/styles";
@@ -150,6 +151,8 @@ export function AdminShell({
   const adminTheme = useMemo(() => createAdminTheme(theme), [theme]);
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const desktopTooltips = useMediaQuery(theme.breakpoints.up("md"));
+  const showNavigationTooltips = desktopTooltips && !open;
   const activeRoute = resolveAdminRouteMetadata(pathname, dictionary);
   const navigationIcons: Partial<Record<AdminRouteSection, ReactNode>> = {
     [ADMIN_ROUTE_SECTION.analysis]: <BarChartOutlined />,
@@ -233,10 +236,13 @@ export function AdminShell({
         <Drawer variant="permanent" open={open}>
           <DrawerHeader sx={{ justifyContent: open ? "flex-end" : "center" }}>
             <Tooltip
+              disableTouchListener
               title={
-                open
-                  ? dictionary.admin.layout.collapse
-                  : dictionary.admin.layout.expand
+                !desktopTooltips
+                  ? ""
+                  : open
+                    ? dictionary.admin.layout.collapse
+                    : dictionary.admin.layout.expand
               }
             >
               <IconButton
@@ -267,48 +273,61 @@ export function AdminShell({
                 disablePadding
                 sx={{ display: "block" }}
               >
-                <ListItemButton
-                  component={Link}
-                  href={item.href}
-                  selected={item.isActive}
-                  sx={{
-                    minHeight: 48,
-                    px: 2.5,
-                    justifyContent: open ? "initial" : "center",
-                    borderRight: item.isActive
-                      ? `2px solid ${theme.palette.info.main}`
-                      : "2px solid transparent",
-                    backgroundColor: item.isActive
-                      ? "action.selected"
-                      : "transparent",
-                    "&:hover": {
+                <Tooltip
+                  title={showNavigationTooltips ? item.label : ""}
+                  placement="right"
+                  arrow
+                  enterDelay={150}
+                  describeChild
+                  disableTouchListener
+                  disableHoverListener={!showNavigationTooltips}
+                  disableFocusListener={!showNavigationTooltips}
+                >
+                  <ListItemButton
+                    aria-label={item.label}
+                    aria-current={item.isActive ? "page" : undefined}
+                    component={Link}
+                    href={item.href}
+                    selected={item.isActive}
+                    sx={{
+                      minHeight: 48,
+                      px: 2.5,
+                      justifyContent: open ? "initial" : "center",
+                      borderRight: item.isActive
+                        ? `2px solid ${theme.palette.info.main}`
+                        : "2px solid transparent",
                       backgroundColor: item.isActive
                         ? "action.selected"
-                        : "action.hover",
-                    },
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : "auto",
-                      justifyContent: "center",
-                      color: item.isActive ? "info.main" : "inherit",
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.label}
-                    sx={{
-                      opacity: open ? 1 : 0,
-                      "& .MuiTypography-root": {
-                        fontWeight: item.isActive ? 700 : 500,
-                        color: item.isActive ? "info.main" : "text.primary",
+                        : "transparent",
+                      "&:hover": {
+                        backgroundColor: item.isActive
+                          ? "action.selected"
+                          : "action.hover",
                       },
                     }}
-                  />
-                </ListItemButton>
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: open ? 3 : "auto",
+                        justifyContent: "center",
+                        color: item.isActive ? "info.main" : "inherit",
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      sx={{
+                        opacity: open ? 1 : 0,
+                        "& .MuiTypography-root": {
+                          fontWeight: item.isActive ? 700 : 500,
+                          color: item.isActive ? "info.main" : "text.primary",
+                        },
+                      }}
+                    />
+                  </ListItemButton>
+                </Tooltip>
               </ListItem>
             ))}
           </List>

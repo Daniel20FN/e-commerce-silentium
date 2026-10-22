@@ -14,16 +14,28 @@ export default async function AdminDashboardPage() {
   const c = getDictionary("es").admin.dashboard.operations;
   return (
     <OperationalHome copy={c}>
-      <Suspense fallback={<PriorityLoading title={c.blocks.orders} copy={c} />}>
+      <Suspense
+        fallback={
+          <PriorityLoading block="orders" title={c.blocks.orders} copy={c} />
+        }
+      >
         <PriorityPanel block="orders" copy={c} />
       </Suspense>
       <Suspense
-        fallback={<PriorityLoading title={c.blocks.inventory} copy={c} />}
+        fallback={
+          <PriorityLoading
+            block="inventory"
+            title={c.blocks.inventory}
+            copy={c}
+          />
+        }
       >
         <PriorityPanel block="inventory" copy={c} />
       </Suspense>
       <Suspense
-        fallback={<PriorityLoading title={c.blocks.catalog} copy={c} />}
+        fallback={
+          <PriorityLoading block="catalog" title={c.blocks.catalog} copy={c} />
+        }
       >
         <PriorityPanel block="catalog" copy={c} />
       </Suspense>

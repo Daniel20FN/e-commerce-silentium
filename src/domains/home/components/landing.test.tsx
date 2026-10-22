@@ -1,5 +1,6 @@
 import { Footer } from "@/components/footer";
 import dictionary from "@/dictionary/es.json";
+import type { StorefrontCategory } from "@/domains/storefront/types/catalog";
 import {
   SALES_WHATSAPP_PHONE,
   salesWhatsAppHref,
@@ -15,6 +16,7 @@ import type { LandingSection } from "../services/landing_links";
 import { landingHref } from "../services/landing_links";
 import { HomePage } from "./home_page";
 import { LandingDisclosures } from "./landing_disclosures";
+import { CategoriesSection } from "./sections/categories_section";
 
 jest.mock("next/image", () => ({
   __esModule: true,
@@ -41,6 +43,81 @@ const sections: LandingSection[] = [
   "contacto",
 ];
 describe("lightweight single-page public information", () => {
+  it("previews three categories and links to the complete category index", () => {
+    const categories: StorefrontCategory[] = Array.from(
+      { length: 5 },
+      (_, index) => ({
+        id: `category-${index}`,
+        name: `Category ${index}`,
+        slug: `category-${index}`,
+        parentId: null,
+        description: null,
+        imageUrl: null,
+        sortOrder: index,
+        seoTitle: null,
+        seoDescription: null,
+      }),
+    );
+    const { container } = render(
+      <CategoriesSection dictionary={dictionary} categories={categories} />,
+    );
+    expect(container.querySelectorAll(".categoryGrid > a")).toHaveLength(3);
+    expect(
+      screen.getByRole("link", {
+        name: dictionary.storefront.viewAllCategories,
+      }),
+    ).toHaveAttribute("href", "/categorias");
+    expect(
+      container.querySelector('a[href="/categorias/category-2"]'),
+    ).not.toBeNull();
+    expect(
+      container.querySelector('a[href="/categorias/category-3"]'),
+    ).toBeNull();
+  });
+  it("does not offer an empty category index when the public catalog has no categories", () => {
+    render(<CategoriesSection dictionary={dictionary} categories={[]} />);
+    expect(
+      screen.queryByRole("link", {
+        name: dictionary.storefront.viewAllCategories,
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      dictionary.storefront.emptyCategories,
+    );
+  });
+  it("keeps merchandising order and tells the story without tabs or fake cart actions", () => {
+    const { container } = render(
+      <HomePage dictionary={dictionary} categories={[]} products={[]} />,
+    );
+    expect(
+      [...container.querySelectorAll("main > section")]
+        .map((section) => section.id)
+        .slice(0, 3),
+    ).toEqual(["inicio", "productos", "colecciones"]);
+    expect(
+      container.querySelectorAll(
+        "#como-comprar button, #como-comprar [role=tab], #nosotros button",
+      ),
+    ).toHaveLength(0);
+    expect(container.querySelectorAll("#como-comprar ol li")).toHaveLength(3);
+    expect(
+      container.querySelector("#como-comprar figcaption"),
+    ).toHaveTextContent(copy.howTo.example);
+    expect(container.querySelector("#como-comprar")).not.toHaveTextContent(
+      "$0",
+    );
+    expect(container.querySelectorAll("#nosotros p")).toHaveLength(1);
+    expect(container.querySelector("#nosotros")).not.toHaveTextContent(
+      copy.about.description,
+    );
+    expect(container.querySelector("#nosotros h2")).toHaveTextContent(
+      copy.about.title,
+    );
+    for (const image of container.querySelectorAll(
+      "#nosotros img, #como-comprar img",
+    ))
+      expect(image).toHaveAttribute("loading", "lazy");
+  });
   beforeEach(() => window.history.replaceState(null, "", "/"));
   afterEach(() => window.history.replaceState(null, "", "/"));
   it("art-directs one eager hero image for phones without duplicating semantic content", () => {
@@ -101,10 +178,10 @@ describe("lightweight single-page public information", () => {
     expect(
       screen.getByRole("region", { name: copy.contact.title }),
     ).toBeInTheDocument();
-    expect(container.querySelectorAll("details")).toHaveLength(
+    expect(container.querySelectorAll("#ayuda details")).toHaveLength(
       copy.help.items.length,
     );
-    expect(container.querySelectorAll("summary")).toHaveLength(
+    expect(container.querySelectorAll("#ayuda summary")).toHaveLength(
       copy.help.items.length,
     );
     expect(container.querySelector("form")).toBeNull();
@@ -143,9 +220,12 @@ describe("lightweight single-page public information", () => {
       "/images/landing/refugio-marfil.webp",
     );
     expect(container.querySelector("#inicio img")).toHaveAttribute("alt", "");
+    expect(
+      container.querySelector("#como-comprar .slipPhoto img"),
+    ).toHaveAttribute("src", photo.url);
     expect(container.querySelector("#nosotros img")).toHaveAttribute(
       "src",
-      photo.url,
+      "/images/landing/story-white-bedding.jpg",
     );
     expect(container.querySelector("#inicio button")).toBeNull();
     expect(screen.queryByText("Elige tu ambiente")).not.toBeInTheDocument();

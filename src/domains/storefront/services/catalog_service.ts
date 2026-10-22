@@ -12,6 +12,8 @@ import type {
   StorefrontProductCard,
   StorefrontVariant,
 } from "../types/catalog";
+import { filteredCatalogPage } from "./catalog_filter_query";
+import { catalogFilters } from "./catalog_filters";
 import {
   categoryTrail,
   descendantCategoryIds,
@@ -218,14 +220,28 @@ export async function getStorefrontListing(
     ? categories.find((item) => item.slug === params.categorySlug)
     : null;
   if (params.categorySlug && !category) return null;
+  const scopeIds = category
+    ? descendantCategoryIds(category.id, categories)
+    : categories.map((item) => item.id);
+  const selectedCategory = params.filterCategorySlug
+    ? categories.find(
+        (item) =>
+          item.slug === params.filterCategorySlug && scopeIds.includes(item.id),
+      )
+    : null;
+  const categoryIds = params.filterCategorySlug
+    ? selectedCategory
+      ? descendantCategoryIds(selectedCategory.id, categories)
+      : []
+    : scopeIds;
   const where: Prisma.ProductWhereInput = {
     ...publicProductWhere(categories),
-    ...(category
+    ...(category || params.filterCategorySlug
       ? {
           categories: {
             some: {
               categoryId: {
-                in: descendantCategoryIds(category.id, categories),
+                in: categoryIds,
               },
             },
           },
@@ -246,19 +262,39 @@ export async function getStorefrontListing(
         }
       : {}),
   };
-  const total = await prisma.product.count({ where });
-  const pageCount = Math.max(1, Math.ceil(total / STOREFRONT_PAGE_SIZE));
+  const advanced = Boolean(
+    params.q ||
+      params.minPriceCents !== undefined ||
+      params.maxPriceCents !== undefined ||
+      params.available ||
+      (params.sort && params.sort !== "recommended"),
+  );
+  const filtered = advanced
+    ? await filteredCatalogPage(params, categoryIds)
+    : null;
+  const total = filtered?.total ?? (await prisma.product.count({ where }));
+  const pageCount =
+    filtered?.pageCount ?? Math.max(1, Math.ceil(total / STOREFRONT_PAGE_SIZE));
   const requestedPage = params.page ?? 1;
-  const page = Number.isSafeInteger(requestedPage)
-    ? Math.max(1, Math.min(requestedPage, pageCount))
-    : 1;
-  const records = await prisma.product.findMany({
-    where,
-    select: cardSelect,
-    orderBy: [{ featured: "desc" }, { name: "asc" }, { id: "asc" }],
-    skip: (page - 1) * STOREFRONT_PAGE_SIZE,
-    take: STOREFRONT_PAGE_SIZE,
-  });
+  const page =
+    filtered?.page ??
+    (Number.isSafeInteger(requestedPage)
+      ? Math.max(1, Math.min(requestedPage, pageCount))
+      : 1);
+  const records =
+    filtered && !filtered.ids.length
+      ? []
+      : await prisma.product.findMany({
+          where: filtered ? { ...where, id: { in: filtered.ids } } : where,
+          select: cardSelect,
+          orderBy: [{ featured: "desc" }, { name: "asc" }, { id: "asc" }],
+          skip: filtered ? 0 : (page - 1) * STOREFRONT_PAGE_SIZE,
+          take: STOREFRONT_PAGE_SIZE,
+        });
+  if (filtered) {
+    const order = new Map(filtered.ids.map((id, index) => [id, index]));
+    records.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+  }
   return {
     items: records.flatMap((record) => {
       const card = productCard(record);
@@ -267,6 +303,10 @@ export async function getStorefrontListing(
     page,
     pageCount,
     total,
+    filters: catalogFilters(params),
+    filterCategories: categories
+      .filter((item) => scopeIds.includes(item.id))
+      .map(({ id, slug, name, parentId }) => ({ id, slug, name, parentId })),
     category: category ?? null,
     breadcrumbs: category ? categoryTrail(category, categories) : [],
     children: categories.filter(
