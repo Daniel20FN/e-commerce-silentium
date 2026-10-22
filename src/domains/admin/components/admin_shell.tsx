@@ -1,10 +1,11 @@
 "use client";
 
-import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { contextualGuideHref } from "@/domains/admin/guide/services/guide_content";
 import {
   ADMIN_ROUTE_SECTION,
   getAdminNavigationSections,
   resolveAdminRouteMetadata,
+  type AdminNavigationDictionary,
   type AdminRouteSection,
 } from "@/domains/admin/services/admin_route_metadata";
 import { createAdminTheme } from "@/domains/admin/services/admin_theme";
@@ -15,7 +16,9 @@ import {
   ChevronLeft,
   ChevronRight,
   DashboardOutlined,
+  HelpOutline,
   Inventory2Outlined,
+  MenuBookOutlined,
   Menu as MenuIcon,
   PeopleOutlined,
   ReceiptLongOutlined,
@@ -130,7 +133,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 interface AdminShellProps {
   children: ReactNode;
-  dictionary: Dictionary;
+  dictionary: AdminNavigationDictionary;
   currentUser: CurrentUserDto;
 }
 
@@ -161,6 +164,7 @@ export function AdminShell({
     [ADMIN_ROUTE_SECTION.categories]: <CategoryOutlined />,
     [ADMIN_ROUTE_SECTION.products]: <Inventory2Outlined />,
     [ADMIN_ROUTE_SECTION.orders]: <ReceiptLongOutlined />,
+    [ADMIN_ROUTE_SECTION.guide]: <MenuBookOutlined />,
   };
 
   const navigationItems: AdminNavigationItem[] = [
@@ -219,6 +223,24 @@ export function AdminShell({
               alignItems="center"
               flexShrink={0}
             >
+              {activeRoute.section !== ADMIN_ROUTE_SECTION.guide && (
+                <Tooltip
+                  title={
+                    desktopTooltips ? dictionary.admin.guide.contextHelp : ""
+                  }
+                  disableTouchListener
+                >
+                  <IconButton
+                    component={Link}
+                    href={contextualGuideHref(pathname)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={dictionary.admin.guide.contextHelp}
+                  >
+                    <HelpOutline />
+                  </IconButton>
+                </Tooltip>
+              )}
               <Avatar sx={{ bgcolor: "info.main", color: "info.contrastText" }}>
                 {displayName.slice(0, 1).toUpperCase()}
               </Avatar>

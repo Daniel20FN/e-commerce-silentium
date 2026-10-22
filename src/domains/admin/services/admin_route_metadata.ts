@@ -1,5 +1,24 @@
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 
+export type AdminNavigationDictionary = Omit<Dictionary, "admin"> & {
+  admin: Omit<Dictionary["admin"], "guide"> & {
+    guide: Pick<
+      Dictionary["admin"]["guide"],
+      "title" | "description" | "contextHelp"
+    >;
+  };
+};
+
+export function adminNavigationDictionary(
+  dictionary: Dictionary,
+): AdminNavigationDictionary {
+  const { title, description, contextHelp } = dictionary.admin.guide;
+  return {
+    ...dictionary,
+    admin: { ...dictionary.admin, guide: { title, description, contextHelp } },
+  };
+}
+
 export const ADMIN_ROUTE_SECTION = {
   dashboard: "dashboard",
   analysis: "analysis",
@@ -8,6 +27,7 @@ export const ADMIN_ROUTE_SECTION = {
   categories: "categories",
   products: "products",
   orders: "orders",
+  guide: "guide",
 } as const;
 
 export type AdminRouteSection =
@@ -29,7 +49,7 @@ export interface AdminNavigationSection {
 }
 
 export function getAdminNavigationSections(
-  dictionary: Dictionary,
+  dictionary: AdminNavigationDictionary,
 ): AdminNavigationSection[] {
   return [
     {
@@ -62,14 +82,27 @@ export function getAdminNavigationSections(
       label: dictionary.admin.navigation.orders,
       section: ADMIN_ROUTE_SECTION.orders,
     },
+    {
+      href: "/admin/guia",
+      label: dictionary.admin.navigation.guide,
+      section: ADMIN_ROUTE_SECTION.guide,
+    },
   ];
 }
 
 export function resolveAdminRouteMetadata(
   pathname: string,
-  dictionary: Dictionary,
+  dictionary: AdminNavigationDictionary,
 ): AdminRouteMetadata {
   const routes: AdminRouteMetadata[] = [
+    {
+      href: "/admin/guia",
+      navigationHref: "/admin/guia",
+      section: ADMIN_ROUTE_SECTION.guide,
+      title: dictionary.admin.guide.title,
+      description: dictionary.admin.guide.description,
+      matches: (path) => path === "/admin/guia",
+    },
     {
       href: "/admin/analisis",
       navigationHref: "/admin/analisis",

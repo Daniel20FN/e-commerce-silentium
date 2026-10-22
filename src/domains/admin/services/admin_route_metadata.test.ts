@@ -1,9 +1,38 @@
 import dictionary from "@/dictionary/es.json";
 import {
   ADMIN_ROUTE_SECTION,
+  adminNavigationDictionary,
   getAdminNavigationSections,
   resolveAdminRouteMetadata,
 } from "./admin_route_metadata";
+it("does not send the guide articles to the shared client shell", () => {
+  const projected = adminNavigationDictionary(dictionary);
+  expect(projected.admin.guide).toEqual({
+    title: dictionary.admin.guide.title,
+    description: dictionary.admin.guide.description,
+    contextHelp: dictionary.admin.guide.contextHelp,
+  });
+  expect(projected.admin.guide).not.toHaveProperty("articles");
+  expect(dictionary.admin.guide.articles).toHaveLength(17);
+  expect(resolveAdminRouteMetadata("/admin/guia", projected).section).toBe(
+    ADMIN_ROUTE_SECTION.guide,
+  );
+});
+it("exposes the private guide as a distinct navigation section", () => {
+  expect(resolveAdminRouteMetadata("/admin/guia", dictionary)).toMatchObject({
+    section: ADMIN_ROUTE_SECTION.guide,
+    navigationHref: "/admin/guia",
+    title: dictionary.admin.guide.title,
+  });
+  expect(getAdminNavigationSections(dictionary)).toContainEqual({
+    href: "/admin/guia",
+    section: ADMIN_ROUTE_SECTION.guide,
+    label: dictionary.admin.navigation.guide,
+  });
+  expect(
+    resolveAdminRouteMetadata("/admin/guia-extra", dictionary).section,
+  ).toBe(ADMIN_ROUTE_SECTION.dashboard);
+});
 it("places orders immediately after products in the drawer", () => {
   const navigation = getAdminNavigationSections(dictionary).map(
     (item) => item.href,

@@ -43,6 +43,18 @@ function setup() {
     </ThemeProvider>,
   );
 }
+it("opens contextual help without replacing an unsaved editing tab", () => {
+  setup();
+  const help = screen.getByRole("link", {
+    name: dictionary.admin.guide.contextHelp,
+  });
+  expect(help).toHaveAttribute("href", "/admin/guia?tema=productos");
+  expect(help).toHaveAttribute("target", "_blank");
+  expect(help).toHaveAttribute("rel", "noopener noreferrer");
+  expect(
+    screen.getByRole("link", { name: dictionary.admin.navigation.guide }),
+  ).toHaveAttribute("href", "/admin/guia");
+});
 it("labels collapsed links and shows their tooltip on desktop hover", () => {
   setup();
   const products = screen.getByRole("link", {
