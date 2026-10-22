@@ -1,17 +1,11 @@
+import { BrandLogo } from "@/components/brand_logo";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
-import type { StorefrontImage } from "@/domains/storefront/types/catalog";
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import Image from "next/image";
 import { sectionAnchorSx } from "../../services/landing_links";
 import styles from "../landing.module.css";
 
-export function AboutSection({
-  dictionary,
-  image,
-}: {
-  dictionary: Dictionary;
-  image?: StorefrontImage | null;
-}) {
+export function AboutSection({ dictionary }: { dictionary: Dictionary }) {
   const copy = dictionary.landing.about;
   return (
     <Box
@@ -23,38 +17,60 @@ export function AboutSection({
       sx={sectionAnchorSx}
     >
       <Container maxWidth="xl">
-        <div className={styles.aboutLayout}>
-          <div className={styles.aboutMedia} data-reveal="image">
+        <Typography
+          component="h2"
+          id="about-title"
+          variant="h3"
+          className={styles.editorialTitle}
+        >
+          <span>{copy.titleLead} </span>
+          <span>{copy.titleTail}</span>
+        </Typography>
+        <div className={styles.editorialSpread} data-reveal="scene">
+          <div
+            className={styles.editorialMain}
+            data-scene-part="editorial-main"
+          >
             <Image
-              src={image?.url ?? "/images/landing/refugio-marfil.webp"}
-              alt={image?.alt ?? dictionary.landing.hero.imageAlt}
+              src="/images/landing/story-white-bedding.jpg"
+              alt={copy.photoAlt}
               fill
-              sizes="(max-width: 899px) 90vw, 45vw"
+              sizes="(max-width: 599px) 65vw, 62vw"
+              loading="lazy"
+            />
+            <div
+              className={styles.editorialCurtain}
+              data-scene-part="editorial-curtain"
+              aria-hidden="true"
             />
           </div>
           <div
-            className={styles.aboutCopy}
-            data-reveal="rise"
-            data-reveal-delay={70}
+            className={styles.editorialSide}
+            data-scene-part="editorial-side"
           >
-            <Typography component="h2" id="about-title" variant="h3">
-              {copy.title}
-            </Typography>
-            <Typography>{copy.description}</Typography>
-            <Typography>{copy.closing}</Typography>
-            <ul>
-              {copy.values.map((value) => (
-                <li key={value.title}>
-                  <Typography component="h3">{value.title}</Typography>
-                  <Typography>{value.body}</Typography>
-                </li>
-              ))}
-            </ul>
-            <Button component="a" href="#contacto" variant="outlined">
-              {copy.contact}
-            </Button>
+            <Image
+              src="/images/landing/story-bedroom.jpg"
+              alt={copy.roomAlt}
+              fill
+              sizes="(max-width: 599px) 29vw, 30vw"
+              loading="lazy"
+            />
           </div>
         </div>
+        <div className={styles.editorialSignature}>
+          <Typography>{copy.statement}</Typography>
+          <BrandLogo width={155} />
+        </div>
+        <details className={styles.photoCredits}>
+          <summary>{copy.credits}</summary>
+          <a href="https://www.pexels.com/photo/white-bed-linen-and-pillows-9893931/">
+            Ofir Eliav / Pexels
+          </a>
+          {" · "}
+          <a href="https://www.pexels.com/photo/a-white-linen-with-pillows-on-the-bed-near-the-wooden-table-13158870/">
+            Andrea Davis / Pexels
+          </a>
+        </details>
       </Container>
     </Box>
   );

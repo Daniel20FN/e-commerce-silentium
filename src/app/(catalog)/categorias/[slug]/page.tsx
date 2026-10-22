@@ -1,6 +1,6 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { CatalogListing } from "@/domains/storefront/components/catalog_listing";
-import { normalizePage } from "@/domains/storefront/services/catalog_rules";
+import { parseCatalogQuery } from "@/domains/storefront/services/catalog_filters";
 import {
   getStorefrontCategories,
   getStorefrontListing,
@@ -30,8 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params, searchParams }: Props) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const listing = await getStorefrontListing({
+    ...parseCatalogQuery(query),
     categorySlug: slug,
-    page: normalizePage(query.page),
   });
   if (!listing) notFound();
   return <CatalogListing listing={listing} dictionary={getDictionary("es")} />;

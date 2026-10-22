@@ -1,6 +1,6 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { CatalogListing } from "@/domains/storefront/components/catalog_listing";
-import { normalizePage } from "@/domains/storefront/services/catalog_rules";
+import { parseCatalogQuery } from "@/domains/storefront/services/catalog_filters";
 import { getStorefrontListing } from "@/domains/storefront/services/catalog_service";
 export const metadata = { title: getDictionary("es").storefront.catalogTitle };
 export default async function Page({
@@ -11,8 +11,7 @@ export default async function Page({
   const params = await searchParams;
   const offers = params.ofertas === "1";
   const listing = await getStorefrontListing({
-    page: normalizePage(params.page),
-    offers,
+    ...parseCatalogQuery(params),
   });
   return listing ? (
     <CatalogListing

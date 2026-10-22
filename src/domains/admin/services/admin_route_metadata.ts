@@ -53,14 +53,14 @@ export function getAdminNavigationSections(
       section: ADMIN_ROUTE_SECTION.categories,
     },
     {
-      href: "/admin/pedidos",
-      label: dictionary.admin.navigation.orders,
-      section: ADMIN_ROUTE_SECTION.orders,
-    },
-    {
       href: "/admin/productos",
       label: dictionary.admin.navigation.products,
       section: ADMIN_ROUTE_SECTION.products,
+    },
+    {
+      href: "/admin/pedidos",
+      label: dictionary.admin.navigation.orders,
+      section: ADMIN_ROUTE_SECTION.orders,
     },
   ];
 }

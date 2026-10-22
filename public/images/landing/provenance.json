@@ -43,6 +43,22 @@
       "hasAlpha": true,
       "source": "exec-a9d304fd-2814-45f7-b8f8-ed6f87eac7f8.png",
       "prompt": "Extract the ivory sheer foreground curtain from the approved portrait concept onto a genuinely transparent, aligned portrait canvas; preserve folds, warm light and lower-right sweeping fabric. No room, text or UI."
+    },
+    {
+      "source": "https://www.pexels.com/photo/white-bed-linen-and-pillows-9893931/",
+      "author": "Ofir Eliav",
+      "license": "https://www.pexels.com/license/",
+      "bytes": 83288,
+      "purpose": "Stock demonstration/ambience only; not supplier-verified SKU photography",
+      "file": "story-white-bedding.jpg"
+    },
+    {
+      "source": "https://www.pexels.com/photo/a-white-linen-with-pillows-on-the-bed-near-the-wooden-table-13158870/",
+      "author": "Andrea Davis",
+      "license": "https://www.pexels.com/license/",
+      "bytes": 145232,
+      "purpose": "Stock demonstration/ambience only; not supplier-verified SKU photography",
+      "file": "story-bedroom.jpg"
     }
   ],
   "implementation": "Desktop atmosphere unchanged. Phone-only portrait room selected through picture (480/800w); eager/high fetch priority without an unconditional desktop preload. Transparent curtain CSS image-set only below 600px. Combined room/curtain: 87,200 bytes at 1x, 196,280 bytes at 2x. Real semantic text and links; no selector, video, scroll listeners or product-image substitution. WebP room quality82; curtain quality80/alpha90. Motion is finite arrival and bounded CSS scroll depth, disabled for reduced motion.",

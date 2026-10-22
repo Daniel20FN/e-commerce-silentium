@@ -4,6 +4,14 @@ import {
   getAdminNavigationSections,
   resolveAdminRouteMetadata,
 } from "./admin_route_metadata";
+it("places orders immediately after products in the drawer", () => {
+  const navigation = getAdminNavigationSections(dictionary).map(
+    (item) => item.href,
+  );
+  expect(navigation.indexOf("/admin/pedidos")).toBe(
+    navigation.indexOf("/admin/productos") + 1,
+  );
+});
 it("resolves order list, new and detail under the same operational navigation", () => {
   for (const path of [
     "/admin/pedidos",

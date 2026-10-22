@@ -1,3 +1,5 @@
+import { getLandingSceneMotion } from "./landing_scene_motion";
+
 export function observeLandingReveals(root: HTMLElement): () => void {
   if (
     typeof window === "undefined" ||
@@ -17,7 +19,17 @@ export function observeLandingReveals(root: HTMLElement): () => void {
     pending.delete(element);
     active.get(element)?.cancel();
     active.delete(element);
+    for (const [child, animation] of active) {
+      if (element.contains(child)) {
+        animation.cancel();
+        active.delete(child);
+      }
+    }
     element.dataset.revealState = "complete";
+    const scene = element.closest<HTMLElement>('[data-reveal="scene"]');
+    if (scene && ![...active.keys()].some((child) => scene.contains(child))) {
+      scene.dataset.revealState = "complete";
+    }
   };
   const finishTarget = () => {
     const target = root.querySelector(":target");
@@ -42,6 +54,31 @@ export function observeLandingReveals(root: HTMLElement): () => void {
 
         observer.unobserve(element);
         pending.delete(element);
+        if (element.dataset.reveal === "scene") {
+          element.dataset.revealState = "running";
+          for (const part of element.querySelectorAll<HTMLElement>(
+            "[data-scene-part]",
+          )) {
+            const motion = getLandingSceneMotion(part.dataset.scenePart);
+            if (!motion) continue;
+            const animation = part.animate([motion.from, motion.to], {
+              duration: motion.duration,
+              delay: motion.delay,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              fill: "backwards",
+            });
+            active.set(part, animation);
+            animation.onfinish = () => {
+              active.delete(part);
+              if (
+                ![...active.keys()].some((child) => element.contains(child))
+              ) {
+                element.dataset.revealState = "complete";
+              }
+            };
+          }
+          continue;
+        }
         const image = element.dataset.reveal === "image";
         const row = element.dataset.reveal === "row";
         const delay = Math.min(

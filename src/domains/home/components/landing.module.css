@@ -156,6 +156,16 @@
 .collections {
   background: var(--landing-paper);
 }
+.collections .sectionIntro p {
+  margin: 12px 0 0;
+  max-width: 540px;
+}
+.categoriesMore {
+  flex-shrink: 0;
+  color: var(--landing-ink) !important;
+  border-color: currentColor !important;
+  white-space: nowrap;
+}
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
@@ -243,79 +253,6 @@
 }
 .howTo {
   background: var(--landing-paper);
-}
-.howToLayout {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 80px;
-  align-items: start;
-}
-.howTo ol {
-  display: grid;
-  gap: 30px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.howTo li {
-  padding-bottom: 25px;
-}
-.howTo li:last-child {
-  padding-bottom: 0;
-}
-.howTo h3 {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 8px;
-}
-.howTo p {
-  margin: 0;
-  color: var(--landing-muted) !important;
-}
-.about {
-  background: var(--landing-story) !important;
-  color: var(--landing-story-ink);
-}
-.aboutLayout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 70px;
-  align-items: center;
-}
-.aboutMedia {
-  position: relative;
-  aspect-ratio: 4/5;
-  overflow: hidden;
-}
-.aboutMedia img {
-  object-fit: cover;
-}
-.aboutCopy {
-  padding-block: 20px;
-}
-.aboutCopy h2 {
-  font-size: clamp(30px, 3.2vw, 48px);
-  margin: 0 0 28px;
-}
-.aboutCopy p {
-  color: var(--landing-story-ink) !important;
-  margin: 0 0 22px;
-}
-.aboutCopy ul {
-  padding: 0;
-  margin: 32px 0;
-  list-style: none;
-  display: grid;
-  gap: 20px;
-}
-.aboutCopy h3 {
-  margin: 0 0 5px;
-  font-size: 18px;
-  font-weight: 600;
-}
-.aboutCopy li p {
-  font-size: 14px;
-  margin: 0;
 }
 .help {
   background: var(--landing-paper);
@@ -409,7 +346,7 @@
     }
   }
   @supports (animation-timeline: view()) {
-    .aboutMedia img {
+    .editorialMain img {
       animation: material-depth linear both;
       animation-timeline: view();
       animation-range: entry 0% exit 100%;
@@ -477,20 +414,9 @@
   .sectionIntro p {
     margin: 0;
   }
-  .howToLayout,
   .helpLayout {
     grid-template-columns: 1fr;
     gap: 35px;
-  }
-  .aboutLayout {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
-  .aboutMedia {
-    aspect-ratio: 4/3;
-  }
-  .aboutCopy {
-    padding: 0;
   }
 }
 @media (max-width: 599.95px) {
@@ -625,4 +551,364 @@
   background: rgba(33, 27, 23, 0.85);
   color: #fefaf9;
   font-size: 11px;
+}
+/* Approved textile story: real product selection over an illustrative room. */
+.shell main .journeyTitle,
+.shell main .editorialTitle {
+  font-size: clamp(54px, 7vw, 94px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  margin: 0 0 40px;
+}
+.journeyTitle span,
+.editorialTitle span {
+  display: block;
+}
+.journeyTitle span:last-child {
+  margin-left: 9%;
+}
+.journeyFigure {
+  margin: 0;
+}
+.journeyScene {
+  position: relative;
+  min-height: 540px;
+  background: #bad9eb;
+  overflow: hidden;
+  isolation: isolate;
+  color: #6e4e37;
+}
+.journeyRoom {
+  position: absolute;
+  inset: 0 24% 0 0;
+}
+.journeyRoom img {
+  object-fit: cover;
+  object-position: 45% 65%;
+}
+.journeyCurtain,
+.editorialCurtain {
+  position: absolute;
+  pointer-events: none;
+  background: url("/images/landing/entre-telas-curtain-800.webp") right center /
+    cover no-repeat;
+}
+.journeyCurtain {
+  inset: -15% 13% -15% 35%;
+  transform: translateX(45%);
+}
+.productSlip {
+  position: absolute;
+  left: 8%;
+  bottom: 35px;
+  width: 220px;
+  padding: 12px;
+  background: #fefaf9;
+  transform: rotate(-5deg);
+  box-shadow: 0 18px 35px rgba(33, 27, 23, 0.2);
+}
+.slipPhoto {
+  position: relative;
+  height: 150px;
+  margin-bottom: 12px;
+  background: #cfb59e;
+}
+.slipPhoto img {
+  object-fit: cover;
+}
+.productSlip strong,
+.productSlip span {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.productSlip strong,
+.selectionSlip > strong {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.productSlip span {
+  margin-top: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.selectionSlip {
+  position: absolute;
+  top: 56px;
+  right: 7%;
+  width: 255px;
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+  background: #fefaf9;
+  transform: rotate(4deg);
+  box-shadow: 0 15px 35px rgba(33, 27, 23, 0.15);
+}
+.selectionSlip > span,
+.messageSlip > span {
+  font-size: 11px;
+}
+.selectionSlip > strong {
+  font-size: 18px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.selectionSlip > div {
+  border-top: 1px solid #cfb59e;
+  padding-top: 16px;
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+}
+.selectionSlip > div strong {
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+}
+.messageSlip {
+  position: absolute;
+  bottom: 28px;
+  right: 6%;
+  width: 285px;
+  padding: 22px;
+  background: #bad9eb;
+  transform: rotate(-2deg);
+  box-shadow: 0 12px 30px rgba(33, 27, 23, 0.13);
+}
+.shell main .messageSlip p {
+  color: #6e4e37;
+  line-height: 1.65;
+  font-size: 15px;
+  margin: 12px 0 0;
+}
+.journeyFigure figcaption {
+  background: #6e4e37;
+  color: #fefaf9;
+  padding: 22px 28px;
+  display: grid;
+  gap: 7px;
+}
+.journeyFigure figcaption strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.journeyFigure figcaption small {
+  font-size: 11px;
+}
+.journeySteps {
+  list-style: none;
+  padding: 0;
+  margin: 52px 0 0;
+  display: grid;
+  gap: 29px;
+}
+.journeySteps li {
+  display: grid;
+  grid-template-columns: 1fr 1.12fr;
+  gap: 30px;
+}
+.journeySteps li:nth-child(2) {
+  margin-left: 9%;
+}
+.journeySteps li:nth-child(3) {
+  margin-left: 18%;
+}
+.journeySteps h3 {
+  font-size: 23px;
+  font-weight: 600;
+  margin: 0;
+}
+.journeySteps p {
+  color: var(--landing-muted);
+  margin: 0;
+  font-size: 14px;
+  max-width: 60ch;
+}
+.about {
+  background: var(--landing-story) !important;
+  color: var(--landing-story-ink);
+}
+.editorialTitle span:last-child {
+  margin-left: 12%;
+}
+.editorialSpread {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 24px;
+}
+.editorialMain {
+  grid-column: 1 / 9;
+  height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+.editorialSide {
+  grid-column: 9 / 13;
+  height: 365px;
+  margin-top: 62px;
+  margin-bottom: -45px;
+  position: relative;
+  overflow: hidden;
+}
+.editorialMain img,
+.editorialSide img {
+  object-fit: cover;
+}
+.editorialMain img {
+  object-position: 45% 65%;
+}
+.editorialCurtain {
+  top: -12%;
+  right: -23%;
+  width: 48%;
+  height: 124%;
+  transform: translateX(15%);
+}
+.editorialSignature {
+  padding-top: 34px;
+  max-width: 360px;
+}
+.shell main .editorialSignature p {
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--landing-story-ink);
+  margin: 0 0 24px;
+}
+.photoCredits {
+  margin-top: 30px;
+  font-size: 11px;
+  color: var(--landing-story-ink);
+}
+.photoCredits summary {
+  cursor: pointer;
+  width: fit-content;
+}
+.photoCredits a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+.photoCredits[open] summary {
+  margin-bottom: 8px;
+}
+@media (max-width: 899.95px) {
+  .journeyScene {
+    min-height: 580px;
+  }
+  .productSlip {
+    left: 5%;
+    width: 190px;
+  }
+  .selectionSlip {
+    right: 5%;
+    width: 230px;
+  }
+  .messageSlip {
+    right: 4%;
+    width: 245px;
+  }
+  .editorialSpread {
+    gap: 16px;
+  }
+}
+@media (max-width: 599.95px) {
+  .shell main .journeyTitle {
+    font-size: clamp(42px, 11vw, 64px);
+    margin-bottom: 30px;
+  }
+  .journeyTitle span:last-child {
+    margin-left: 0;
+  }
+  .journeyScene {
+    min-height: 590px;
+  }
+  .journeyRoom {
+    right: 0;
+  }
+  .journeyCurtain {
+    left: 14%;
+    right: -22%;
+  }
+  .productSlip {
+    width: 145px;
+    left: 5%;
+    bottom: 190px;
+    padding: 9px;
+  }
+  .slipPhoto {
+    height: 100px;
+    margin-bottom: 8px;
+  }
+  .productSlip strong,
+  .productSlip span {
+    font-size: 11px;
+  }
+  .selectionSlip {
+    width: 182px;
+    padding: 18px;
+    gap: 12px;
+    right: 6%;
+    top: 28px;
+  }
+  .selectionSlip > strong {
+    font-size: 16px;
+  }
+  .selectionSlip > div strong {
+    font-size: 17px;
+  }
+  .messageSlip {
+    width: 213px;
+    padding: 18px;
+    bottom: 24px;
+    right: 6%;
+  }
+  .shell main .messageSlip p {
+    font-size: 13px;
+  }
+  .journeyFigure figcaption {
+    padding: 20px;
+  }
+  .journeySteps {
+    margin-top: 36px;
+    gap: 28px;
+  }
+  .journeySteps li {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .journeySteps li:nth-child(n) {
+    margin-left: 0;
+  }
+  .journeySteps h3 {
+    font-size: 22px;
+  }
+  .shell main .editorialTitle {
+    font-size: clamp(52px, 14vw, 70px);
+    margin-bottom: 30px;
+  }
+  .editorialTitle span:last-child {
+    margin-left: 9%;
+  }
+  .editorialSpread {
+    gap: 10px;
+  }
+  .editorialMain {
+    height: 285px;
+  }
+  .editorialSide {
+    height: 245px;
+    margin-top: 50px;
+    margin-bottom: -25px;
+  }
+  .editorialCurtain {
+    width: 60%;
+    right: -28%;
+  }
+  .editorialSignature {
+    max-width: 260px;
+    padding-top: 28px;
+  }
+  .shell main .editorialSignature p {
+    font-size: 17px;
+  }
 }

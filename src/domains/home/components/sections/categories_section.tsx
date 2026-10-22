@@ -1,7 +1,7 @@
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import type { StorefrontCategory } from "@/domains/storefront/types/catalog";
 import ArrowForward from "@mui/icons-material/ArrowForward";
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
 import { sectionAnchorSx } from "../../services/landing_links";
 import { CategoryEditorialImage } from "../category_editorial_image";
 import styles from "../landing.module.css";
@@ -25,14 +25,27 @@ export function CategoriesSection({
     >
       <Container maxWidth="xl">
         <div className={styles.sectionIntro} data-reveal="rise">
-          <Typography component="h2" id="collections-title" variant="h3">
-            {copy.categoriesTitle}
-          </Typography>
-          <Typography>{copy.categoriesDescription}</Typography>
+          <div>
+            <Typography component="h2" id="collections-title" variant="h3">
+              {copy.categoriesTitle}
+            </Typography>
+            <Typography>{copy.categoriesDescription}</Typography>
+          </div>
+          {categories.length > 0 ? (
+            <Button
+              component="a"
+              href="/categorias"
+              variant="outlined"
+              endIcon={<ArrowForward />}
+              className={styles.categoriesMore}
+            >
+              {copy.viewAllCategories}
+            </Button>
+          ) : null}
         </div>
         {categories.length ? (
           <div className={styles.categoryGrid}>
-            {categories.map((category, index) => (
+            {categories.slice(0, 3).map((category, index) => (
               <a
                 key={category.id}
                 href={`/categorias/${category.slug}`}

@@ -46,7 +46,7 @@ export function OperationalHome({ copy: c, children }: Props) {
             xs: "minmax(0, 1fr)",
             lg: "repeat(3, minmax(0, 1fr))",
           },
-          gap: 2,
+          gap: 3,
           alignItems: "start",
         }}
       >

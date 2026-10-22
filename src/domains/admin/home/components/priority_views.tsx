@@ -28,7 +28,9 @@ export async function PriorityPanel({
     queues = await getPriorityBlock(block);
   } catch (error) {
     console.error("[admin priorities]", block, error);
-    return <PriorityFailure title={copy.blocks[block]} copy={copy} />;
+    return (
+      <PriorityFailure block={block} title={copy.blocks[block]} copy={copy} />
+    );
   }
   return <PriorityPanelContent block={block} queues={queues} copy={copy} />;
 }

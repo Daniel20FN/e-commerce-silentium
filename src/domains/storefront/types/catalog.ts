@@ -1,3 +1,5 @@
+import type { CatalogFilters } from "./api_params";
+
 export interface StorefrontImage {
   id: string;
   url: string;
@@ -59,6 +61,11 @@ export interface StorefrontProduct extends StorefrontProductCard {
 }
 
 export interface StorefrontListing {
+  filters?: CatalogFilters;
+  filterCategories?: Pick<
+    StorefrontCategory,
+    "id" | "name" | "slug" | "parentId"
+  >[];
   items: StorefrontProductCard[];
   page: number;
   pageCount: number;

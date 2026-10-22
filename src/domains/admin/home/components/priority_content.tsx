@@ -16,6 +16,7 @@ import type {
   PriorityQueue,
   PriorityRow,
 } from "../types/operational";
+import { PriorityPanelFrame } from "./priority_panel_frame";
 import { RefreshPriorities } from "./refresh_priorities";
 type Copy = Dictionary["admin"]["dashboard"]["operations"];
 export function PriorityItem({ row, copy }: { row: PriorityRow; copy: Copy }) {
@@ -109,10 +110,29 @@ function QueueSummary({ queue, copy }: { queue: PriorityQueue; copy: Copy }) {
 export function PriorityLoading({
   title,
   copy,
+  block,
 }: {
   title: string;
   copy: Copy;
+  block?: PriorityBlock;
 }) {
+  const content = (
+    <>
+      <Typography role="status" variant="body2" color="text.secondary">
+        {copy.loading}
+      </Typography>
+      <Skeleton height={64} animation={false} />
+      <Skeleton height={64} animation={false} />
+      <Skeleton height={64} animation={false} />
+    </>
+  );
+  if (block) {
+    return (
+      <PriorityPanelFrame block={block} title={title} busy>
+        {content}
+      </PriorityPanelFrame>
+    );
+  }
   return (
     <Paper
       component="section"
@@ -124,12 +144,7 @@ export function PriorityLoading({
       <Typography component="h2" variant="h6">
         {title}
       </Typography>
-      <Typography role="status" variant="body2" color="text.secondary">
-        {copy.loading}
-      </Typography>
-      <Skeleton height={64} animation={false} />
-      <Skeleton height={64} animation={false} />
-      <Skeleton height={64} animation={false} />
+      {content}
     </Paper>
   );
 }
@@ -137,11 +152,26 @@ export function PriorityFailure({
   title,
   copy,
   heading = "h2",
+  block,
 }: {
   title: string;
   copy: Copy;
   heading?: "h1" | "h2";
+  block?: PriorityBlock;
 }) {
+  if (block) {
+    return (
+      <PriorityPanelFrame block={block} title={title}>
+        <Stack spacing={1.5} alignItems="flex-start">
+          <Alert severity="error">{copy.error}</Alert>
+          <RefreshPriorities
+            label={copy.retry}
+            pendingLabel={copy.refreshing}
+          />
+        </Stack>
+      </PriorityPanelFrame>
+    );
+  }
   return (
     <Paper component="section" variant="outlined" sx={{ p: 2, minWidth: 0 }}>
       <Stack spacing={1.5} alignItems="flex-start">
@@ -164,14 +194,7 @@ export function PriorityPanelContent({
   queues: PriorityQueue[];
 }) {
   return (
-    <Paper
-      component="section"
-      variant="outlined"
-      sx={{ p: 2, minWidth: 0, alignSelf: "start" }}
-    >
-      <Typography component="h2" variant="h6">
-        {copy.blocks[block]}
-      </Typography>
+    <PriorityPanelFrame block={block} title={copy.blocks[block]}>
       <Stack divider={<Divider />}>
         {queues.map((queue) => (
           <QueueSummary key={queue.group} queue={queue} copy={copy} />
@@ -180,7 +203,7 @@ export function PriorityPanelContent({
       <Typography variant="caption" color="text.secondary" component="p">
         {copy.updated.replace("{date}", queues[0].updatedLabel)}
       </Typography>
-    </Paper>
+    </PriorityPanelFrame>
   );
 }
 export function PriorityQueueContent({

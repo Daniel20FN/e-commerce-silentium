@@ -1,12 +1,13 @@
 import dictionary from "@/dictionary/es.json";
+import { brandColors } from "@/styles/brand_colors";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { render, screen } from "@testing-library/react";
 import {
   getPriorityBlock,
   getPriorityQueue,
 } from "../services/operational_service";
-import type { PriorityQueue } from "../types/operational";
-import { PriorityPanelContent } from "./priority_content";
+import type { PriorityBlock, PriorityQueue } from "../types/operational";
+import { PriorityFailure, PriorityPanelContent } from "./priority_content";
 import {
   PriorityLoading,
   PriorityPanel,
@@ -118,4 +119,66 @@ it("keeps pagination in the same group", async () => {
     "href",
     "/admin/pendientes?group=out",
   );
+});
+
+const blocks: PriorityBlock[] = ["orders", "inventory", "catalog"];
+it.each(["light", "dark"] as const)(
+  "distinguishes all three headers in %s mode",
+  (mode) => {
+    const theme = createTheme({ palette: { mode } });
+    const backgrounds = [
+      brandColors.brown,
+      brandColors.blue,
+      brandColors.beige,
+    ];
+    blocks.forEach((block, index) => {
+      const view = render(
+        <ThemeProvider theme={theme}>
+          <PriorityPanelContent block={block} queues={[queue]} copy={c} />
+        </ThemeProvider>,
+      );
+      const region = screen.getByRole("region", { name: c.blocks[block] });
+      expect(region.querySelector("header")).toHaveStyle({
+        backgroundColor: backgrounds[index],
+        color: index === 0 ? brandColors.ivory : brandColors.brownHover,
+      });
+      expect(
+        screen.getByRole("heading", { name: c.blocks[block], level: 2 }),
+      ).toBeVisible();
+      expect(screen.getByText("0")).toBeVisible();
+      view.unmount();
+    });
+  },
+);
+it("retains column identity while loading and after a failure", () => {
+  const view = render(
+    <PriorityLoading block="inventory" title={c.blocks.inventory} copy={c} />,
+  );
+  expect(
+    screen.getByRole("region", { name: c.blocks.inventory }),
+  ).toHaveAttribute("aria-busy", "true");
+  expect(view.container.querySelector("header")).toHaveStyle({
+    backgroundColor: brandColors.blue,
+  });
+  expect(screen.queryByText("0")).not.toBeInTheDocument();
+  view.rerender(
+    <PriorityFailure block="inventory" title={c.blocks.inventory} copy={c} />,
+  );
+  expect(view.container.querySelector("header")).toHaveStyle({
+    backgroundColor: brandColors.blue,
+  });
+  expect(
+    screen.getAllByRole("heading", { name: c.blocks.inventory }),
+  ).toHaveLength(1);
+  expect(screen.getByRole("alert")).toHaveTextContent(c.error);
+  expect(screen.getByRole("button", { name: c.retry })).toBeEnabled();
+});
+it("preserves the independent queue error heading", () => {
+  const view = render(
+    <PriorityFailure title={c.groups.out.title} heading="h1" copy={c} />,
+  );
+  expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+    c.groups.out.title,
+  );
+  expect(view.container.querySelector("header")).toBeNull();
 });

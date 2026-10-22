@@ -34,10 +34,13 @@ export function HomePage({
         }}
       />
       <HeroSection dictionary={dictionary} />
-      <CategoriesSection dictionary={dictionary} categories={categories} />
       <FeaturedProductsSection dictionary={dictionary} products={products} />
-      <BenefitsSection dictionary={dictionary} />
-      <AboutSection dictionary={dictionary} image={products[0]?.image} />
+      <CategoriesSection dictionary={dictionary} categories={categories} />
+      <BenefitsSection
+        dictionary={dictionary}
+        product={products.find((product) => product.available && product.image)}
+      />
+      <AboutSection dictionary={dictionary} />
       <HelpSection dictionary={dictionary} />
       <ContactSection dictionary={dictionary} />
     </Box>

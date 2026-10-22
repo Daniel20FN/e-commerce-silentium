@@ -153,6 +153,43 @@ describe("progressive landing scroll motion", () => {
     cleanup();
   });
 
+  it("choreographs each scene once and preserves its final paper angles", () => {
+    root.innerHTML =
+      '<section id="story"><div data-reveal="scene"><div data-scene-part="product"></div><div data-scene-part="receipt"></div><div data-scene-part="message"><a href="#story">Focus</a></div></div></section>';
+    const cleanup = observeLandingReveals(root);
+    const scene = root.querySelector<HTMLElement>('[data-reveal="scene"]');
+    if (!scene) throw new Error("Missing scene");
+    enter(scene);
+    expect(animate).toHaveBeenCalledTimes(3);
+    expect(animate).toHaveBeenNthCalledWith(
+      2,
+      expect.arrayContaining([{ opacity: 1, transform: "rotate(4deg)" }]),
+      expect.objectContaining({ delay: 650, fill: "backwards" }),
+    );
+    enter(scene);
+    expect(animate).toHaveBeenCalledTimes(3);
+    root.querySelector("a")?.focus();
+    for (const result of animate.mock.results)
+      expect(result.value.cancel).toHaveBeenCalled();
+    expect(scene.dataset.revealState).toBe("complete");
+    cleanup();
+  });
+
+  it("cancels every scene part if reduced motion is enabled while it runs", () => {
+    root.innerHTML =
+      '<div data-reveal="scene"><div data-scene-part="room"></div><div data-scene-part="curtain"></div></div>';
+    const cleanup = observeLandingReveals(root);
+    const scene = root.querySelector("div");
+    if (!scene) throw new Error("Missing scene");
+    enter(scene);
+    preference.matches = true;
+    const listener = preference.addEventListener.mock.calls[0]?.[1];
+    if (typeof listener === "function") listener();
+    for (const result of animate.mock.results)
+      expect(result.value.cancel).toHaveBeenCalled();
+    cleanup();
+  });
+
   it("leaves a readable fallback without Web Animations", () => {
     Object.defineProperty(Element.prototype, "animate", {
       configurable: true,
