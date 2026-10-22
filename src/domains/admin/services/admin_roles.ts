@@ -18,3 +18,9 @@ export function canAccessAdmin(
 ): user is CurrentUserDto {
   return user !== null && hasAdminAccess(user.role);
 }
+
+export function canManageUsers(
+  user: Pick<CurrentUserDto, "role"> | null,
+): boolean {
+  return user?.role === ADMIN_ROLE.superAdmin;
+}

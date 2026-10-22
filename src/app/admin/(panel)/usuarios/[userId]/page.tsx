@@ -1,4 +1,5 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
+import { requireSuperAdminUser } from "@/domains/admin/services/require_admin_user";
 import {
   formatAdminDateTimeFromDate,
   getAdminRoleLabel,
@@ -41,6 +42,7 @@ export default async function AdminUserDetailPage({
 }: AdminUserDetailPageProps) {
   const dictionary = getDictionary("es");
   const { userId } = await params;
+  await requireSuperAdminUser(`/admin/usuarios/${userId}`);
   const user = await getAdminUserDetail(userId);
 
   if (!user) {

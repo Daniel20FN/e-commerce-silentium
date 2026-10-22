@@ -5,6 +5,20 @@ import {
   getAdminNavigationSections,
   resolveAdminRouteMetadata,
 } from "./admin_route_metadata";
+it("only adds user management for super admins, keeping other sections identical", () => {
+  const admin = getAdminNavigationSections(dictionary, { role: "admin" });
+  const superAdmin = getAdminNavigationSections(dictionary, {
+    role: "super_admin",
+  });
+  expect(superAdmin).toContainEqual({
+    href: "/admin/usuarios",
+    label: dictionary.admin.navigation.users,
+    section: ADMIN_ROUTE_SECTION.users,
+  });
+  expect(admin).toEqual(
+    superAdmin.filter((item) => item.href !== "/admin/usuarios"),
+  );
+});
 it("does not send the guide articles to the shared client shell", () => {
   const projected = adminNavigationDictionary(dictionary);
   expect(projected.admin.guide).toEqual({
@@ -24,7 +38,9 @@ it("exposes the private guide as a distinct navigation section", () => {
     navigationHref: "/admin/guia",
     title: dictionary.admin.guide.title,
   });
-  expect(getAdminNavigationSections(dictionary)).toContainEqual({
+  expect(
+    getAdminNavigationSections(dictionary, { role: "admin" }),
+  ).toContainEqual({
     href: "/admin/guia",
     section: ADMIN_ROUTE_SECTION.guide,
     label: dictionary.admin.navigation.guide,
@@ -34,9 +50,9 @@ it("exposes the private guide as a distinct navigation section", () => {
   ).toBe(ADMIN_ROUTE_SECTION.dashboard);
 });
 it("places orders immediately after products in the drawer", () => {
-  const navigation = getAdminNavigationSections(dictionary).map(
-    (item) => item.href,
-  );
+  const navigation = getAdminNavigationSections(dictionary, {
+    role: "admin",
+  }).map((item) => item.href);
   expect(navigation.indexOf("/admin/pedidos")).toBe(
     navigation.indexOf("/admin/productos") + 1,
   );
@@ -53,7 +69,9 @@ it("resolves order list, new and detail under the same operational navigation", 
       navigationHref: "/admin/pedidos",
     });
   }
-  expect(getAdminNavigationSections(dictionary)).toContainEqual({
+  expect(
+    getAdminNavigationSections(dictionary, { role: "admin" }),
+  ).toContainEqual({
     href: "/admin/pedidos",
     label: dictionary.admin.navigation.orders,
     section: ADMIN_ROUTE_SECTION.orders,
@@ -73,5 +91,7 @@ it("keeps analysis separate from operational home and lookalike paths", () => {
   expect(
     resolveAdminRouteMetadata("/admin/analisis-extra", dictionary).section,
   ).toBe(ADMIN_ROUTE_SECTION.dashboard);
-  expect(getAdminNavigationSections(dictionary)[0].href).toBe("/admin");
+  expect(
+    getAdminNavigationSections(dictionary, { role: "admin" })[0].href,
+  ).toBe("/admin");
 });

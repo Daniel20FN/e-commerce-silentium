@@ -40,12 +40,21 @@ describe("GET /api/admin/users", () => {
     mockCreateRouteHandlerSupabaseClient.mockReturnValue({ auth: {} });
   });
 
-  it("returns a paginated list for admin users", async () => {
+  it("requires authentication before reading users", async () => {
+    mockResolveCurrentUser.mockResolvedValue(null);
+    const response = await GET(
+      new NextRequest("http://localhost/api/admin/users"),
+    );
+    expect(response.status).toBe(401);
+    expect(mockListAdminUsers).not.toHaveBeenCalled();
+  });
+
+  it("returns a paginated list for super admins", async () => {
     mockResolveCurrentUser.mockResolvedValue({
       id: "admin-1",
       authUserId: "auth-admin-1",
       email: "admin@example.com",
-      role: UserRole.admin,
+      role: UserRole.super_admin,
       status: UserStatus.active,
       emailVerified: true,
       profile: {
@@ -112,28 +121,32 @@ describe("GET /api/admin/users", () => {
     });
   });
 
-  it("rejects non admin users", async () => {
-    mockResolveCurrentUser.mockResolvedValue({
-      id: "customer-1",
-      authUserId: "auth-customer-1",
-      email: "customer@example.com",
-      role: UserRole.customer,
-      status: UserStatus.active,
-      emailVerified: true,
-      profile: {
-        firstName: "Ana",
-        lastName: "Cliente",
-      },
-    });
+  it.each([UserRole.admin, UserRole.support, UserRole.customer])(
+    "rejects %s without reading users",
+    async (role) => {
+      mockResolveCurrentUser.mockResolvedValue({
+        id: "customer-1",
+        authUserId: "auth-customer-1",
+        email: "customer@example.com",
+        role,
+        status: UserStatus.active,
+        emailVerified: true,
+        profile: {
+          firstName: "Ana",
+          lastName: "Cliente",
+        },
+      });
 
-    const response = await GET(
-      new NextRequest("http://localhost/api/admin/users"),
-    );
+      const response = await GET(
+        new NextRequest("http://localhost/api/admin/users"),
+      );
 
-    expect(response.status).toBe(403);
-    await expect(response.json()).resolves.toEqual({
-      type: "forbidden",
-      message: "forbidden",
-    });
-  });
+      expect(mockListAdminUsers).not.toHaveBeenCalled();
+      expect(response.status).toBe(403);
+      await expect(response.json()).resolves.toEqual({
+        type: "forbidden",
+        message: "forbidden",
+      });
+    },
+  );
 });

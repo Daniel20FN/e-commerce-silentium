@@ -1,6 +1,13 @@
-import { canAccessAdmin, hasAdminAccess } from "./admin_roles";
+import { canAccessAdmin, canManageUsers, hasAdminAccess } from "./admin_roles";
 
 describe("admin role access", () => {
+  it("reserves user management for super admins", () => {
+    expect(canManageUsers({ role: "super_admin" })).toBe(true);
+    for (const role of ["admin", "support", "customer"] as const) {
+      expect(canManageUsers({ role })).toBe(false);
+    }
+    expect(canManageUsers(null)).toBe(false);
+  });
   it("allows admin and super admin roles", () => {
     expect(hasAdminAccess("admin")).toBe(true);
     expect(hasAdminAccess("super_admin")).toBe(true);

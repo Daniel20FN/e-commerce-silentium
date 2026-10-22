@@ -168,7 +168,7 @@ export function AdminShell({
   };
 
   const navigationItems: AdminNavigationItem[] = [
-    ...getAdminNavigationSections(dictionary).map((item) => ({
+    ...getAdminNavigationSections(dictionary, currentUser).map((item) => ({
       ...item,
       icon: navigationIcons[item.section] ?? <DashboardOutlined />,
       isActive: activeRoute.navigationHref === item.href,

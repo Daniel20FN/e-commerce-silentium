@@ -1,4 +1,4 @@
-import { canAccessAdmin } from "@/domains/admin/services/admin_roles";
+import { canManageUsers } from "@/domains/admin/services/admin_roles";
 import { updateAdminUser } from "@/domains/admin/users/services/admin_user_mutations";
 import { adminUserUpdateSchema } from "@/domains/admin/users/services/admin_user_schemas";
 import type { AdminUserMutationApiResponse } from "@/domains/admin/users/types/api_responses";
@@ -61,7 +61,7 @@ export async function PATCH(
       );
     }
 
-    if (!canAccessAdmin(currentUser)) {
+    if (!canManageUsers(currentUser)) {
       return copySupabaseResponseCookies(
         supabaseResponse,
         createJsonResponse(
