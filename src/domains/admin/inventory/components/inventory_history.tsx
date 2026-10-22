@@ -153,6 +153,7 @@ export function InventoryHistory({
           !variant?.inTrash &&
           !!variant &&
           !row.reversedById &&
+          !row.orderLinked &&
           (row.type === "entry" || row.type === "exit" || row.type === "count");
         return (
           <Stack
@@ -191,8 +192,17 @@ export function InventoryHistory({
                 ? (Object.entries(copy.initialReasons).find(
                     ([key]) => key === row.reason,
                   )?.[1] ?? row.reason)
-                : row.reason}
+                : row.orderLinked &&
+                    row.type === "exit" &&
+                    row.reason === "order_confirmation"
+                  ? copy.orderConfirmation
+                  : row.reason}
             </Typography>
+            {row.orderLinked && (
+              <Typography variant="caption" color="text.secondary">
+                {copy.orderLinkedHint}
+              </Typography>
+            )}
             {row.reference && (
               <Typography variant="body2" sx={{ overflowWrap: "anywhere" }}>
                 {copy.filterReference}: {row.reference}

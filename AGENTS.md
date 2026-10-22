@@ -87,6 +87,10 @@
 
 - Optional inventory PostgreSQL checks: set `INVENTORY_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/inventory/services/inventory_service.integration.test.ts`. Requires explicit `.env.development` `DATABASE_URL` and inventory migration. Creates isolated QA products/variants and soft-retires them. Stock UPDATE requires an explicit transaction-local inventory context; fixtures use `updateQaStock`, never unlogged writes. Ledger/operations are immutable; do not physically delete historical fixtures. No Storage operations or real stock changes. Stop Next/Jest before Prisma generation/build on Windows.
 
+### Manual order integration checks
+
+- Set `ORDERS_INTEGRATION=1` and run `npm run test:file -- src/domains/admin/orders/services/order_service.integration.test.ts` for optional PostgreSQL order checks. Requires explicit `.env.development` `DATABASE_URL` and both inventory/order migrations. Creates isolated QA catalog, order and immutable ledger data; soft-retires catalog fixtures, never physically deletes history, uploads Storage files or sends WhatsApp messages. Never run against production. Stop Next/Jest before Prisma generation/build on Windows. See `docs/admin-orders.md`.
+
 ## Git Hooks
 
 - Husky is enabled via the `prepare` script.

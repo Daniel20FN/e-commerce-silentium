@@ -35,6 +35,7 @@ const movement = z
     reason: z.string(),
     reference: z.string().nullable(),
     reversedById: z.string().nullable(),
+    orderLinked: z.boolean().optional(),
     createdAt: z.string(),
   })
   .strict();

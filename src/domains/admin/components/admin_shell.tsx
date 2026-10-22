@@ -17,6 +17,7 @@ import {
   Inventory2Outlined,
   Menu as MenuIcon,
   PeopleOutlined,
+  ReceiptLongOutlined,
   StorefrontOutlined,
 } from "@mui/icons-material";
 import {
@@ -154,6 +155,7 @@ export function AdminShell({
     [ADMIN_ROUTE_SECTION.users]: <PeopleOutlined />,
     [ADMIN_ROUTE_SECTION.categories]: <CategoryOutlined />,
     [ADMIN_ROUTE_SECTION.products]: <Inventory2Outlined />,
+    [ADMIN_ROUTE_SECTION.orders]: <ReceiptLongOutlined />,
   };
 
   const navigationItems: AdminNavigationItem[] = [
