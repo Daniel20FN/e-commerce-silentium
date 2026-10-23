@@ -59,10 +59,16 @@ function resolveProfileNames(input: SyncAuthUserInput): {
 }
 
 function resolveUserStatus(params: {
+  existingStatus?: UserStatus;
   emailVerifiedAt: Date | null;
   firstName: string | null;
   lastName: string | null;
 }): UserStatus {
+  if (
+    params.existingStatus === UserStatus.blocked ||
+    params.existingStatus === UserStatus.inactive
+  )
+    return params.existingStatus;
   if (params.emailVerifiedAt && params.firstName && params.lastName) {
     return UserStatus.active;
   }
@@ -111,6 +117,7 @@ export async function syncAuthUser(
           phoneVerifiedAt,
           lastLoginAt,
           status: resolveUserStatus({
+            existingStatus: existingUser.status,
             emailVerifiedAt,
             firstName:
               profileNames.firstName ?? existingUser.profile?.firstName ?? null,

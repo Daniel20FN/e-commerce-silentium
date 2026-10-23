@@ -14,7 +14,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const next = request.nextUrl.searchParams.get("next") ?? undefined;
 
   const safeReturnTo = sanitizeReturnTo(next);
-  const loginUrl = new URL(AUTH_ROUTE_PREFIXES.login, request.url);
+  const loginUrl = new URL(
+    type === "invite" ||
+    (type === "recovery" && next === AUTH_ROUTE_PREFIXES.invitation)
+      ? AUTH_ROUTE_PREFIXES.invitation
+      : AUTH_ROUTE_PREFIXES.login,
+    request.url,
+  );
   loginUrl.searchParams.set("confirmed", "1");
 
   if (safeReturnTo) {

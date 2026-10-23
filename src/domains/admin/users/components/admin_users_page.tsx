@@ -60,6 +60,8 @@ import {
 import Link from "next/link";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { AdminUserInvitation } from "./admin_user_invitation";
+import { DeleteUserButton } from "./delete_user_button";
 
 const ADMIN_USERS_REQUEST_ID = "admin-users-list";
 const ADMIN_USERS_UPDATE_REQUEST_ID = "admin-users-update";
@@ -302,7 +304,7 @@ export function AdminUsersPage({ dictionary }: AdminUsersPageProps) {
     {
       field: "actions",
       headerName: dictionary.admin.users.table.columns.actions,
-      minWidth: 320,
+      minWidth: 510,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
@@ -364,6 +366,11 @@ export function AdminUsersPage({ dictionary }: AdminUsersPageProps) {
                 ? dictionary.admin.users.actions.activate
                 : dictionary.admin.users.actions.block}
             </Button>
+            <DeleteUserButton
+              user={row}
+              dictionary={dictionary}
+              onDeleted={() => setReloadVersion((value) => value + 1)}
+            />
           </Stack>
         );
       },
@@ -372,6 +379,9 @@ export function AdminUsersPage({ dictionary }: AdminUsersPageProps) {
 
   return (
     <Stack spacing={3}>
+      <Box sx={{ alignSelf: "flex-end" }}>
+        <AdminUserInvitation dictionary={dictionary} />
+      </Box>
       <Paper
         sx={{
           p: { xs: 2, md: 2.5 },

@@ -30,3 +30,9 @@ export type AdminUsersListApiResponse =
   ApiResponse<AdminUsersListApiResponseData>;
 export type AdminUserMutationApiResponse =
   ApiResponse<AdminUserMutationApiResponseData>;
+
+export interface AdminUserInviteData {
+  email: string;
+}
+export type AdminUserInviteApiResponse = ApiResponse<AdminUserInviteData>;
+export type AdminUserDeleteApiResponse = ApiResponse<{ deletedId: string }>;

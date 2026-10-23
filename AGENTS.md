@@ -56,7 +56,8 @@
 - Run development migration: `npm run prisma:migrate:dev:development`
 - Run production migration deploy: `npm run prisma:migrate:deploy:production`
 - Seed database: `npm run db:seed`
-- Cart product links use optional server-side `APP_PUBLIC_URL` (public HTTPS origin). Until a domain is defined, leave it unset: WhatsApp messages include SKU/public photos but omit product URLs, never localhost. See `docs/cart-whatsapp.md`; no WhatsApp API credentials are needed.
+- Cart product links use server-side `APP_PUBLIC_URL=https://www.silentium-hogar.com` (canonical public HTTPS origin). Without it, WhatsApp messages include SKU/public photos but omit product URLs, never localhost. See `docs/cart-whatsapp.md`; no WhatsApp API credentials are needed.
+- User invitations require a trusted public HTTPS origin (`APP_PUBLIC_URL` or Vercel's `VERCEL_PROJECT_PRODUCTION_URL`) and an exact Supabase redirect allowlist entry for `/auth/invitacion`. Only active verified superadmins invite; roles activate only after recipient-owned password setup/consent. The default Supabase mailer does not deliver to arbitrary addresses: show its restriction, never add operators to the infrastructure team as a workaround. Apply the private invitation-table migration before publishing. See `docs/admin-invitations.md`.
 
 ## Lint, Format, And Validation
 

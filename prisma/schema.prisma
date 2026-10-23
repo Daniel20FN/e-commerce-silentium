@@ -52,23 +52,44 @@ enum ProductStatus {
 }
 
 model User {
-  id                 String          @id @default(cuid())
-  supabaseAuthUserId String?         @unique
-  email              String          @unique
-  role               UserRole        @default(customer)
-  status             UserStatus      @default(pending_profile)
+  id                 String                @id @default(cuid())
+  supabaseAuthUserId String?               @unique
+  email              String                @unique
+  role               UserRole              @default(customer)
+  status             UserStatus            @default(pending_profile)
   emailVerifiedAt    DateTime?
   phoneVerifiedAt    DateTime?
   lastLoginAt        DateTime?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
   profile            UserProfile?
   addresses          UserAddress[]
   preferences        UserPreference?
+  invitations        AdminUserInvitation[]
 
   @@index([email])
   @@index([role])
   @@index([status])
+}
+
+model AdminUserInvitation {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  firstName      String
+  lastName       String
+  role           UserRole  @default(admin)
+  authUserId     String?   @unique
+  invitedById    String
+  inviter        User      @relation(fields: [invitedById], references: [id], onDelete: Restrict)
+  attemptedAt    DateTime  @default(now())
+  leaseId        String?
+  leaseExpiresAt DateTime?
+  sentAt         DateTime?
+  expiresAt      DateTime?
+  acceptedAt     DateTime?
+  failureCode    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model UserProfile {

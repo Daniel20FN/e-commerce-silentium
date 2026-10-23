@@ -16,7 +16,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 interface AuthShellProps {
-  dictionary: Dictionary;
+  dictionary: Pick<Dictionary, "general">;
   title: string;
   subtitle: string;
   children: ReactNode;

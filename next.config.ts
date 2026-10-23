@@ -62,6 +62,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/auth/invitacion",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
         source: "/api/apps/get-app-config",
         headers: [
           { key: "Access-Control-Allow-Credentials", value: "true" },

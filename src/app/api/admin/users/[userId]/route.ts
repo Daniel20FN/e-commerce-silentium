@@ -9,6 +9,7 @@ import {
 } from "@/lib/supabase/server";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+export { deleteUserHandler as DELETE } from "./delete_handler";
 
 function createJsonResponse(
   body: AdminUserMutationApiResponse,

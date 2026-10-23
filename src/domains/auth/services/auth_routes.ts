@@ -3,6 +3,7 @@ export const AUTH_ROUTE_PREFIXES = {
   register: "/register",
   confirm: "/auth/confirm",
   authCodeError: "/auth/auth-code-error",
+  invitation: "/auth/invitacion",
 } as const;
 
 export const PROTECTED_ROUTE_PREFIXES = {

@@ -39,6 +39,27 @@ describe("GET /auth/confirm", () => {
     jest.clearAllMocks();
   });
 
+  it("routes a verified invitation to password setup, not login or a caller redirect", async () => {
+    const verifyOtp = jest
+      .fn()
+      .mockResolvedValue({ data: { user: createSupabaseUser() }, error: null });
+    mockCreateRouteHandlerSupabaseClient.mockReturnValue({
+      auth: { verifyOtp, exchangeCodeForSession: jest.fn() },
+    });
+    const response = await GET(
+      new NextRequest(
+        "http://localhost/auth/confirm?token_hash=invite-token&type=invite&next=https://evil.invalid",
+      ),
+    );
+    expect(verifyOtp).toHaveBeenCalledWith({
+      token_hash: "invite-token",
+      type: "invite",
+    });
+    expect(response.headers.get("location")).toBe(
+      "http://localhost/auth/invitacion?confirmed=1",
+    );
+  });
+
   it("supports the code exchange flow and redirects back to login", async () => {
     const authUser = createSupabaseUser();
     const exchangeCodeForSession = jest.fn().mockResolvedValue({
