@@ -439,6 +439,32 @@
       "email_already_confirmed": "Ese correo ya fue confirmado. Ya puedes iniciar sesión.",
       "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez.",
       "auth_service_unavailable": "El servicio de acceso no está disponible. Intentá nuevamente en unos minutos."
+    },
+    "invitation": {
+      "title": "Tu acceso a Silentium",
+      "subtitle": "Establece una contraseña para completar tu invitación.",
+      "loading": "Comprobando la invitación…",
+      "confirmPassword": "Repite tu contraseña",
+      "submit": "Activar mi cuenta",
+      "submitting": "Activando…",
+      "login": "Ir a iniciar sesión",
+      "recipient": "Invitación para {email}",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "passwordHelp": "Entre 8 y 128 caracteres. Utiliza una contraseña que no uses en otros sitios.",
+      "errors": {
+        "invitation_email_restricted": "Supabase no permite enviar a este correo con el servicio predeterminado. Configura SMTP para invitar a personas ajenas al equipo del proyecto. No se ha activado ningún acceso.",
+        "invitation_rate_limit": "Hay un envío en curso o se ha alcanzado el límite de correo. Espera antes de intentarlo de nuevo.",
+        "invitation_user_exists": "Esta cuenta ya existe o ya completó una invitación. Gestiona sus permisos desde Usuarios; no se han cambiado.",
+        "invitation_delivery_failed": "No se ha podido confirmar el envío de la invitación. Revisa la configuración de correo antes de volver a intentarlo.",
+        "invitation_changed": "La invitación ha cambiado. Vuelve a abrirla o pide al superadministrador que revise la cuenta.",
+        "invitation_origin_missing": "Falta configurar APP_PUBLIC_URL con el dominio HTTPS de la tienda, o el dominio de producción de Vercel.",
+        "invitation_unavailable": "No hay una invitación válida para esta sesión. El enlace puede haber caducado, haberse utilizado o pertenecer a otra cuenta. Abre el último correo de invitación o pide uno nuevo.",
+        "invitation_password_failed": "No pudimos guardar esta contraseña. Prueba otra que cumpla los requisitos de seguridad.",
+        "invitation_invalid_fields": "Revisa los datos y acepta las condiciones para continuar.",
+        "forbidden": "No tienes permisos para realizar esta acción.",
+        "unauthorized": "Inicia sesión para continuar.",
+        "internal_server_error": "No pudimos completar la operación. Inténtalo más tarde."
+      }
     }
   },
   "admin": {
@@ -702,6 +728,35 @@
         "inactive": "Inactivo",
         "blocked": "Bloqueado",
         "pending_profile": "Perfil pendiente"
+      },
+      "invitation": {
+        "button": "Invitar usuario",
+        "title": "Invitar a Silentium",
+        "intro": "La persona recibirá un enlace para elegir su contraseña. El rol se activará cuando complete la invitación.",
+        "mailerNotice": "La invitación se envía mediante el correo configurado en Supabase. La persona debe revisar también spam y abrir el enlace antes de que caduque.",
+        "submit": "Enviar invitación",
+        "submitting": "Enviando…",
+        "close": "Cerrar",
+        "cancel": "Cancelar",
+        "role": "Rol al aceptar",
+        "sent": "Supabase ha aceptado el envío a {email}. La entrega depende del servicio de correo; la cuenta aún no tiene el rol asignado.",
+        "expiry": "La invitación se puede completar durante una hora. Para volver a enviarla, abre este formulario con los mismos datos; no se cambian permisos de cuentas ya registradas."
+      },
+      "deletion": {
+        "button": "Eliminar cuenta",
+        "title": "¿Eliminar esta cuenta?",
+        "description": "Se eliminarán de forma permanente el acceso, el perfil, las direcciones y las preferencias de esta persona. Los pedidos y el historial operativo se conservarán. Esta acción no se puede deshacer.",
+        "confirmLabel": "Escribe el correo de la cuenta para confirmar",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar definitivamente",
+        "success": "Cuenta eliminada",
+        "errors": {
+          "self": "No puedes eliminar tu propia cuenta.",
+          "history": "Esta cuenta ha emitido invitaciones. No se puede eliminar sin afectar su historial.",
+          "missing": "La cuenta ya no existe. Actualiza el listado.",
+          "provider": "No se pudo confirmar el borrado en Supabase. Revisa la conexión y vuelve a intentarlo.",
+          "failed": "No se pudo completar la eliminación. Actualiza el listado y vuelve a intentarlo."
+        }
       }
     },
     "categories": {
@@ -1843,14 +1898,17 @@
           "title": "Gestionar acceso de usuarios",
           "summary": "Solo el superadministrador puede consultar y gestionar usuarios, roles y estados. El resto del panel es igual para administradores y superadministradores.",
           "steps": [
+            "Solo como superadministrador, pulsa Invitar usuario, completa nombre, apellidos, correo y rol y confirma el envío. La persona debe abrir el correo, elegir su contraseña y aceptar las condiciones para activar su acceso.",
             "Abre Usuarios y usa búsqueda y filtros para localizar a la persona.",
             "Abre Ver detalle y comprueba perfil, rol y estado antes de cambiarlo.",
-            "Usa Editar rol, Bloquear o Activar según tus permisos y restricciones de la pantalla. Revisa la confirmación antes de guardar."
+            "Usa Editar rol, Bloquear o Activar según tus permisos y restricciones de la pantalla. Revisa la confirmación antes de guardar.",
+            "Para eliminar una cuenta, pulsa Eliminar cuenta, escribe su correo y confirma. Es permanente: se borran el acceso y los datos de perfil, pero no los pedidos. No puedes borrar tu propia cuenta ni una cuenta que haya emitido invitaciones."
           ],
           "notes": [
             "La guía y el panel requieren permisos administrativos. No compartas tu sesión para enseñar a otra persona.",
             "Registrar nombre y WhatsApp en un pedido no crea automáticamente una cuenta de usuario.",
-            "La aplicación puede impedir cambios sensibles según tus permisos y la cuenta afectada."
+            "La aplicación puede impedir cambios sensibles según tus permisos y la cuenta afectada.",
+            "Las invitaciones caducan en una hora y no activan el rol hasta completarse. No se envían contraseñas. Si el correo predeterminado de Supabase rechaza un destinatario, configura SMTP; no lo añadas al equipo de Supabase como solución."
           ],
           "warning": "Cambiar roles o bloquear usuarios afecta su acceso. No lo uses como prueba sin tener claro a quién modificas.",
           "example": "Si un compañero necesita gestionar catálogo, revisa su cuenta y permisos con el responsable. No compartas la contraseña del administrador.",

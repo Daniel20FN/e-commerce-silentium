@@ -19,3 +19,10 @@ export interface AdminUserUpdateParams {
   role?: AdminUserRole;
   status?: AdminUserStatus;
 }
+
+export interface AdminUserInviteParams {
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: AdminUserRole;
+}

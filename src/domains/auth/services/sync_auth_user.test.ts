@@ -52,6 +52,24 @@ describe("syncAuthUser", () => {
     jest.clearAllMocks();
   });
 
+  it.each([UserStatus.blocked, UserStatus.inactive])(
+    "preserves a manually disabled %s account during invitation/session sync",
+    async (status) => {
+      const existing = {
+        id: "user-1",
+        status,
+        profile: { firstName: "Ana", lastName: "Ejemplo" },
+      };
+      mockUserFindFirst.mockResolvedValue(existing);
+      mockUserUpdate.mockResolvedValue(existing);
+      mockUserFindUnique.mockResolvedValue(existing);
+      await syncAuthUser({ authUser: createSupabaseUser() });
+      expect(mockUserUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.objectContaining({ status }) }),
+      );
+    },
+  );
+
   it("creates a linked business user with profile and preferences on first signup", async () => {
     const acceptedTermsAt = new Date("2026-04-02T12:00:00.000Z");
     const syncedUser: AuthUserRecord = {
