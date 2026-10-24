@@ -10,6 +10,7 @@ jest.mock("@/lib/supabase/admin", () => ({
   }),
 }));
 const tx = {
+  $executeRaw: jest.fn(),
   $queryRaw: jest.fn(),
   user: {
     findUnique: jest.fn(),

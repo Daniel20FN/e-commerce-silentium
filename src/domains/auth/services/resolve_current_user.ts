@@ -42,7 +42,8 @@ export async function resolveCurrentUser(
   } catch (error) {
     if (
       error instanceof Error &&
-      (error.name === "AuthSessionMissingError" ||
+      (error.message === "account_deleted" ||
+        error.name === "AuthSessionMissingError" ||
         ("code" in error &&
           (error.code === "refresh_token_not_found" ||
             error.code === "refresh_token_already_used" ||

@@ -124,10 +124,14 @@ describe("PATCH /api/admin/users/[userId]", () => {
       },
     );
 
-    expect(mockUpdateAdminUser).toHaveBeenCalledWith("user-1", {
-      role: UserRole.admin,
-      status: UserStatus.blocked,
-    });
+    expect(mockUpdateAdminUser).toHaveBeenCalledWith(
+      "user-1",
+      {
+        role: UserRole.admin,
+        status: UserStatus.blocked,
+      },
+      "admin-1",
+    );
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       data: {

@@ -148,9 +148,9 @@ describe("public landing navigation", () => {
       ).not.toBeInTheDocument(),
     );
   });
-  it("keeps customer logout but never links to unimplemented account/orders/wishlist", async () => {
+  it("links customers to their account without exposing unimplemented orders/wishlist", async () => {
     const store = setup(user);
-    const { container } = render(
+    render(
       <Provider store={store}>
         <Navbar dictionary={dictionary} />
       </Provider>,
@@ -161,12 +161,38 @@ describe("public landing navigation", () => {
     expect(
       screen.queryByRole("menuitem", { name: dictionary.auth.navbar.orders }),
     ).not.toBeInTheDocument();
-    expect(container.querySelector('a[href^="/account"]')).toBeNull();
+    expect(
+      screen.getByRole("menuitem", { name: dictionary.auth.navbar.account }),
+    ).toHaveAttribute("href", "/account");
     fireEvent.click(
       screen.getByRole("menuitem", { name: dictionary.auth.navbar.logout }),
     );
     await waitFor(() => expect(store.get(currentUserAtom)).toBeNull());
     expect(mockPush).toHaveBeenCalledWith("/");
+  });
+
+  it("closes the mobile drawer when account navigation is chosen, even on the account route", async () => {
+    mockPathname.mockReturnValue("/account");
+    render(
+      <Provider store={setup(user)}>
+        <Navbar dictionary={dictionary} />
+      </Provider>,
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: dictionary.storefront.openNavigation,
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole("link", { name: dictionary.auth.navbar.account }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("button", {
+          name: dictionary.storefront.closeNavigation,
+        }),
+      ).not.toBeInTheDocument(),
+    );
   });
   it("keeps the real admin panel entry for eligible staff", () => {
     render(

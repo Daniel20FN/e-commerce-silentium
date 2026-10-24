@@ -1,3 +1,5 @@
+import { isDeletedAccount } from "@/domains/auth/services/deleted_account";
+import { lockUserAccess } from "@/domains/auth/services/user_access_lock";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { Prisma } from "@prisma/client";
@@ -26,6 +28,7 @@ export async function deleteAdminUser(
   // retrying a missing Auth identity if the final PostgreSQL commit was lost.
   await prisma.$transaction(
     async (tx) => {
+      await lockUserAccess(tx);
       const locked = await tx.$queryRaw<{ id: string }[]>(
         Prisma.sql`SELECT id FROM "User" WHERE id IN (${userId}, ${actorId}) ORDER BY id FOR UPDATE`,
       );
@@ -40,6 +43,8 @@ export async function deleteAdminUser(
       if (!locked.some((row) => row.id === userId))
         throw new UserDeletionError("missing", 404);
       const target = await tx.user.findUniqueOrThrow({ where: { id: userId } });
+      if (isDeletedAccount(target.email))
+        throw new UserDeletionError("history", 409);
       if (
         await tx.adminUserInvitation.count({ where: { invitedById: userId } })
       ) {
