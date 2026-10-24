@@ -1,6 +1,7 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { CategoryCards } from "@/domains/storefront/components/catalog_cards";
 import { getStorefrontCategories } from "@/domains/storefront/services/catalog_service";
+import { getCatalogDictionary } from "@/domains/storefront/services/storefront_dictionary";
 import { Container, Stack, Typography } from "@mui/material";
 export const metadata = {
   title: getDictionary("es").storefront.categoriesTitle,
@@ -24,7 +25,7 @@ export default async function Page() {
         {categories.length ? (
           <CategoryCards
             items={categories.filter((category) => !category.parentId)}
-            dictionary={dictionary}
+            dictionary={getCatalogDictionary(dictionary)}
           />
         ) : (
           <Typography role="status">

@@ -38,6 +38,7 @@ export default async function PreviewContentPage({
         key={product.id}
         product={product}
         dictionary={dictionary}
+        previewCopy={dictionary.admin.products.publication}
         preview
       />
     </Box>

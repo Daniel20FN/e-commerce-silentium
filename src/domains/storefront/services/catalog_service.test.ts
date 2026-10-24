@@ -1,8 +1,7 @@
 /** @jest-environment node */
-import { listStorefrontCatalogImages } from "@/domains/admin/media/services/catalog_media_service";
-
 import {
   getStorefrontCategories,
+  getStorefrontFeaturedProducts,
   getStorefrontListing,
   getStorefrontProduct,
 } from "./catalog_service";
@@ -20,9 +19,6 @@ jest.mock("@/lib/prisma", () => ({
     },
     productVariant: { fields: { priceCents: "priceCents" } },
   },
-}));
-jest.mock("@/domains/admin/media/services/catalog_media_service", () => ({
-  listStorefrontCatalogImages: jest.fn(),
 }));
 const root = {
   id: "root",
@@ -83,7 +79,6 @@ describe("storefront public read contracts", () => {
     jest.mocked(mockCount).mockResolvedValue(1);
     jest.mocked(mockProducts).mockResolvedValue([product]);
     jest.mocked(mockProduct).mockResolvedValue(product);
-    jest.mocked(listStorefrontCatalogImages).mockResolvedValue([]);
   });
   it("returns only visible category DTOs, not operational flags", async () => {
     jest
@@ -215,11 +210,11 @@ describe("storefront public read contracts", () => {
         }),
       }),
     );
-    expect(listStorefrontCatalogImages).not.toHaveBeenCalled();
   });
-  it("consumes the PRD03 public media resolver and excludes values used only by hidden variants", async () => {
+  it("reuses the selected public media and excludes values used only by hidden variants", async () => {
     const result = await getStorefrontProduct("product");
-    expect(listStorefrontCatalogImages).toHaveBeenCalledWith("p1", "v1");
+    expect(mockProduct).toHaveBeenCalledTimes(1);
+    expect(result?.image?.id).toBe("img");
     expect(result?.options[0].values).toEqual([{ id: "red", value: "Red" }]);
     expect(result?.breadcrumbs.map((c) => c.id)).toEqual(["root"]);
     expect(result?.variants[0]).not.toHaveProperty("deletedAt");
@@ -237,5 +232,59 @@ describe("storefront public read contracts", () => {
   it("never queries a pathological product slug", async () => {
     expect(await getStorefrontProduct("x".repeat(181))).toBeNull();
     expect(mockProduct).not.toHaveBeenCalled();
+  });
+  it("uses a variant gallery before the general gallery without copying its ownership", async () => {
+    mockProduct.mockResolvedValue({
+      ...product,
+      variants: [{ ...product.variants[0], images: [{ ...image, id: "own" }] }],
+    });
+    const result = await getStorefrontProduct("product");
+    expect(result?.image?.id).toBe("own");
+    expect(result?.variants[0].images[0].id).toBe("own");
+    expect(result?.images[0].id).toBe("img");
+    expect(mockProduct.mock.calls[0][0].select.images.where).toEqual({
+      status: "ready",
+      deletedAt: null,
+      variantId: null,
+    });
+    expect(
+      mockProduct.mock.calls[0][0].select.variants.select.images.where,
+    ).toEqual({ status: "ready", deletedAt: null });
+  });
+  it("returns no image when both public galleries are empty", async () => {
+    mockProduct.mockResolvedValue({ ...product, images: [] });
+    expect((await getStorefrontProduct("product"))?.image).toBeNull();
+  });
+  it("loads only four real featured cards without a pagination count", async () => {
+    const result = await getStorefrontFeaturedProducts();
+    expect(mockCount).not.toHaveBeenCalled();
+    expect(mockProducts).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          featured: true,
+          status: "active",
+          archivedAt: null,
+          deletedAt: null,
+        }),
+        take: 4,
+        orderBy: [{ name: "asc" }, { id: "asc" }],
+      }),
+    );
+    expect(result[0].id).toBe("p1");
+    expect(result[0]).not.toHaveProperty("variants");
+  });
+  it("starts the first page read before the count completes", async () => {
+    let completeCount: (total: number) => void = () => {};
+    mockCount.mockReturnValueOnce(
+      new Promise<number>((resolve) => {
+        completeCount = resolve;
+      }),
+    );
+    const pending = getStorefrontListing();
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    expect(mockProducts).toHaveBeenCalledTimes(1);
+    completeCount(1);
+    expect((await pending)?.page).toBe(1);
+    expect(mockProducts).toHaveBeenCalledTimes(1);
   });
 });

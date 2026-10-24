@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import Link from "@/components/navigation_link";
 import { priceFormatter } from "@/utils/price_formatter";
 import {
   Box,
@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import Link from "next/link";
+import type { CatalogDictionary } from "../services/storefront_dictionary";
 import type {
   StorefrontCategory,
   StorefrontProductCard,
@@ -28,7 +28,7 @@ export function CatalogPrice({
   cents: number;
   compareAt: number | null;
   from?: boolean;
-  dictionary: Dictionary;
+  dictionary: CatalogDictionary;
 }) {
   const copy = dictionary.storefront;
   return (
@@ -61,7 +61,7 @@ export function ProductCards({
   dictionary,
 }: {
   items: StorefrontProductCard[];
-  dictionary: Dictionary;
+  dictionary: CatalogDictionary;
 }) {
   const copy = dictionary.storefront;
   return (
@@ -164,7 +164,7 @@ export function CategoryCards({
   dictionary,
 }: {
   items: StorefrontCategory[];
-  dictionary: Dictionary;
+  dictionary: CatalogDictionary;
 }) {
   return (
     <Box
@@ -223,7 +223,7 @@ export function CategoryCards({
   );
 }
 
-export function CatalogLink({ dictionary }: { dictionary: Dictionary }) {
+export function CatalogLink({ dictionary }: { dictionary: CatalogDictionary }) {
   return (
     <Button component={Link} href="/productos" variant="outlined">
       {dictionary.storefront.allProducts}

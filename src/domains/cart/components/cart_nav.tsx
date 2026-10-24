@@ -1,9 +1,10 @@
 "use client";
+import Link from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { useHydrated } from "@/hooks/use_hydrated";
 import { ShoppingBagOutlined } from "@mui/icons-material";
 import { Badge, IconButton } from "@mui/material";
 import { useAtomValue } from "jotai";
-import Link from "next/link";
 import { cartReadyAtom, cartUnitsAtom } from "../states/cart_state";
 
 export function CartNav({
@@ -11,7 +12,9 @@ export function CartNav({
 }: {
   dictionary: { cart: Pick<Dictionary["cart"], "title" | "navCount"> };
 }) {
-  const ready = useAtomValue(cartReadyAtom);
+  const hydrated = useHydrated();
+  const initialized = useAtomValue(cartReadyAtom);
+  const ready = hydrated && initialized;
   const units = useAtomValue(cartUnitsAtom);
   return (
     <IconButton

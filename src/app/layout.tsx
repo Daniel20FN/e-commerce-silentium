@@ -31,7 +31,12 @@ export default async function RootLayout({
     <html lang="es">
       <body>
         <AppRouterCacheProvider>
-          <Providers initialTheme={initialTheme}>{children}</Providers>
+          <Providers
+            initialTheme={initialTheme}
+            loadingLabel={getDictionary("es").general.loading}
+          >
+            {children}
+          </Providers>
         </AppRouterCacheProvider>
       </body>
     </html>

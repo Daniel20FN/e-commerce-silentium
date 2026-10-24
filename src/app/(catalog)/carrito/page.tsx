@@ -12,7 +12,7 @@ export const metadata = {
 export default function Page() {
   return (
     <CartPage
-      dictionary={getDictionary("es")}
+      dictionary={{ cart: getDictionary("es").cart }}
       contact={{
         phone: SALES_WHATSAPP_PHONE,
         publicOrigin: publicOrigin(process.env.APP_PUBLIC_URL),

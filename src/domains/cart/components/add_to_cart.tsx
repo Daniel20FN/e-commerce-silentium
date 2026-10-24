@@ -1,9 +1,10 @@
 "use client";
+import Link from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import type { StorefrontVariant } from "@/domains/storefront/types/catalog";
+import { useHydrated } from "@/hooks/use_hydrated";
 import { Alert, Button, Stack, TextField } from "@mui/material";
 import { useAtomValue, useStore } from "jotai";
-import Link from "next/link";
 import { useState } from "react";
 import { fetchCartQuote } from "../services/cart_client";
 import {
@@ -23,12 +24,15 @@ export function AddToCart({
   dictionary,
 }: {
   variant: StorefrontVariant | null;
-  dictionary: Dictionary;
+  dictionary: Pick<Dictionary, "cart">;
 }) {
   const copy = dictionary.cart;
   const store = useStore();
-  const ready = useAtomValue(cartReadyAtom);
-  const notice = useAtomValue(cartNoticeAtom);
+  const hydrated = useHydrated();
+  const initialized = useAtomValue(cartReadyAtom);
+  const ready = hydrated && initialized;
+  const savedNotice = useAtomValue(cartNoticeAtom);
+  const notice = hydrated ? savedNotice : null;
   const [quantity, setQuantity] = useState("1");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<"added" | "invalid" | "error" | null>(

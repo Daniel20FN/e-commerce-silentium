@@ -90,6 +90,7 @@ export function ProductPreviewFrame({
               key={productId}
               product={product}
               dictionary={dictionary}
+              previewCopy={copy}
               preview
             />
           ) : (

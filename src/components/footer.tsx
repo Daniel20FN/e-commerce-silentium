@@ -1,4 +1,5 @@
 import { BrandLogo } from "@/components/brand_logo";
+import NavigationLink from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { CompanyValues } from "@/values/app_values";
 import {
@@ -60,6 +61,7 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
             sx={{ gridColumn: { xs: "1 / -1", md: "auto" }, minWidth: 0 }}
           >
             <Link
+              component={NavigationLink}
               aria-label={CompanyValues.name}
               href="/#inicio"
               underline="none"
@@ -97,6 +99,7 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
               <Stack spacing={1}>
                 {section.links.map((link) => (
                   <Link
+                    component={NavigationLink}
                     key={link.href}
                     href={link.href}
                     underline="hover"

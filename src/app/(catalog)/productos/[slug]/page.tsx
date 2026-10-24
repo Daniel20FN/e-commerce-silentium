@@ -1,6 +1,7 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { ProductDetail } from "@/domains/storefront/components/product_detail";
 import { getStorefrontProduct } from "@/domains/storefront/services/catalog_service";
+import { getProductDictionary } from "@/domains/storefront/services/storefront_dictionary";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 type Props = { params: Promise<{ slug: string }> };
@@ -32,7 +33,7 @@ export default async function Page({ params }: Props) {
     <ProductDetail
       key={product.id}
       product={product}
-      dictionary={getDictionary("es")}
+      dictionary={getProductDictionary(getDictionary("es"))}
     />
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import Close from "@mui/icons-material/Close";
 import Search from "@mui/icons-material/Search";
 import Tune from "@mui/icons-material/Tune";
@@ -24,11 +23,12 @@ import {
   activeCatalogFilters,
   catalogQueryString,
 } from "../services/catalog_filters";
+import type { CatalogDictionary } from "../services/storefront_dictionary";
 import type { CatalogFilters } from "../types/api_params";
 import type { StorefrontCategory } from "../types/catalog";
 
 type Props = {
-  dictionary: Dictionary;
+  dictionary: CatalogDictionary;
   filters: CatalogFilters;
   categories: Pick<StorefrontCategory, "id" | "name" | "slug" | "parentId">[];
   base: string;

@@ -5,6 +5,7 @@ import {
   getStorefrontCategories,
   getStorefrontListing,
 } from "@/domains/storefront/services/catalog_service";
+import { getCatalogDictionary } from "@/domains/storefront/services/storefront_dictionary";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 type Props = {
@@ -34,5 +35,10 @@ export default async function Page({ params, searchParams }: Props) {
     categorySlug: slug,
   });
   if (!listing) notFound();
-  return <CatalogListing listing={listing} dictionary={getDictionary("es")} />;
+  return (
+    <CatalogListing
+      listing={listing}
+      dictionary={getCatalogDictionary(getDictionary("es"))}
+    />
+  );
 }

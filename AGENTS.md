@@ -47,6 +47,9 @@
 
 ## Install And Run
 
+- Navigation performance: `vercel.json` pins functions to `dub1`, colocated with the confirmed Supabase `eu-west-1` database; verify before changing regions. Public links use `NavigationLink`/native Next pending state and streaming loading boundaries. Keep public dictionary props projected, and do not introduce shared caches for stock/auth/account/admin to hide latency. See `docs/navigation-performance.md`.
+- Streaming hydration: `CartBootstrap` may restore browser atoms before a delayed island hydrates. Keep `useHydrated` gates for cart count/content/notices and AddToCart readiness; never hide hydration errors with suppression. `cart_nav_hydration.test.tsx` covers SSR followed by pre-hydration store restoration for all three cart islands.
+
 - Install dependencies: `npm install`
 - Start dev server: `npm run dev`
 - Production build: `npm run build`
@@ -71,6 +74,8 @@
 - Important: there is no standalone `typecheck` script right now.
 
 ## Tests
+
+- Optional read-only gallery parity: `STOREFRONT_INTEGRATION=1` with `npm run test:file -- src/domains/storefront/services/catalog_gallery_read.integration.test.ts` compares existing public photos with the media resolver, without fixtures, Storage uploads or stock writes. Requires explicit `.env.development` `DATABASE_URL`; normal runs skip it. Do not run other fixture-producing integration suites against shared dev/prod data.
 
 - Self-service account lives at `/account`, with owned endpoints under `/api/account`. Sensitive actions recheck the current password through an isolated non-persistent Auth client. Privilege changes and account removals share `lockUserAccess`; identity synchronization and self-deletion coordinate with the per-user `lockUserIdentity` plus row locks. Preserve these locks and the last active verified superadmin guard. Deleted-account technical references use `@deleted.invalid` and must never be reactivated or synced from stale tokens. See `docs/my-account.md`. Do not run destructive account/password browser checks against real users: dev/prod currently share the database.
 
