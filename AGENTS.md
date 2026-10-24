@@ -75,6 +75,9 @@
 
 ## Tests
 
+- Public mobile performance: see `docs/mobile-pagespeed.md`. `experimental.inlineCss` is production-only and global; verify the compiled build, not just dev. Keep the media-scoped curtain preload in sync with its CSS `image-set`, preserving desktop art direction and reduced motion. Shared cart validation uses `zod/mini` with the same strict rules; do not remove validation to shrink bundles. No global date-picker provider is needed unless actual picker consumers are introduced.
+- `/api/auth/me` is optional identity discovery and returns `200` with `user: null` for guests/stale sessions, with `private, no-store`; protected account/admin APIs still require authorization. Preserve the Navbar hydration snapshot gate: bootstrap may resolve before a streamed menu hydrates. Regression: `src/components/navbar_hydration.test.tsx`.
+
 - Optional read-only gallery parity: `STOREFRONT_INTEGRATION=1` with `npm run test:file -- src/domains/storefront/services/catalog_gallery_read.integration.test.ts` compares existing public photos with the media resolver, without fixtures, Storage uploads or stock writes. Requires explicit `.env.development` `DATABASE_URL`; normal runs skip it. Do not run other fixture-producing integration suites against shared dev/prod data.
 
 - Self-service account lives at `/account`, with owned endpoints under `/api/account`. Sensitive actions recheck the current password through an isolated non-persistent Auth client. Privilege changes and account removals share `lockUserAccess`; identity synchronization and self-deletion coordinate with the per-user `lockUserIdentity` plus row locks. Preserve these locks and the last active verified superadmin guard. Deleted-account technical references use `@deleted.invalid` and must never be reactivated or synced from stale tokens. See `docs/my-account.md`. Do not run destructive account/password browser checks against real users: dev/prod currently share the database.

@@ -10,8 +10,6 @@ import CustomThemeProvider from "@/styles/custom_theme_provider";
 import { ThemeProvider } from "@/styles/theme_context";
 import type { ThemeMode } from "@/styles/theme_mode";
 import { CssBaseline } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Provider } from "jotai";
 import { SnackbarProvider } from "notistack";
 import { ReactNode } from "react";
@@ -31,18 +29,16 @@ export function Providers({
         <ThemeProvider initialTheme={initialTheme}>
           <CustomThemeProvider>
             <LanguageProvider>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <SnackbarProvider maxSnack={4}>
-                  <CancellableApiProvider options={{ autoCleanup: true }}>
-                    <CssBaseline />
-                    <AuthSessionBootstrap />
-                    <CartBootstrap />
-                    <NavigationFeedbackProvider label={loadingLabel}>
-                      {children}
-                    </NavigationFeedbackProvider>
-                  </CancellableApiProvider>
-                </SnackbarProvider>
-              </LocalizationProvider>
+              <SnackbarProvider maxSnack={4}>
+                <CancellableApiProvider options={{ autoCleanup: true }}>
+                  <CssBaseline />
+                  <AuthSessionBootstrap />
+                  <CartBootstrap />
+                  <NavigationFeedbackProvider label={loadingLabel}>
+                    {children}
+                  </NavigationFeedbackProvider>
+                </CancellableApiProvider>
+              </SnackbarProvider>
             </LanguageProvider>
           </CustomThemeProvider>
         </ThemeProvider>

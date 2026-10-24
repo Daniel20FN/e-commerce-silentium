@@ -47,6 +47,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     webpackBuildWorker: true,
+    inlineCss: true,
   },
   outputFileTracingExcludes: {
     // Avoids including canvas in the trace to avoid 50 Mb+ serverless functions
