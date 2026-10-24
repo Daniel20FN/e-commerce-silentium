@@ -52,7 +52,20 @@ No se modifica stock, pedidos, precios, usuarios ni Storage para estas pruebas. 
 - Comprobaciones HTTP sin cookies: descubrimiento de sesión `200`/usuario nulo; cuenta y API de productos administrativos `401`; `/account` redirige al login. Todas las respuestas correspondientes siguen privadas/sin caché.
 - Chrome sobre el build compilado: hero en 390/768/1440 px, fotografías de categorías optimizadas, menú y anclas, galería, variante de 50 × 90 cm, carrito de invitado persistido al recargar y búsqueda móvil con tres resultados. Sin errores de consola en los recorridos comprobados. La sesión existente también abre el panel administrativo. Se retiró únicamente el artículo de prueba del carrito aislado; el carrito previo de localhost no se modificó.
 
-La nueva puntuación móvil queda pendiente de repetir PageSpeed después del despliegue. No se debe presentar el build local como una mejora ya publicada.
+## Segunda pasada: JavaScript inicial y entrada móvil
+
+Tras publicar la primera pasada, el informe `eqvba7zygy` subió de 78 a **83 en móvil** y de 97 a **100 en escritorio**. Accesibilidad, buenas prácticas y SEO llegaron a 100 en ambos. El LCP móvil bajó de 5,4 a 4,2 s; el informe todavía señala la cortina como elemento LCP y un retraso importante de renderizado. Son pruebas de laboratorio, no datos reales de usuarios.
+
+- El analizador nativo de Next identificó que el contador del carrito importaba indirectamente sus esquemas de validación. Ahora los átomos y constantes ligeros están separados; los consumidores operativos conservan las mismas referencias mediante reexportaciones.
+- Un navegador sin carrito guardado no carga el validador durante el arranque. Si hay datos persistidos, se importa de forma diferida y se valida **antes** de habilitar el carrito. No se acepta JSON sin comprobarlo ni se relajan las validaciones del servidor.
+- Las restauraciones asíncronas tienen revisión y protección al desmontar: un evento más reciente de otra pestaña, incluido vaciar el carrito, no puede ser sobrescrito por una lectura antigua.
+- La entrada de la cortina pasa de 1.150 a 450 ms solo en móvil. Conserva imagen, composición, recorrido, curva de aceleración y profundidad al hacer scroll; escritorio y movimiento reducido no cambian.
+- Comparación del HTML compilado: **24 → 23 scripts iniciales**, **1.375.308 → 1.107.840 bytes descomprimidos**, estimación gzip **406.332 → 346.302 bytes**. La reducción estimada comprimida es de aproximadamente 60 KB; no equivale a una puntuación Lighthouse.
+- Una sonda temporal local confirmó que descargar la cortina no implica pintarla inmediatamente. Sus tiempos variaron entre recargas, por lo que no se atribuye todo el retraso a una sola animación ni se promete un LCP de producción a partir de esa prueba. La sonda se retira del código entregado.
+- La suite completa de esta pasada pasó **146 suites y 854 pruebas**; siguen omitidas 12 suites/63 pruebas de integración. Los nuevos casos cubren arranque vacío, datos corruptos, orden de eventos entre pestañas, desmontaje y almacenamiento bloqueado. Las regresiones existentes de hidratación y carrito también pasan.
+- El build final sin sonda compila con tipos correctos; lint y formato de los cambios pasan. En Chrome móvil se añadió una variante real, se conservó al recargar y se mostró su foto, referencia, cantidad y subtotal en el carrito. Solo se retiró esa selección de prueba del origen aislado `127.0.0.1`, sin tocar el carrito previo de `localhost`, stock ni pedidos. Los controles HTTP siguen devolviendo `200` al invitado en `/api/auth/me` y `401` en cuenta/administración, siempre privados y sin caché.
+
+La puntuación de esta segunda pasada queda pendiente de publicar y repetir PageSpeed varias veces. No presentar el build local como una mejora ya desplegada ni prometer 100 móvil.
 
 ## Referencias técnicas
 

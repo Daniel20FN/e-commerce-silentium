@@ -482,7 +482,7 @@
   }
   @media (prefers-reduced-motion: no-preference) {
     .heroCurtain {
-      animation: curtain-arrival 1150ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+      animation: curtain-arrival 450ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
     }
     @keyframes curtain-arrival {
       from {
