@@ -6,6 +6,9 @@ import { syncAuthUser } from "./sync_auth_user";
 
 jest.mock("@/lib/prisma", () => ({
   prisma: {
+    $transaction: jest.fn(),
+    $executeRaw: jest.fn(),
+    $queryRaw: jest.fn(),
     user: {
       findFirst: jest.fn(),
       update: jest.fn(),
@@ -50,6 +53,43 @@ function createSupabaseUser(overrides?: Partial<User>): User {
 describe("syncAuthUser", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(prisma.$transaction).mockImplementation(async (callback) => {
+      if (typeof callback !== "function") throw new Error("Unexpected batch");
+      return callback(prisma as never);
+    });
+  });
+
+  it("preserves profile edits instead of restoring old signup metadata", async () => {
+    const existing = {
+      id: "user-1",
+      email: "cliente@example.com",
+      status: UserStatus.active,
+      profile: { firstName: "Diana", lastName: "Moreno" },
+    };
+    mockUserFindFirst.mockResolvedValue(existing);
+    mockUserUpdate.mockResolvedValue(existing);
+    mockUserFindUnique.mockResolvedValue(existing);
+    await syncAuthUser({
+      authUser: createSupabaseUser({
+        user_metadata: { first_name: "Old", last_name: "Name" },
+      }),
+    });
+    expect(mockUserProfileUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({ update: {} }),
+    );
+  });
+  it("does not revive a deleted account from a previously verified stale session", async () => {
+    mockUserFindFirst.mockResolvedValue({
+      id: "old",
+      email: "random@deleted.invalid",
+      status: UserStatus.inactive,
+    });
+    await expect(
+      syncAuthUser({ authUser: createSupabaseUser() }),
+    ).rejects.toThrow("account_deleted");
+    expect(mockUserUpdate).not.toHaveBeenCalled();
+    expect(mockUserCreate).not.toHaveBeenCalled();
+    expect(mockUserProfileUpsert).not.toHaveBeenCalled();
   });
 
   it.each([UserStatus.blocked, UserStatus.inactive])(

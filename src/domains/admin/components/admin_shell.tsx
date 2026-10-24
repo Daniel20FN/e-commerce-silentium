@@ -241,9 +241,17 @@ export function AdminShell({
                   </IconButton>
                 </Tooltip>
               )}
-              <Avatar sx={{ bgcolor: "info.main", color: "info.contrastText" }}>
-                {displayName.slice(0, 1).toUpperCase()}
-              </Avatar>
+              <IconButton
+                component={Link}
+                href="/account"
+                aria-label={dictionary.auth.navbar.account}
+              >
+                <Avatar
+                  sx={{ bgcolor: "info.main", color: "info.contrastText" }}
+                >
+                  {displayName.slice(0, 1).toUpperCase()}
+                </Avatar>
+              </IconButton>
               <Box sx={{ display: { xs: "none", sm: "block" } }}>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {displayName}

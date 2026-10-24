@@ -72,6 +72,8 @@
 
 ## Tests
 
+- Self-service account lives at `/account`, with owned endpoints under `/api/account`. Sensitive actions recheck the current password through an isolated non-persistent Auth client. Privilege changes and account removals share `lockUserAccess`; identity synchronization and self-deletion coordinate with the per-user `lockUserIdentity` plus row locks. Preserve these locks and the last active verified superadmin guard. Deleted-account technical references use `@deleted.invalid` and must never be reactivated or synced from stale tokens. See `docs/my-account.md`. Do not run destructive account/password browser checks against real users: dev/prod currently share the database.
+
 - Jest is configured through `jest.config.ts` with `next/jest` and `jest.setup.ts`.
 - Run the full test suite with `npm run test`.
 - Run a single test file with `npm run test:file -- src/path/to/file.test.ts`.

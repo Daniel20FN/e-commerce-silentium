@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { UserStatus } from "@prisma/client";
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
+import { isDeletedAccount } from "./deleted_account";
 import type { AuthUserRecord } from "./sanitize_current_user";
+import { lockUserIdentity } from "./user_access_lock";
 
 interface SyncAuthUserProfileInput {
   firstName?: string | null;
@@ -79,128 +81,144 @@ function resolveUserStatus(params: {
 export async function syncAuthUser(
   input: SyncAuthUserInput,
 ): Promise<AuthUserRecord> {
-  const email = input.authUser.email?.trim().toLowerCase();
+  return prisma.$transaction(async (tx) => {
+    await lockUserIdentity(tx, input.authUser.id);
+    const email = input.authUser.email?.trim().toLowerCase();
 
-  if (!email) {
-    throw new Error("Cannot sync auth user without email");
-  }
+    if (!email) {
+      throw new Error("Cannot sync auth user without email");
+    }
 
-  const emailVerifiedAt = input.authUser.email_confirmed_at
-    ? new Date(input.authUser.email_confirmed_at)
-    : null;
-  const phoneVerifiedAt = input.authUser.phone_confirmed_at
-    ? new Date(input.authUser.phone_confirmed_at)
-    : null;
-  const lastLoginAt = input.authUser.last_sign_in_at
-    ? new Date(input.authUser.last_sign_in_at)
-    : new Date();
-  const profileNames = resolveProfileNames(input);
+    const emailVerifiedAt = input.authUser.email_confirmed_at
+      ? new Date(input.authUser.email_confirmed_at)
+      : null;
+    const phoneVerifiedAt = input.authUser.phone_confirmed_at
+      ? new Date(input.authUser.phone_confirmed_at)
+      : null;
+    const lastLoginAt = input.authUser.last_sign_in_at
+      ? new Date(input.authUser.last_sign_in_at)
+      : new Date();
+    const profileNames = resolveProfileNames(input);
 
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [{ supabaseAuthUserId: input.authUser.id }, { email }],
-    },
-    include: {
-      profile: true,
-    },
-  });
+    await tx.$queryRaw`SELECT id FROM "User" WHERE "supabaseAuthUserId" = ${input.authUser.id} OR email = ${email} ORDER BY id FOR UPDATE`;
+    const existingUser = await tx.user.findFirst({
+      where: {
+        OR: [{ supabaseAuthUserId: input.authUser.id }, { email }],
+      },
+      include: {
+        profile: true,
+      },
+    });
 
-  const user = existingUser
-    ? await prisma.user.update({
+    if (existingUser && isDeletedAccount(existingUser.email))
+      throw new Error("account_deleted");
+    const user = existingUser
+      ? await tx.user.update({
+          where: {
+            id: existingUser.id,
+          },
+          data: {
+            supabaseAuthUserId: input.authUser.id,
+            email,
+            emailVerifiedAt,
+            phoneVerifiedAt,
+            lastLoginAt,
+            status: resolveUserStatus({
+              existingStatus: existingUser.status,
+              emailVerifiedAt,
+              firstName:
+                existingUser.profile?.firstName ??
+                profileNames.firstName ??
+                null,
+              lastName:
+                existingUser.profile?.lastName ?? profileNames.lastName ?? null,
+            }),
+          },
+        })
+      : await tx.user.create({
+          data: {
+            email,
+            supabaseAuthUserId: input.authUser.id,
+            emailVerifiedAt,
+            phoneVerifiedAt,
+            lastLoginAt,
+            status: resolveUserStatus({
+              emailVerifiedAt,
+              firstName: profileNames.firstName,
+              lastName: profileNames.lastName,
+            }),
+          },
+        });
+
+    if (profileNames.firstName && profileNames.lastName) {
+      await tx.userProfile.upsert({
         where: {
-          id: existingUser.id,
+          userId: user.id,
         },
-        data: {
-          supabaseAuthUserId: input.authUser.id,
-          email,
-          emailVerifiedAt,
-          phoneVerifiedAt,
-          lastLoginAt,
-          status: resolveUserStatus({
-            existingStatus: existingUser.status,
-            emailVerifiedAt,
-            firstName:
-              profileNames.firstName ?? existingUser.profile?.firstName ?? null,
-            lastName:
-              profileNames.lastName ?? existingUser.profile?.lastName ?? null,
-          }),
+        update: {
+          ...(input.profile?.firstName
+            ? { firstName: profileNames.firstName }
+            : !existingUser?.profile?.firstName
+              ? { firstName: profileNames.firstName }
+              : {}),
+          ...(input.profile?.lastName
+            ? { lastName: profileNames.lastName }
+            : !existingUser?.profile?.lastName
+              ? { lastName: profileNames.lastName }
+              : {}),
         },
-      })
-    : await prisma.user.create({
-        data: {
-          email,
-          supabaseAuthUserId: input.authUser.id,
-          emailVerifiedAt,
-          phoneVerifiedAt,
-          lastLoginAt,
-          status: resolveUserStatus({
-            emailVerifiedAt,
-            firstName: profileNames.firstName,
-            lastName: profileNames.lastName,
-          }),
+        create: {
+          userId: user.id,
+          firstName: profileNames.firstName,
+          lastName: profileNames.lastName,
         },
       });
+    }
 
-  if (profileNames.firstName && profileNames.lastName) {
-    await prisma.userProfile.upsert({
+    await tx.userPreference.upsert({
       where: {
         userId: user.id,
       },
       update: {
-        firstName: profileNames.firstName,
-        lastName: profileNames.lastName,
+        ...(input.acceptedTermsAt
+          ? {
+              acceptedTermsAt: input.acceptedTermsAt,
+              acceptedPrivacyPolicyAt: input.acceptedTermsAt,
+            }
+          : {}),
+        ...(input.acceptsMarketingEmails !== undefined
+          ? { acceptsMarketingEmails: input.acceptsMarketingEmails }
+          : {}),
+        ...(input.acceptsWhatsAppMarketing !== undefined
+          ? { acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing }
+          : {}),
       },
       create: {
         userId: user.id,
-        firstName: profileNames.firstName,
-        lastName: profileNames.lastName,
+        acceptsMarketingEmails: input.acceptsMarketingEmails ?? false,
+        acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing ?? false,
+        ...(input.acceptedTermsAt
+          ? {
+              acceptedTermsAt: input.acceptedTermsAt,
+              acceptedPrivacyPolicyAt: input.acceptedTermsAt,
+            }
+          : {}),
       },
     });
-  }
 
-  await prisma.userPreference.upsert({
-    where: {
-      userId: user.id,
-    },
-    update: {
-      ...(input.acceptedTermsAt
-        ? {
-            acceptedTermsAt: input.acceptedTermsAt,
-            acceptedPrivacyPolicyAt: input.acceptedTermsAt,
-          }
-        : {}),
-      ...(input.acceptsMarketingEmails !== undefined
-        ? { acceptsMarketingEmails: input.acceptsMarketingEmails }
-        : {}),
-      ...(input.acceptsWhatsAppMarketing !== undefined
-        ? { acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing }
-        : {}),
-    },
-    create: {
-      userId: user.id,
-      acceptsMarketingEmails: input.acceptsMarketingEmails ?? false,
-      acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing ?? false,
-      ...(input.acceptedTermsAt
-        ? {
-            acceptedTermsAt: input.acceptedTermsAt,
-            acceptedPrivacyPolicyAt: input.acceptedTermsAt,
-          }
-        : {}),
-    },
+    const syncedUser = await tx.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!syncedUser) {
+      throw new Error("Failed to resolve synced business user");
+    }
+
+    return syncedUser;
   });
-
-  const syncedUser = await prisma.user.findUnique({
-    where: {
-      id: user.id,
-    },
-    include: {
-      profile: true,
-    },
-  });
-
-  if (!syncedUser) {
-    throw new Error("Failed to resolve synced business user");
-  }
-
-  return syncedUser;
 }

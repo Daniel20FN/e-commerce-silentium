@@ -3,6 +3,7 @@ import { updateAdminUser } from "@/domains/admin/users/services/admin_user_mutat
 import { adminUserUpdateSchema } from "@/domains/admin/users/services/admin_user_schemas";
 import type { AdminUserMutationApiResponse } from "@/domains/admin/users/types/api_responses";
 import { resolveCurrentUser } from "@/domains/auth/services/resolve_current_user";
+import { UserAccessError } from "@/domains/auth/services/user_access_lock";
 import {
   copySupabaseResponseCookies,
   createRouteHandlerSupabaseClient,
@@ -62,7 +63,11 @@ export async function PATCH(
       );
     }
 
-    if (!canManageUsers(currentUser)) {
+    if (
+      !canManageUsers(currentUser) ||
+      currentUser.status !== "active" ||
+      !currentUser.emailVerified
+    ) {
       return copySupabaseResponseCookies(
         supabaseResponse,
         createJsonResponse(
@@ -76,7 +81,7 @@ export async function PATCH(
     }
 
     const { userId } = await params;
-    const user = await updateAdminUser(userId, payload.data);
+    const user = await updateAdminUser(userId, payload.data, currentUser.id);
 
     return copySupabaseResponseCookies(
       supabaseResponse,
@@ -87,6 +92,18 @@ export async function PATCH(
       }),
     );
   } catch (error) {
+    if (error instanceof UserAccessError) {
+      return copySupabaseResponseCookies(
+        supabaseResponse,
+        createJsonResponse(
+          {
+            type: error.status === 403 ? "forbidden" : "conflict",
+            message: error.code,
+          },
+          error.status,
+        ),
+      );
+    }
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2025"

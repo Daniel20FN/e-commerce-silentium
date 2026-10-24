@@ -221,11 +221,16 @@ export function AdminUsersPage({ dictionary }: AdminUsersPageProps) {
       setRows((currentRows) =>
         currentRows.map((row) => (row.id === userId ? response.user : row)),
       );
-    } catch {
-      enqueueSnackbar(dictionary.admin.users.feedback.updateError, {
-        variant: "error",
-        preventDuplicate: true,
-      });
+    } catch (error) {
+      enqueueSnackbar(
+        error instanceof Error && error.message === "account_last_superadmin"
+          ? dictionary.account.errors.account_last_superadmin
+          : dictionary.admin.users.feedback.updateError,
+        {
+          variant: "error",
+          preventDuplicate: true,
+        },
+      );
     }
   };
 

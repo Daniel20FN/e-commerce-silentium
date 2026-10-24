@@ -146,6 +146,8 @@ export function Navbar({
   const drawerAuthButtons = currentUser ? (
     <StackedDrawerAuth
       displayName={displayName ?? dictionary.auth.navbar.hello}
+      accountLabel={dictionary.auth.navbar.account}
+      onNavigate={() => setMobileOpen(false)}
       adminHref={showAdminAccess ? "/admin" : undefined}
       adminLabel={
         showAdminAccess ? dictionary.admin.navigation.panel : undefined
@@ -495,6 +497,14 @@ export function Navbar({
       >
         {currentUser
           ? [
+              <MenuItem
+                key="account"
+                component={Link}
+                href="/account"
+                onClick={handleProfileClose}
+              >
+                {dictionary.auth.navbar.account}
+              </MenuItem>,
               showAdminAccess ? (
                 <MenuItem
                   key="admin"
@@ -558,6 +568,8 @@ export function Navbar({
 }
 
 interface StackedDrawerAuthProps {
+  onNavigate: () => void;
+  accountLabel: string;
   displayName: string;
   adminHref?: string;
   adminLabel?: string;
@@ -567,6 +579,8 @@ interface StackedDrawerAuthProps {
 }
 
 function StackedDrawerAuth({
+  onNavigate,
+  accountLabel,
   displayName,
   adminHref,
   adminLabel,
@@ -579,8 +593,23 @@ function StackedDrawerAuth({
       <Typography variant="body2" sx={{ overflowWrap: "anywhere" }}>
         {displayName}
       </Typography>
+      <Button
+        component={Link}
+        href="/account"
+        variant="outlined"
+        fullWidth
+        onClick={onNavigate}
+      >
+        {accountLabel}
+      </Button>
       {adminHref && adminLabel ? (
-        <Button component={Link} href={adminHref} variant="outlined" fullWidth>
+        <Button
+          component={Link}
+          href={adminHref}
+          variant="outlined"
+          fullWidth
+          onClick={onNavigate}
+        >
           {adminLabel}
         </Button>
       ) : null}

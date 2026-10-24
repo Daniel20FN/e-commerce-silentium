@@ -145,6 +145,7 @@ export async function listAdminUsers(
   params: ResolvedAdminUsersListParams,
 ): Promise<AdminUsersListResult> {
   const where: Prisma.UserWhereInput = {
+    NOT: { email: { endsWith: "@deleted.invalid" } },
     ...(params.role ? { role: params.role } : {}),
     ...(params.status ? { status: params.status } : {}),
     ...(buildSearchWhere(params.search) ?? {}),
