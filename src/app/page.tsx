@@ -5,7 +5,7 @@ import { HomePage } from "@/domains/home/components/home_page";
 import { LandingShell } from "@/domains/home/components/landing_shell";
 import {
   getStorefrontCategories,
-  getStorefrontListing,
+  getStorefrontFeaturedProducts,
 } from "@/domains/storefront/services/catalog_service";
 import { getPublicNavigationDictionary } from "@/domains/storefront/services/public_navigation";
 
@@ -15,9 +15,9 @@ export default async function Home() {
   // Hooks
   const dictionary = getDictionary("es");
 
-  const [categories, listing] = await Promise.all([
+  const [categories, products] = await Promise.all([
     getStorefrontCategories(),
-    getStorefrontListing({ featured: true }),
+    getStorefrontFeaturedProducts(),
   ]);
   return (
     <LandingShell>
@@ -28,7 +28,7 @@ export default async function Home() {
       <HomePage
         dictionary={dictionary}
         categories={categories.filter((category) => !category.parentId)}
-        products={listing?.items.slice(0, 4) ?? []}
+        products={products}
       />
       <Footer dictionary={dictionary} />
     </LandingShell>

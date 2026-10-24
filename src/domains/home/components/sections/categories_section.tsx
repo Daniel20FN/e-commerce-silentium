@@ -1,3 +1,4 @@
+import Link from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import type { StorefrontCategory } from "@/domains/storefront/types/catalog";
 import ArrowForward from "@mui/icons-material/ArrowForward";
@@ -33,7 +34,7 @@ export function CategoriesSection({
           </div>
           {categories.length > 0 ? (
             <Button
-              component="a"
+              component={Link}
               href="/categorias"
               variant="outlined"
               endIcon={<ArrowForward />}
@@ -46,7 +47,7 @@ export function CategoriesSection({
         {categories.length ? (
           <div className={styles.categoryGrid}>
             {categories.slice(0, 3).map((category, index) => (
-              <a
+              <Link
                 key={category.id}
                 href={`/categorias/${category.slug}`}
                 className={styles.category}
@@ -67,7 +68,7 @@ export function CategoriesSection({
                   </div>
                   <ArrowForward aria-hidden="true" />
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         ) : (

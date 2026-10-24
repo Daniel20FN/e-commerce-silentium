@@ -1,5 +1,7 @@
 "use client";
+import Link from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { useHydrated } from "@/hooks/use_hydrated";
 import { priceFormatter } from "@/utils/price_formatter";
 import {
   Alert,
@@ -19,7 +21,6 @@ import {
 } from "@mui/material";
 import { useAtomValue, useStore } from "jotai";
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchCartQuote } from "../services/cart_client";
 import { cartSignature, pricesChanged } from "../services/cart_rules";
@@ -97,14 +98,17 @@ export function CartPage({
   dictionary,
   contact,
 }: {
-  dictionary: Dictionary;
+  dictionary: Pick<Dictionary, "cart">;
   contact: CartContact;
 }) {
   const copy = dictionary.cart;
   const store = useStore();
   const items = useAtomValue(cartItemsAtom);
-  const ready = useAtomValue(cartReadyAtom);
-  const notice = useAtomValue(cartNoticeAtom);
+  const hydrated = useHydrated();
+  const initialized = useAtomValue(cartReadyAtom);
+  const ready = hydrated && initialized;
+  const savedNotice = useAtomValue(cartNoticeAtom);
+  const notice = hydrated ? savedNotice : null;
   const signature = cartSignature(items);
   const sequence = useRef(0);
   const [state, setState] = useState<QuoteState>({

@@ -2,6 +2,7 @@ import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { CatalogListing } from "@/domains/storefront/components/catalog_listing";
 import { parseCatalogQuery } from "@/domains/storefront/services/catalog_filters";
 import { getStorefrontListing } from "@/domains/storefront/services/catalog_service";
+import { getCatalogDictionary } from "@/domains/storefront/services/storefront_dictionary";
 export const metadata = { title: getDictionary("es").storefront.catalogTitle };
 export default async function Page({
   searchParams,
@@ -16,7 +17,7 @@ export default async function Page({
   return listing ? (
     <CatalogListing
       listing={listing}
-      dictionary={getDictionary("es")}
+      dictionary={getCatalogDictionary(getDictionary("es"))}
       offers={offers}
     />
   ) : null;

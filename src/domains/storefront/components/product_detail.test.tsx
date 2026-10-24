@@ -99,7 +99,14 @@ async function choose(label: string, value: string): Promise<void> {
 
 describe("public product variant selection", () => {
   it("keeps the real presentation and variant selection but never offers cart or public navigation in preview", async () => {
-    render(<ProductDetail product={product} dictionary={dictionary} preview />);
+    render(
+      <ProductDetail
+        product={product}
+        dictionary={dictionary}
+        preview
+        previewCopy={dictionary.admin.products.publication}
+      />,
+    );
     expect(
       screen.getByRole("button", {
         name: dictionary.admin.products.publication.buyDisabled,

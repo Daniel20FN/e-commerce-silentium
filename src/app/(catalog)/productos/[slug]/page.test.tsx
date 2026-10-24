@@ -47,7 +47,9 @@ it("does not render an ineligible slug and marks its metadata non-indexable", as
 it("uses the public service for anonymous rendering and metadata", async () => {
   jest.mocked(getStorefrontProduct).mockResolvedValue(product);
   const props = { params: Promise.resolve({ slug: "public" }) };
-  expect(await Page(props)).toMatchObject({ props: { product } });
+  const page = await Page(props);
+  expect(page).toMatchObject({ props: { product } });
+  expect(Object.keys(page.props.dictionary)).toEqual(["storefront", "cart"]);
   expect(await generateMetadata(props)).toMatchObject({
     title: "Public SEO",
     description: "Description",

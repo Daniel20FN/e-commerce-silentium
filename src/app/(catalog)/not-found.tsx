@@ -1,5 +1,6 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { CatalogLink } from "@/domains/storefront/components/catalog_cards";
+import { getCatalogDictionary } from "@/domains/storefront/services/storefront_dictionary";
 import { Container, Stack, Typography } from "@mui/material";
 export default function NotFound() {
   const dictionary = getDictionary("es");
@@ -10,7 +11,7 @@ export default function NotFound() {
           {dictionary.storefront.notFoundTitle}
         </Typography>
         <Typography>{dictionary.storefront.notFoundBody}</Typography>
-        <CatalogLink dictionary={dictionary} />
+        <CatalogLink dictionary={getCatalogDictionary(dictionary)} />
       </Stack>
     </Container>
   );

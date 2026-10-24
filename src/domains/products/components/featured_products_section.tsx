@@ -1,3 +1,4 @@
+import Link from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import styles from "@/domains/home/components/landing.module.css";
 import { sectionAnchorSx } from "@/domains/home/services/landing_links";
@@ -5,6 +6,7 @@ import {
   CatalogLink,
   ProductCards,
 } from "@/domains/storefront/components/catalog_cards";
+import { getCatalogDictionary } from "@/domains/storefront/services/storefront_dictionary";
 import type { StorefrontProductCard } from "@/domains/storefront/types/catalog";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 export function FeaturedProductsSection({
@@ -42,7 +44,10 @@ export function FeaturedProductsSection({
             {copy.featuredDescription}
           </Typography>
           {products.length ? (
-            <ProductCards items={products} dictionary={dictionary} />
+            <ProductCards
+              items={products}
+              dictionary={getCatalogDictionary(dictionary)}
+            />
           ) : (
             <Typography role="status">{copy.emptyFeatured}</Typography>
           )}
@@ -54,8 +59,8 @@ export function FeaturedProductsSection({
               alignItems: "center",
             }}
           >
-            <CatalogLink dictionary={dictionary} />
-            <Button component="a" href="/ofertas">
+            <CatalogLink dictionary={getCatalogDictionary(dictionary)} />
+            <Button component={Link} href="/ofertas">
               {dictionary.navigation.offers}
             </Button>
           </Box>

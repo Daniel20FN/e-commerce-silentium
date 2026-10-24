@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import Link from "@/components/navigation_link";
 import {
   Box,
   Breadcrumbs,
@@ -9,12 +9,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import Link from "next/link";
 import {
   activeCatalogFilters,
   catalogFilters,
   catalogQueryString,
 } from "../services/catalog_filters";
+import type { CatalogDictionary } from "../services/storefront_dictionary";
 import type { StorefrontCategory, StorefrontListing } from "../types/catalog";
 import { ProductCards } from "./catalog_cards";
 import {
@@ -29,7 +29,7 @@ export function CatalogBreadcrumbs({
   productName,
 }: {
   items: StorefrontCategory[];
-  dictionary: Dictionary;
+  dictionary: CatalogDictionary;
   productName?: string;
 }) {
   return (
@@ -65,7 +65,7 @@ export function CatalogListing({
   offers = false,
 }: {
   listing: StorefrontListing;
-  dictionary: Dictionary;
+  dictionary: CatalogDictionary;
   offers?: boolean;
 }) {
   const copy = dictionary.storefront;

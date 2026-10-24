@@ -3,6 +3,7 @@
 import { BrandLogo } from "@/components/brand_logo";
 import { brandColors } from "@/styles/brand_colors";
 
+import Link from "@/components/navigation_link";
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import { canAccessAdmin } from "@/domains/admin/services/admin_roles";
 import {
@@ -47,7 +48,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { useAtomValue, useSetAtom } from "jotai";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
 import { useState } from "react";

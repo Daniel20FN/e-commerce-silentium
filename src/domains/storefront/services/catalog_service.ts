@@ -1,4 +1,3 @@
-import { listStorefrontCatalogImages } from "@/domains/admin/media/services/catalog_media_service";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { cache } from "react";
@@ -272,17 +271,33 @@ export async function getStorefrontListing(
   const filtered = advanced
     ? await filteredCatalogPage(params, categoryIds)
     : null;
-  const total = filtered?.total ?? (await prisma.product.count({ where }));
+  const requestedPage = params.page ?? 1;
+  const firstPage =
+    !filtered && (!Number.isSafeInteger(requestedPage) || requestedPage <= 1);
+  const [total, firstPageRecords] = await Promise.all([
+    filtered
+      ? Promise.resolve(filtered.total)
+      : prisma.product.count({ where }),
+    firstPage
+      ? prisma.product.findMany({
+          where,
+          select: cardSelect,
+          orderBy: [{ featured: "desc" }, { name: "asc" }, { id: "asc" }],
+          skip: 0,
+          take: STOREFRONT_PAGE_SIZE,
+        })
+      : Promise.resolve(null),
+  ]);
   const pageCount =
     filtered?.pageCount ?? Math.max(1, Math.ceil(total / STOREFRONT_PAGE_SIZE));
-  const requestedPage = params.page ?? 1;
   const page =
     filtered?.page ??
     (Number.isSafeInteger(requestedPage)
       ? Math.max(1, Math.min(requestedPage, pageCount))
       : 1);
   const records =
-    filtered && !filtered.ids.length
+    firstPageRecords ??
+    (filtered && !filtered.ids.length
       ? []
       : await prisma.product.findMany({
           where: filtered ? { ...where, id: { in: filtered.ids } } : where,
@@ -290,7 +305,7 @@ export async function getStorefrontListing(
           orderBy: [{ featured: "desc" }, { name: "asc" }, { id: "asc" }],
           skip: filtered ? 0 : (page - 1) * STOREFRONT_PAGE_SIZE,
           take: STOREFRONT_PAGE_SIZE,
-        });
+        }));
   if (filtered) {
     const order = new Map(filtered.ids.map((id, index) => [id, index]));
     records.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
@@ -313,6 +328,22 @@ export async function getStorefrontListing(
       (item) => item.parentId === (category?.id ?? null),
     ),
   };
+}
+
+export async function getStorefrontFeaturedProducts(): Promise<
+  StorefrontProductCard[]
+> {
+  const categories = await getStorefrontCategories();
+  const records = await prisma.product.findMany({
+    where: { ...publicProductWhere(categories), featured: true },
+    select: cardSelect,
+    orderBy: [{ name: "asc" }, { id: "asc" }],
+    take: 4,
+  });
+  return records.flatMap((record) => {
+    const card = productCard(record);
+    return card ? [card] : [];
+  });
 }
 
 export function projectStorefrontProduct(
@@ -379,16 +410,7 @@ export const getStorefrontProduct = cache(
     const variants = publicVariants(product);
     const selected = initialVariant(variants);
     if (!card || !selected) return null;
-    const projected = projectStorefrontProduct(product, categories);
-    const resolvedImages = await listStorefrontCatalogImages(
-      product.id,
-      selected.id,
-    );
-    return {
-      ...projected,
-      image: resolvedImages[0]
-        ? publicImage(resolvedImages[0], product.name)
-        : null,
-    };
+    // The selected records already contain ready, non-deleted general/variant images.
+    return projectStorefrontProduct(product, categories);
   },
 );

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { AddToCart } from "@/domains/cart/components/add_to_cart";
 import {
@@ -17,12 +18,12 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import {
   canSelectOptionValue,
   resolveVariant,
 } from "../services/catalog_rules";
+import type { ProductDictionary } from "../services/storefront_dictionary";
 import type { StorefrontImage, StorefrontProduct } from "../types/catalog";
 import { CatalogPrice } from "./catalog_cards";
 import { CatalogBreadcrumbs } from "./catalog_listing";
@@ -32,7 +33,7 @@ function ProductGallery({
   dictionary,
 }: {
   images: StorefrontImage[];
-  dictionary: Dictionary;
+  dictionary: ProductDictionary;
 }) {
   const [index, setIndex] = useState(0);
   const current = images[index] ?? images[0];
@@ -98,15 +99,26 @@ function ProductGallery({
   );
 }
 
+type ProductDetailProps = {
+  product: StorefrontProduct;
+  dictionary: ProductDictionary;
+} & (
+  | {
+      preview: true;
+      previewCopy: Pick<
+        Dictionary["admin"]["products"]["publication"],
+        "previewEmpty" | "buyDisabled"
+      >;
+    }
+  | { preview?: false; previewCopy?: never }
+);
+
 export function ProductDetail({
   product,
   dictionary,
   preview = false,
-}: {
-  product: StorefrontProduct;
-  dictionary: Dictionary;
-  preview?: boolean;
-}) {
+  previewCopy,
+}: ProductDetailProps) {
   const copy = dictionary.storefront;
   const initial = product.variants.find(
     (variant) => variant.id === product.initialVariantId,
@@ -153,7 +165,7 @@ export function ProductDetail({
         )}
         {preview && !product.variants.length && (
           <Alert severity="info" sx={{ mb: 3 }}>
-            {dictionary.admin.products.publication.previewEmpty}
+            {previewCopy?.previewEmpty}
           </Alert>
         )}
         <Box
@@ -305,7 +317,7 @@ export function ProductDetail({
             ) : null}
             {preview ? (
               <Button variant="contained" disabled>
-                {dictionary.admin.products.publication.buyDisabled}
+                {previewCopy?.buyDisabled}
               </Button>
             ) : (
               <AddToCart
