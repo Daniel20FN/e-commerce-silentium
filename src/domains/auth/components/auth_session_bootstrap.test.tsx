@@ -38,6 +38,33 @@ describe("AuthSessionBootstrap", () => {
     jest.clearAllMocks();
   });
 
+  it("resolves the ordinary guest result without an exception", async () => {
+    const store = createStore();
+    const get = jest.fn().mockResolvedValue({ user: null });
+    store.set(currentUserAtom, createCurrentUser());
+    mockUseCancellableApiContext.mockReturnValue({
+      cancellableApi: {
+        get,
+        post: jest.fn(),
+        put: jest.fn(),
+        patch: jest.fn(),
+        delete: jest.fn(),
+      },
+      abort: jest.fn(),
+      abortAll: jest.fn(),
+      isPending: jest.fn().mockReturnValue(false),
+    });
+    render(
+      <Provider store={store}>
+        <AuthSessionBootstrap />
+      </Provider>,
+    );
+    await waitFor(() => {
+      expect(store.get(currentUserAtom)).toBeNull();
+      expect(store.get(hasResolvedCurrentUserAtom)).toBe(true);
+    });
+  });
+
   it("replaces stale cached user data with the latest /auth/me result", async () => {
     const store = createStore();
     const staleUser = createCurrentUser({

@@ -20,6 +20,8 @@ import { CategoriesSection } from "./sections/categories_section";
 
 jest.mock("next/image", () => ({
   __esModule: true,
+  getImageProps:
+    jest.requireActual<typeof import("next/image")>("next/image").getImageProps,
   default: ({
     src,
     alt,
@@ -132,7 +134,9 @@ describe("lightweight single-page public information", () => {
     );
     expect(picture?.querySelector("source")).toHaveAttribute(
       "srcset",
-      "/images/landing/entre-telas-room-480.webp 480w, /images/landing/entre-telas-room-800.webp 800w",
+      expect.stringContaining(
+        "%2Fimages%2Flanding%2Fentre-telas-room-800.webp",
+      ),
     );
     expect(picture?.querySelector("img")).toHaveAttribute("loading", "eager");
     expect(picture?.querySelector("img")).toHaveAttribute(
@@ -140,6 +144,15 @@ describe("lightweight single-page public information", () => {
       "high",
     );
     expect(container.querySelectorAll("#inicio img")).toHaveLength(1);
+    const curtainPreload = document.querySelector(
+      'link[rel="preload"][as="image"][imagesrcset^="/images/landing/entre-telas-curtain-480.webp"]',
+    );
+    expect(curtainPreload).toHaveAttribute("media", "(max-width: 599.95px)");
+    expect(curtainPreload).toHaveAttribute("fetchpriority", "high");
+    expect(curtainPreload).toHaveAttribute(
+      "imagesrcset",
+      "/images/landing/entre-telas-curtain-480.webp 1x, /images/landing/entre-telas-curtain-800.webp 2x",
+    );
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
   it("uses the official brief headline, slogan and brand statement", () => {

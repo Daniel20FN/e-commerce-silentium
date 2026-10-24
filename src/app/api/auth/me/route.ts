@@ -64,10 +64,7 @@ export async function GET(
     if (!user) {
       const response = copySupabaseResponseCookies(
         supabaseResponse,
-        createJsonResponse(
-          { type: "unauthorized", message: "session_expired" },
-          401,
-        ),
+        createJsonResponse({ data: { user: null } }),
       );
       clearSupabaseAuthCookies(request, response);
       return response;
@@ -85,13 +82,7 @@ export async function GET(
     if (isUnauthorizedSessionError(error)) {
       const response = copySupabaseResponseCookies(
         supabaseResponse,
-        createJsonResponse(
-          {
-            type: "unauthorized",
-            message: "session_expired",
-          },
-          401,
-        ),
+        createJsonResponse({ data: { user: null } }),
       );
 
       clearSupabaseAuthCookies(request, response);

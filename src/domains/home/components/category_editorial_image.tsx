@@ -22,8 +22,7 @@ export function CategoryEditorialImage({
         src={illustrative ? "/images/landing/refugio-marfil.webp" : src}
         alt={illustrative ? fallbackAlt : alt}
         fill
-        unoptimized={!illustrative}
-        sizes="(max-width: 899px) 90vw, 60vw"
+        sizes="(max-width: 641px) 91vw, (max-width: 975px) 44vw, 420px"
         onError={() => setFailed(true)}
       />
       {illustrative ? (

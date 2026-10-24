@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandLogo } from "@/components/brand_logo";
+import { useHydrated } from "@/hooks/use_hydrated";
 import { brandColors } from "@/styles/brand_colors";
 
 import Link from "@/components/navigation_link";
@@ -72,8 +73,11 @@ export function Navbar({
   const pathname = usePathname() ?? "/";
   const { cancellableApi, isPending } = useCancellableApiContext();
   const { themeMode, setThemeMode } = useThemeMode();
-  const currentUser = useAtomValue(currentUserAtom);
-  const hasResolvedCurrentUser = useAtomValue(hasResolvedCurrentUserAtom);
+  const hydrated = useHydrated();
+  const storedUser = useAtomValue(currentUserAtom);
+  const resolvedUser = useAtomValue(hasResolvedCurrentUserAtom);
+  const currentUser = hydrated ? storedUser : null;
+  const hasResolvedCurrentUser = hydrated && resolvedUser;
   const setCurrentUser = useSetAtom(currentUserAtom);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -465,7 +469,7 @@ export function Navbar({
                     px: 2,
                   }}
                 >
-                  <CircularProgress size={20} />
+                  <CircularProgress size={20} disableShrink />
                 </Box>
               )}
 

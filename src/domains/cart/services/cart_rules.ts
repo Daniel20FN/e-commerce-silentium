@@ -1,30 +1,39 @@
-import { z } from "zod";
+import {
+  array,
+  int,
+  literal,
+  maximum,
+  maxLength,
+  minimum,
+  minLength,
+  refine,
+  regex,
+  strictObject,
+  string,
+  unknown as unknownValue,
+} from "zod/mini";
 import type { CartItem, CartQuote } from "../types/api_params";
 
 export const CART_KEY = "silentium.cart.v1";
 export const MAX_CART_LINES = 50;
 export const MAX_CART_QUANTITY = 99;
-export const cartItemSchema = z
-  .object({
-    variantId: z
-      .string()
-      .min(1)
-      .max(128)
-      .regex(/^[a-zA-Z0-9_-]+$/),
-    quantity: z.number().int().min(1).max(MAX_CART_QUANTITY),
-  })
-  .strict();
-export const resolveCartSchema = z
-  .object({
-    items: z
-      .array(cartItemSchema)
-      .max(MAX_CART_LINES)
-      .refine(
-        (items) =>
-          new Set(items.map((item) => item.variantId)).size === items.length,
-      ),
-  })
-  .strict();
+export const cartItemSchema = strictObject({
+  variantId: string().check(
+    minLength(1),
+    maxLength(128),
+    regex(/^[a-zA-Z0-9_-]+$/),
+  ),
+  quantity: int().check(minimum(1), maximum(MAX_CART_QUANTITY)),
+});
+export const resolveCartSchema = strictObject({
+  items: array(cartItemSchema).check(
+    maxLength(MAX_CART_LINES),
+    refine(
+      (items) =>
+        new Set(items.map((item) => item.variantId)).size === items.length,
+    ),
+  ),
+});
 
 export function cartSignature(items: CartItem[]): string {
   return JSON.stringify(items);
@@ -52,10 +61,10 @@ export function readCart(raw: string | null): {
   try {
     // JSON/localStorage is an untrusted boundary; validate before reading fields.
     const parsed: unknown = JSON.parse(raw);
-    const envelope = z
-      .object({ version: z.literal(1), items: z.array(z.unknown()).max(500) })
-      .strict()
-      .safeParse(parsed);
+    const envelope = strictObject({
+      version: literal(1),
+      items: array(unknownValue()).check(maxLength(500)),
+    }).safeParse(parsed);
     if (!envelope.success) return { items: [], recovered: true };
     const items: CartItem[] = [];
     let recovered = false;

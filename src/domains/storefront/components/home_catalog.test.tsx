@@ -4,7 +4,12 @@ import { HeroSection } from "@/domains/home/components/sections/hero_section";
 import { FeaturedProductsSection } from "@/domains/products/components/featured_products_section";
 import { render, screen } from "@testing-library/react";
 
-jest.mock("next/image", () => ({ __esModule: true, default: () => null }));
+jest.mock("next/image", () => ({
+  __esModule: true,
+  getImageProps:
+    jest.requireActual<typeof import("next/image")>("next/image").getImageProps,
+  default: () => null,
+}));
 it("connects the hero to the real catalog without inventing a global discount", () => {
   render(<HeroSection dictionary={dictionary} />);
   expect(

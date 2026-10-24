@@ -78,7 +78,7 @@ describe("GET /api/auth/me", () => {
     });
   });
 
-  it("clears stale Supabase cookies and returns 401 when the refresh token no longer exists", async () => {
+  it("clears stale Supabase cookies and resolves a guest when the refresh token no longer exists", async () => {
     mockCreateRouteHandlerSupabaseClient.mockImplementation(
       (_request, response: NextResponse<unknown>) => {
         response.cookies.set("sb-project-auth-token", "stale-token");
@@ -99,10 +99,9 @@ describe("GET /api/auth/me", () => {
 
     const response = await GET(request);
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      type: "unauthorized",
-      message: "session_expired",
+      data: { user: null },
     });
     expect(response.cookies.get("sb-project-auth-token")?.value).toBe("");
     expect(response.cookies.get("unrelated-cookie")).toBeUndefined();
@@ -116,14 +115,13 @@ describe("GET /api/auth/me", () => {
 
     const response = await GET(new NextRequest("http://localhost/api/auth/me"));
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      type: "unauthorized",
-      message: "session_expired",
+      data: { user: null },
     });
   });
 
-  it("returns 401 when no Supabase auth session exists", async () => {
+  it("resolves a guest when no Supabase auth session exists", async () => {
     mockCreateRouteHandlerSupabaseClient.mockReturnValue({ auth: {} });
     mockResolveCurrentUser.mockRejectedValue(
       Object.assign(new Error("Auth session missing!"), {
@@ -133,10 +131,18 @@ describe("GET /api/auth/me", () => {
 
     const response = await GET(new NextRequest("http://localhost/api/auth/me"));
 
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      type: "unauthorized",
-      message: "session_expired",
+      data: { user: null },
     });
+  });
+
+  it("returns an uncached guest snapshot without exposing account data", async () => {
+    mockCreateRouteHandlerSupabaseClient.mockReturnValue({ auth: {} });
+    mockResolveCurrentUser.mockResolvedValue(null);
+    const response = await GET(new NextRequest("http://localhost/api/auth/me"));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    await expect(response.json()).resolves.toEqual({ data: { user: null } });
   });
 });
