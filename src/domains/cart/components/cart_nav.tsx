@@ -5,7 +5,7 @@ import { useHydrated } from "@/hooks/use_hydrated";
 import { ShoppingBagOutlined } from "@mui/icons-material";
 import { Badge, IconButton } from "@mui/material";
 import { useAtomValue } from "jotai";
-import { cartReadyAtom, cartUnitsAtom } from "../states/cart_state";
+import { cartReadyAtom, cartUnitsAtom } from "../states/cart_atoms";
 
 export function CartNav({
   dictionary,

@@ -1,6 +1,13 @@
 import dictionary from "@/dictionary/es.json";
 import type { StorefrontVariant } from "@/domains/storefront/types/catalog";
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { createStore, Provider } from "jotai";
 import { fetchCartQuote } from "../services/cart_client";
 import { CART_KEY } from "../services/cart_rules";
@@ -101,7 +108,7 @@ describe("guest cart UI and persistence", () => {
         }),
       ),
     );
-    expect(store.get(cartItemsAtom)[0].quantity).toBe(3);
+    await waitFor(() => expect(store.get(cartItemsAtom)[0].quantity).toBe(3));
     act(() =>
       window.dispatchEvent(
         new StorageEvent("storage", {
@@ -121,7 +128,7 @@ describe("guest cart UI and persistence", () => {
         <CartBootstrap />
       </Provider>,
     );
-    expect(store.get(cartNoticeAtom)).toBe("recovered");
+    await waitFor(() => expect(store.get(cartNoticeAtom)).toBe("recovered"));
     unmount();
     const write = jest
       .spyOn(Storage.prototype, "setItem")

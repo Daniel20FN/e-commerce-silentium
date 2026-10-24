@@ -13,10 +13,9 @@ import {
   unknown as unknownValue,
 } from "zod/mini";
 import type { CartItem, CartQuote } from "../types/api_params";
+import { MAX_CART_LINES, MAX_CART_QUANTITY } from "./cart_constants";
 
-export const CART_KEY = "silentium.cart.v1";
-export const MAX_CART_LINES = 50;
-export const MAX_CART_QUANTITY = 99;
+export { CART_KEY, MAX_CART_LINES, MAX_CART_QUANTITY } from "./cart_constants";
 export const cartItemSchema = strictObject({
   variantId: string().check(
     minLength(1),
