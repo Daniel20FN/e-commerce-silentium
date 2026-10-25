@@ -5,6 +5,10 @@ import {
   isProtectedApiRoute,
   isProtectedAppRoute,
 } from "@/domains/auth/services/auth_routes";
+import {
+  searchIndexingEnabled,
+  seoPrivatePath,
+} from "@/domains/storefront/services/seo_rules";
 import { updateSupabaseSession } from "@/lib/supabase/middleware";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,6 +28,9 @@ function copyCookies(source: NextResponse, target: NextResponse): NextResponse {
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { response, userId } = await updateSupabaseSession(request);
   const pathname = request.nextUrl.pathname;
+  if (!searchIndexingEnabled() || seoPrivatePath(pathname)) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
   if (
     pathname === "/admin" ||
     pathname.startsWith("/admin/") ||
@@ -78,6 +85,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap\\.xml$|robots\\.txt$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

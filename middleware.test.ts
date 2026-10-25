@@ -2,7 +2,7 @@
 
 import { updateSupabaseSession } from "@/lib/supabase/middleware";
 import { NextRequest, NextResponse } from "next/server";
-import { middleware } from "./middleware";
+import { config, middleware } from "./middleware";
 
 jest.mock("@/lib/supabase/middleware", () => ({
   updateSupabaseSession: jest.fn(),
@@ -17,6 +17,66 @@ function createSessionResponse(): NextResponse {
 }
 
 describe("auth middleware", () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it.each([
+    "/login",
+    "/register",
+    "/carrito",
+    "/account",
+    "/api/account",
+    "/auth/confirm",
+    "/admin",
+  ])("keeps %s noindex, including anonymous redirects", async (path) => {
+    jest.replaceProperty(process, "env", {
+      ...process.env,
+      VERCEL_ENV: "production",
+    });
+    mockUpdateSupabaseSession.mockResolvedValue({
+      response: createSessionResponse(),
+      userId: null,
+    });
+    const response = await middleware(
+      new NextRequest(`https://www.silentium-hogar.com${path}`),
+    );
+    expect(response.headers.get("X-Robots-Tag")).toContain("noindex");
+  });
+
+  it("does not noindex production public pages but excludes previews", async () => {
+    jest.replaceProperty(process, "env", {
+      ...process.env,
+      VERCEL_ENV: "production",
+    });
+    mockUpdateSupabaseSession.mockResolvedValue({
+      response: NextResponse.next(),
+      userId: null,
+    });
+    expect(
+      (
+        await middleware(
+          new NextRequest("https://www.silentium-hogar.com/productos"),
+        )
+      ).headers.has("X-Robots-Tag"),
+    ).toBe(false);
+    process.env.VERCEL_ENV = "preview";
+    mockUpdateSupabaseSession.mockResolvedValue({
+      response: NextResponse.next(),
+      userId: null,
+    });
+    expect(
+      (
+        await middleware(new NextRequest("https://preview.example/productos"))
+      ).headers.get("X-Robots-Tag"),
+    ).toContain("noindex");
+  });
+
+  it("excludes only exact metadata paths from session middleware", () => {
+    const matcher = new RegExp(`^${config.matcher[0]}$`);
+    expect(matcher.test("/sitemap.xml")).toBe(false);
+    expect(matcher.test("/robots.txt")).toBe(false);
+    expect(matcher.test("/productos/sitemap.xml-example")).toBe(true);
+    expect(matcher.test("/api/account")).toBe(true);
+  });
   it.each([
     "/admin/productos/qa/preview",
     "/admin/productos/qa/preview/content",

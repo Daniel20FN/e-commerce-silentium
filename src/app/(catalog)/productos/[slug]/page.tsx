@@ -1,6 +1,7 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { ProductDetail } from "@/domains/storefront/components/product_detail";
 import { getStorefrontProduct } from "@/domains/storefront/services/catalog_service";
+import { canonicalMetadata } from "@/domains/storefront/services/seo_rules";
 import { getProductDictionary } from "@/domains/storefront/services/storefront_dictionary";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -10,6 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getStorefrontProduct(slug);
   return product
     ? {
+        ...canonicalMetadata(`/productos/${encodeURIComponent(product.slug)}`),
         title: product.seoTitle ?? product.name,
         description:
           product.seoDescription ?? product.shortDescription ?? undefined,
