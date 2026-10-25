@@ -1,9 +1,11 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { CategoryCards } from "@/domains/storefront/components/catalog_cards";
 import { getStorefrontCategories } from "@/domains/storefront/services/catalog_service";
+import { canonicalMetadata } from "@/domains/storefront/services/seo_rules";
 import { getCatalogDictionary } from "@/domains/storefront/services/storefront_dictionary";
 import { Container, Stack, Typography } from "@mui/material";
 export const metadata = {
+  ...canonicalMetadata("/categorias"),
   title: getDictionary("es").storefront.categoriesTitle,
 };
 export default async function Page() {

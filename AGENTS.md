@@ -75,6 +75,8 @@
 
 ## Tests
 
+- Technical SEO: see `docs/technical-seo.md`. Only `VERCEL_ENV=production` allows indexing; previews/dev serve noindex and an empty sitemap. `src/app/sitemap.ts` caches only public URL projections for 300 seconds, never live stock/auth/admin. Keep sitemap eligibility aligned with `visibleCategories`/`publicProductWhere`, pagination canonicals aligned with the actual listing page, and `/robots.txt`/`/sitemap.xml` excluded from session middleware. The canonical origin is centralized in `seo_rules.ts`; keep it aligned with `APP_PUBLIC_URL` when changing domains.
+
 - Public mobile performance: see `docs/mobile-pagespeed.md`. `experimental.inlineCss` is production-only and global; verify the compiled build, not just dev. Keep the media-scoped curtain preload in sync with its CSS `image-set`, preserving desktop art direction and reduced motion. Shared cart validation uses `zod/mini` with the same strict rules; do not remove validation to shrink bundles. No global date-picker provider is needed unless actual picker consumers are introduced.
 - `/api/auth/me` is optional identity discovery and returns `200` with `user: null` for guests/stale sessions, with `private, no-store`; protected account/admin APIs still require authorization. Preserve the Navbar hydration snapshot gate: bootstrap may resolve before a streamed menu hydrates. Regression: `src/components/navbar_hydration.test.tsx`.
 

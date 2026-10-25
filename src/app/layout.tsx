@@ -1,4 +1,9 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
+import {
+  NO_INDEX,
+  searchIndexingEnabled,
+  STOREFRONT_ORIGIN,
+} from "@/domains/storefront/services/seo_rules";
 import { brandColors } from "@/styles/brand_colors";
 import { resolveThemeMode } from "@/styles/theme_mode";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
@@ -7,6 +12,8 @@ import { cookies } from "next/headers";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(STOREFRONT_ORIGIN),
+  ...(!searchIndexingEnabled() ? { robots: NO_INDEX } : {}),
   title: {
     default: getDictionary("es").storefront.brandTitle,
     template: getDictionary("es").storefront.titleTemplate,

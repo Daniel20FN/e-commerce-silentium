@@ -1,9 +1,24 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { CatalogListing } from "@/domains/storefront/components/catalog_listing";
-import { parseCatalogQuery } from "@/domains/storefront/services/catalog_filters";
-import { getStorefrontListing } from "@/domains/storefront/services/catalog_service";
+import { getCatalogPageData } from "@/domains/storefront/services/catalog_page_data";
+import {
+  listingMetadata,
+  type CatalogSearch,
+} from "@/domains/storefront/services/seo_rules";
 import { getCatalogDictionary } from "@/domains/storefront/services/storefront_dictionary";
-export const metadata = { title: getDictionary("es").storefront.catalogTitle };
+import type { Metadata } from "next";
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<CatalogSearch>;
+}): Promise<Metadata> {
+  const query = await searchParams;
+  const listing = await getCatalogPageData(query);
+  return {
+    title: getDictionary("es").storefront.catalogTitle,
+    ...listingMetadata("/productos", query, listing?.page ?? 1),
+  };
+}
 export default async function Page({
   searchParams,
 }: {
@@ -11,9 +26,7 @@ export default async function Page({
 }) {
   const params = await searchParams;
   const offers = params.ofertas === "1";
-  const listing = await getStorefrontListing({
-    ...parseCatalogQuery(params),
-  });
+  const listing = await getCatalogPageData(params);
   return listing ? (
     <CatalogListing
       listing={listing}

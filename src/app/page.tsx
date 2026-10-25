@@ -8,8 +8,10 @@ import {
   getStorefrontFeaturedProducts,
 } from "@/domains/storefront/services/catalog_service";
 import { getPublicNavigationDictionary } from "@/domains/storefront/services/public_navigation";
+import { canonicalMetadata } from "@/domains/storefront/services/seo_rules";
 
 export const dynamic = "force-dynamic";
+export const metadata = canonicalMetadata("/");
 
 export default async function Home() {
   // Hooks
