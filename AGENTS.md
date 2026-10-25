@@ -47,7 +47,7 @@
 
 ## Install And Run
 
-- Navigation performance: `vercel.json` pins functions to `dub1`, colocated with the confirmed Supabase `eu-west-1` database; verify before changing regions. Public links use `NavigationLink`/native Next pending state and streaming loading boundaries. Keep public dictionary props projected, and do not introduce shared caches for stock/auth/account/admin to hide latency. See `docs/navigation-performance.md`.
+- Navigation performance: `vercel.json` pins functions to `dub1`, colocated with the confirmed Supabase `eu-west-1` database; verify before changing regions. Public links use `NavigationLink`/native Next pending feedback; public document loading boundaries are intentionally absent so readers without JavaScript can see the content. Private routes retain scoped loading boundaries. Keep public dictionary props projected, and do not introduce shared caches for stock/auth/account/admin to hide latency. See `docs/navigation-performance.md` and `docs/geo-readability.md`.
 - Streaming hydration: `CartBootstrap` may restore browser atoms before a delayed island hydrates. Keep `useHydrated` gates for cart count/content/notices and AddToCart readiness; never hide hydration errors with suppression. `cart_nav_hydration.test.tsx` covers SSR followed by pre-hydration store restoration for all three cart islands.
 
 - Install dependencies: `npm install`
@@ -74,6 +74,8 @@
 - Important: there is no standalone `typecheck` script right now.
 
 ## Tests
+
+- GEO/readability: see `docs/geo-readability.md`. Keep JSON-LD escaped and limited to verified public data; product offers must match the selected variant and never appear in private preview. Do not reintroduce public loading boundaries that hide content pending JS without testing raw HTML readability and navigation feedback. Security headers deliberately use a baseline CSP and same-origin frame protection; preserve stricter private Referrer-Policy and avoid claiming strict script/style CSP or changing HSTS/robots just for scanner scores.
 
 - Technical SEO: see `docs/technical-seo.md`. Only `VERCEL_ENV=production` allows indexing; previews/dev serve noindex and an empty sitemap. `src/app/sitemap.ts` caches only public URL projections for 300 seconds, never live stock/auth/admin. Keep sitemap eligibility aligned with `visibleCategories`/`publicProductWhere`, pagination canonicals aligned with the actual listing page, and `/robots.txt`/`/sitemap.xml` excluded from session middleware. The canonical origin is centralized in `seo_rules.ts`; keep it aligned with `APP_PUBLIC_URL` when changing domains.
 
