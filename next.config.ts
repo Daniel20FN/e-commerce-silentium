@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 import packageJson from "./package.json";
+import { securityHeaders } from "./src/lib/security_headers";
 
 const pwaConfig = withPWA({
   dest: "public",
@@ -62,6 +63,7 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      { source: "/:path*", headers: securityHeaders() },
       {
         source: "/account/:path*",
         headers: [

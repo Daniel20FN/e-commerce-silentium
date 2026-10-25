@@ -99,7 +99,7 @@ async function choose(label: string, value: string): Promise<void> {
 
 describe("public product variant selection", () => {
   it("keeps the real presentation and variant selection but never offers cart or public navigation in preview", async () => {
-    render(
+    const { container } = render(
       <ProductDetail
         product={product}
         dictionary={dictionary}
@@ -114,11 +114,23 @@ describe("public product variant selection", () => {
     ).toBeDisabled();
     expect(screen.queryAllByRole("link")).toHaveLength(0);
     expect(
+      container.querySelector('script[type="application/ld+json"]'),
+    ).toBeNull();
+    expect(
       screen.queryByRole("button", { name: dictionary.cart.add }),
     ).not.toBeInTheDocument();
   });
   it("renders the initial variant in COP with general fallback and a cart action", () => {
-    render(<ProductDetail product={product} dictionary={dictionary} />);
+    const { container } = render(
+      <ProductDetail product={product} dictionary={dictionary} />,
+    );
+    expect(screen.getByRole("article")).toHaveAccessibleName(product.name);
+    const data = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.textContent ?? "{}",
+    );
+    expect(data.sku).toBe("SMALL-RED");
+    expect(data.offers.price).toBe("189000.00");
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Bedding QA",
     );
@@ -134,8 +146,20 @@ describe("public product variant selection", () => {
     ).toBeInTheDocument();
   });
   it("changes price, stock, SKU and own gallery immediately for an exact selection", async () => {
-    render(<ProductDetail product={product} dictionary={dictionary} />);
+    const { container } = render(
+      <ProductDetail product={product} dictionary={dictionary} />,
+    );
     await choose("Size", "Large");
+    expect(
+      container.querySelectorAll('script[type="application/ld+json"]'),
+    ).toHaveLength(1);
+    const data = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.textContent ?? "{}",
+    );
+    expect(data.sku).toBe("LARGE-RED");
+    expect(data.offers.price).toBe("219000.00");
+    expect(data.image).toEqual([own.url]);
     expect(
       screen
         .getByLabelText(new RegExp(copy.currentPrice))
@@ -152,7 +176,9 @@ describe("public product variant selection", () => {
     ).not.toBeInTheDocument();
   });
   it("disables a nonexistent combination and allows clearing constraints", async () => {
-    render(<ProductDetail product={product} dictionary={dictionary} />);
+    const { container } = render(
+      <ProductDetail product={product} dictionary={dictionary} />,
+    );
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Color" }));
     const list = await screen.findByRole("listbox");
     expect(within(list).getByRole("option", { name: "Blue" })).toHaveAttribute(
@@ -162,6 +188,9 @@ describe("public product variant selection", () => {
     fireEvent.keyDown(list, { key: "Escape" });
     fireEvent.click(screen.getByRole("button", { name: copy.resetSelection }));
     expect(screen.getByText(copy.partialSelection)).toBeInTheDocument();
+    expect(
+      container.querySelector('script[type="application/ld+json"]'),
+    ).toBeNull();
     expect(
       screen.queryByLabelText(new RegExp(copy.currentPrice)),
     ).not.toBeInTheDocument();

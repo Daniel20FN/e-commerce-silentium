@@ -24,9 +24,11 @@ import {
   resolveVariant,
 } from "../services/catalog_rules";
 import type { ProductDictionary } from "../services/storefront_dictionary";
+import { productStructuredData } from "../services/structured_data";
 import type { StorefrontImage, StorefrontProduct } from "../types/catalog";
 import { CatalogPrice } from "./catalog_cards";
 import { CatalogBreadcrumbs } from "./catalog_listing";
+import { StructuredData } from "./structured_data";
 
 function ProductGallery({
   images,
@@ -138,6 +140,8 @@ export function ProductDetail({
   const complete = product.options.every((option) => selected[option.id]);
   return (
     <Box
+      component="article"
+      aria-labelledby="product-title"
       sx={
         preview
           ? { containerType: "inline-size", containerName: "product-preview" }
@@ -156,6 +160,9 @@ export function ProductDetail({
             : undefined
         }
       >
+        {!preview && (
+          <StructuredData data={productStructuredData(product, variant)} />
+        )}
         {!preview && (
           <CatalogBreadcrumbs
             items={product.breadcrumbs}
@@ -212,6 +219,7 @@ export function ProductDetail({
             ) : null}
             <Typography
               component="h1"
+              id="product-title"
               variant="h3"
               sx={{
                 fontSize: preview ? "2rem" : { xs: "2rem", md: "2.75rem" },

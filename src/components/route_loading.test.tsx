@@ -1,8 +1,8 @@
-import Loading from "@/app/(catalog)/loading";
+import Loading from "@/app/(catalog)/account/loading";
 import dictionary from "@/dictionary/es.json";
 import { render, screen } from "@testing-library/react";
 
-it("provides an accessible streaming fallback without fake products or interactive placeholders", () => {
+it("provides an accessible private-account fallback without fake products or interactive placeholders", () => {
   render(<Loading />);
   expect(screen.getByRole("status")).toHaveTextContent(
     dictionary.general.loading,
