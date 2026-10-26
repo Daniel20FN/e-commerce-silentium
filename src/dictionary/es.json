@@ -166,6 +166,8 @@
       "description": "¿Dudas sobre tamaños, colores o cómo recibir tu compra? Escríbenos por WhatsApp y revisamos los detalles contigo.",
       "cta": "Escribir por WhatsApp",
       "phoneLabel": "También puedes llamarnos",
+      "emailLabel": "O escribirnos por correo",
+      "instagramLabel": "Instagram: {handle}",
       "message": "Hola, quisiera información sobre los productos de Silentium.",
       "note": "Tú decides qué compartir y cuándo enviar el mensaje.",
       "browse": "Volver a los productos"

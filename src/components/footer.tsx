@@ -3,6 +3,11 @@ import NavigationLink from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { CompanyValues } from "@/values/app_values";
 import {
+  SALES_INSTAGRAM_HANDLE,
+  SALES_INSTAGRAM_URL,
+} from "@/values/sales_contact";
+import Instagram from "@mui/icons-material/Instagram";
+import {
   Box,
   Container,
   Divider,
@@ -81,6 +86,27 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
             >
               {copy.description}
             </Typography>
+            <Link
+              href={SALES_INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              color="text.primary"
+              underline="always"
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 1,
+                minHeight: 44,
+                fontSize: "0.875rem",
+                alignSelf: "flex-start",
+              }}
+            >
+              <Instagram fontSize="small" />
+              {dictionary.landing.contact.instagramLabel.replace(
+                "{handle}",
+                SALES_INSTAGRAM_HANDLE,
+              )}
+            </Link>
           </Stack>
           {sections.map((section) => (
             <Box

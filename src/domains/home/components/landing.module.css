@@ -310,7 +310,7 @@
 .shell footer a {
   color: #fefaf9;
 }
-.shell footer > div > div:first-child > div:first-child > a {
+.shell footer > div > div:first-child > div:first-child > a:first-child {
   color: var(--landing-footer-mark);
   font-size: clamp(28px, 3vw, 44px);
   letter-spacing: -0.03em;
