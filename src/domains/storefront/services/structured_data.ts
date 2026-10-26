@@ -1,6 +1,10 @@
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import { CompanyValues } from "@/values/app_values";
-import { SALES_WHATSAPP_PHONE } from "@/values/sales_contact";
+import {
+  SALES_EMAIL,
+  SALES_INSTAGRAM_URL,
+  SALES_WHATSAPP_PHONE,
+} from "@/values/sales_contact";
 import type { StorefrontProduct, StorefrontVariant } from "../types/catalog";
 import { storefrontUrl } from "./seo_rules";
 
@@ -34,9 +38,12 @@ export function organizationStructuredData(
         url: storefrontUrl("/"),
         logo: storefrontUrl("/brand/wordmark.svg"),
         telephone: `+${SALES_WHATSAPP_PHONE}`,
+        email: SALES_EMAIL,
+        sameAs: [SALES_INSTAGRAM_URL],
         contactPoint: {
           "@type": "ContactPoint",
           telephone: `+${SALES_WHATSAPP_PHONE}`,
+          email: SALES_EMAIL,
           url: storefrontUrl("/#contacto"),
           availableLanguage: "es",
         },

@@ -53,10 +53,14 @@ it("describes the real brand and same-page contact without inventing legal or co
   expect(serialized).toContain('"@type":"Organization"');
   expect(serialized).toContain('"@type":"WebSite"');
   expect(serialized).toContain('"telephone":"+573166218114"');
+  expect(serialized).toContain('"email":"contacto@silentium-hogar.com"');
+  expect(serialized).toContain(
+    '"sameAs":["https://www.instagram.com/silentium.hogar/"]',
+  );
   expect(serialized).toContain("https://www.silentium-hogar.com/#contacto");
   expect(serialized).toContain("https://www.silentium-hogar.com/#nosotros");
   expect(serialized).not.toMatch(
-    /taxID|address|openingHours|sameAs|returnPolicy|shipping|SearchAction/,
+    /taxID|address|openingHours|returnPolicy|shipping|SearchAction/,
   );
 });
 it("projects exact selected-variant price, SKU, attributes and public gallery", () => {

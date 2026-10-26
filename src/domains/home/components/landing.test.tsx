@@ -2,6 +2,9 @@ import { Footer } from "@/components/footer";
 import dictionary from "@/dictionary/es.json";
 import type { StorefrontCategory } from "@/domains/storefront/types/catalog";
 import {
+  SALES_EMAIL,
+  SALES_INSTAGRAM_HANDLE,
+  SALES_INSTAGRAM_URL,
   SALES_WHATSAPP_PHONE,
   salesWhatsAppHref,
 } from "@/values/sales_contact";
@@ -45,6 +48,39 @@ const sections: LandingSection[] = [
   "contacto",
 ];
 describe("lightweight single-page public information", () => {
+  it("links the supplied Instagram from contact and footer without embedding trackers", () => {
+    const { container } = render(
+      <>
+        <HomePage dictionary={dictionary} categories={[]} products={[]} />
+        <Footer dictionary={dictionary} />
+      </>,
+    );
+    const links = screen.getAllByRole("link", {
+      name: copy.contact.instagramLabel.replace(
+        "{handle}",
+        SALES_INSTAGRAM_HANDLE,
+      ),
+      exact: true,
+    });
+    expect(links).toHaveLength(2);
+    for (const link of links) {
+      expect(link).toHaveAttribute("href", SALES_INSTAGRAM_URL);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    }
+    expect(container.querySelector("iframe")).toBeNull();
+  });
+  it("offers the public contact mailbox as a mailto link beside the phone", () => {
+    const { container } = render(
+      <HomePage dictionary={dictionary} categories={[]} products={[]} />,
+    );
+    const contact = container.querySelector("#contacto");
+    expect(contact).toHaveTextContent(copy.contact.emailLabel);
+    expect(
+      screen.getByRole("link", { name: SALES_EMAIL, exact: true }),
+    ).toHaveAttribute("href", `mailto:${SALES_EMAIL}`);
+    expect(contact?.querySelector('a[href^="tel:"]')).not.toBeNull();
+  });
   it("previews three categories and links to the complete category index", () => {
     const categories: StorefrontCategory[] = Array.from(
       { length: 5 },
@@ -307,7 +343,7 @@ describe("lightweight single-page public information", () => {
     });
     expect(container.querySelector("#cambios")).toHaveAttribute("open");
   });
-  it("gives every footer link a real landing target, no placeholders or unsupported pages", () => {
+  it("keeps footer information on the landing and permits only the supplied external social profile", () => {
     const { container } = render(
       <>
         <HomePage dictionary={dictionary} categories={[]} products={[]} />
@@ -318,6 +354,7 @@ describe("lightweight single-page public information", () => {
     expect(footer).not.toBeNull();
     for (const link of footer?.querySelectorAll("a") ?? []) {
       const href = link.getAttribute("href");
+      if (href === SALES_INSTAGRAM_URL) continue;
       expect(href).toMatch(/^\/#.+/);
       expect(
         container.querySelector(href?.slice(1) ?? "missing"),

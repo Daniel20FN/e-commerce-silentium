@@ -1,9 +1,13 @@
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
 import {
+  SALES_EMAIL,
+  SALES_INSTAGRAM_HANDLE,
+  SALES_INSTAGRAM_URL,
   SALES_PHONE_DISPLAY,
   SALES_WHATSAPP_PHONE,
   salesWhatsAppHref,
 } from "@/values/sales_contact";
+import Instagram from "@mui/icons-material/Instagram";
 import WhatsApp from "@mui/icons-material/WhatsApp";
 import { Box, Button, Container, Link, Stack, Typography } from "@mui/material";
 import { sectionAnchorSx } from "../../services/landing_links";
@@ -61,18 +65,48 @@ export function ContactSection({ dictionary }: { dictionary: Dictionary }) {
           >
             {copy.cta}
           </Button>
-          <Stack spacing={0.5}>
-            <Typography variant="body2" color="text.secondary">
-              {copy.phoneLabel}
-            </Typography>
-            <Link
-              href={`tel:+${SALES_WHATSAPP_PHONE}`}
-              color="text.primary"
-              underline="hover"
-            >
-              {SALES_PHONE_DISPLAY}
-            </Link>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={{ xs: 2.5, sm: 5 }}
+            sx={{ minWidth: 0, maxWidth: "100%" }}
+          >
+            <Stack spacing={0.5}>
+              <Typography variant="body2" color="text.secondary">
+                {copy.phoneLabel}
+              </Typography>
+              <Link
+                href={`tel:+${SALES_WHATSAPP_PHONE}`}
+                color="text.primary"
+                underline="hover"
+              >
+                {SALES_PHONE_DISPLAY}
+              </Link>
+            </Stack>
+            <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+              <Typography variant="body2" color="text.secondary">
+                {copy.emailLabel}
+              </Typography>
+              <Link
+                href={`mailto:${SALES_EMAIL}`}
+                color="text.primary"
+                underline="always"
+                sx={{ overflowWrap: "anywhere" }}
+              >
+                {SALES_EMAIL}
+              </Link>
+            </Stack>
           </Stack>
+          <Button
+            component="a"
+            href={SALES_INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="outlined"
+            startIcon={<Instagram />}
+            sx={{ alignSelf: { xs: "flex-start", sm: "center" } }}
+          >
+            {copy.instagramLabel.replace("{handle}", SALES_INSTAGRAM_HANDLE)}
+          </Button>
           <Typography variant="caption" color="text.secondary">
             {copy.note}
           </Typography>
