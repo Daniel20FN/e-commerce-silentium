@@ -41,10 +41,31 @@ No se cambian HSTS, `includeSubDomains`, preload, robots, permisos o autenticaci
 
 ## Pendientes que requieren otra decisión
 
-- Políticas legales y datos definitivos del negocio: siguen pendientes del cuestionario ya acordado. No se publica una privacidad o devolución genérica como si estuviera aprobada.
+- Las políticas legales ya están publicadas en `/legal/terminos`, `/legal/privacidad`, `/legal/cookies` y `/legal/reembolsos`, con el alcance y pendientes operativos de [la lista legal](legal-readiness-checklist.md). No confundir un fallo de detección del escáner con la ausencia de estos documentos.
 - Revisión de fotografías, descripciones y precios definitivos del catálogo antes de promocionarlo activamente.
 - Endurecimiento CSP de scripts/estilos con una estrategia compatible con streaming, autenticación y MUI; queda fuera de esta protección inicial.
-- Search Console sigue pendiente, separado de la [base técnica SEO](technical-seo.md). No se configura Analytics ni ninguna cuenta o DNS aquí.
+- Search Console tiene su configuración inicial completada; rastreos y validación de Google siguen su propio ciclo. Ver [configuración y seguimiento](search-console-pendiente.md). Analytics es independiente y no se configura aquí.
+
+### Revisión del escáner — 28 de octubre de 2026
+
+Nuevo análisis en producción a las 22:24 UTC: **91/100, grado A**, metodología 2026-10-22 y 28 comprobaciones centrales. No equivale a probabilidad de recomendación por IA ni a un porcentaje de indexación.
+
+| Deducción indicada           | Evidencia y tratamiento                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Confianza, +4 posibles       | Dice no reconocer nosotros/contacto/privacidad. La web conserva nosotros y contacto en la landing por decisión de producto, y enlaza la privacidad española desde el pie. Se añaden relaciones HTML estándar `privacy-policy` y `terms-of-service` a los enlaces reales, sin duplicar páginas ni rellenar texto para superar un umbral.            |
+| Rastreadores IA, +3 posibles | Penaliza la restricción de `/api/`, no el catálogo público. Se conserva: el catálogo HTML y el sitemap están disponibles sin abrir rutas internas. No se crean excepciones permisivas por agente.                                                                                                                                                  |
+| Estado dinámico, +1 posible  | Detecta 14 widgets y pocos atributos ARIA en HTML estático. Los `details` nativos ya exponen su estado al navegador; no se les añade ARIA redundante. Sí se corrigen los disparadores personalizados del menú de sesión y del diálogo móvil: estado expandido, tipo de destino y relación con su contenido, con identificadores estables de React. |
+| HSTS, +1 posible             | Ya reconoce `max-age=63072000`; pide `includeSubDomains`. Se mantiene el alcance actual hasta revisar todos los subdominios y servicios presentes/futuros. No se activa preload ni una política global solo por la nota.                                                                                                                           |
+
+Los puntos son estimaciones del escáner, no una promesa de subida. Las mejoras locales de enlaces/menús requieren publicación y nuevo análisis antes de atribuirles una puntuación de producción. El objetivo es descubrimiento y uso reales, no retirar protecciones para obtener 100.
+
+#### Verificación de esta revisión
+
+- Suite completa: **159 suites y 934 pruebas aprobadas**; 13 suites y 64 pruebas omitidas por sus controles de entorno.
+- Pruebas específicas: 30 aprobadas entre navegación/hidratación, enlaces del pie, landing, JSON-LD y cabeceras. Apertura/cierre de sesión con invitado y usuario, y relación del diálogo móvil comprobados por pruebas de componentes.
+- Lint de los cuatro archivos de componentes/pruebas, `tsc --noEmit`, formato y `git diff --check` aprobados. No se ejecutó un nuevo build de producción en esta revisión.
+- Chrome sobre desarrollo local `localhost:3001`: menú de sesión autenticada con estado falso → verdadero → falso y cierre con Escape; enlace de privacidad con relación estándar comprobado. Chrome registró una advertencia de hidratación por atributos inyectados por extensiones (`speedupyoutubeads` y `cz-shortcut-listen`), no por los identificadores del menú; no se ocultó la advertencia ni se alteraron esas extensiones.
+- La nota **91/A** corresponde al nuevo análisis de producción previo a estos cambios locales. Publicación y análisis posterior siguen pendientes.
 
 ## Verificación
 

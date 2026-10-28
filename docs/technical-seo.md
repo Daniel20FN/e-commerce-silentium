@@ -1,5 +1,7 @@
 # Indexación del catálogo
 
+Configuración inicial de Google y seguimiento de rastreos: [Search Console](search-console-pendiente.md).
+
 ## Qué se mantiene automáticamente
 
 | Recurso        | Comportamiento                                                                                                  |
