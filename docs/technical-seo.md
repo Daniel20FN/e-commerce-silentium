@@ -1,6 +1,6 @@
 # Indexación del catálogo
 
-Configuración de Google aún pendiente: [Search Console — pasos para terminar](search-console-pendiente.md).
+Configuración inicial de Google y seguimiento de rastreos: [Search Console](search-console-pendiente.md).
 
 ## Qué se mantiene automáticamente
 
