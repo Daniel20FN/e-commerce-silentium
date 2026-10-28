@@ -1,17 +1,30 @@
 # Información pendiente para preparar la parte legal de Silentium
 
-Estado: pendiente de respuestas del titular. Este documento es un cuestionario y plan de revisión, no una política publicada ni una certificación de cumplimiento.
+Estado a 28/10/2026: respuestas comerciales principales recibidas y [borradores para revisión](legal/README.md) preparados. Implementación local autorizada el 28/10/2026: páginas legales y cambios de consentimiento desarrollados; aplicación aún no desplegada. Ver [estado técnico](legal/implementation.md). Este documento no certifica cumplimiento.
+
+## Respuestas recibidas y pendientes actuales
+
+| Área         | Confirmado                                                                                                                                     | Falta cerrar                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Identidad    | Diana Milena Moreno Jaramillo, persona natural; Silentium para mi Hogar; Colombia; contacto@silentium-hogar.com y teléfono existente           | NIT y dígito recibidos el 28/10/2026 e incorporados en términos; sin consulta independiente a DIAN     |
+| Compra       | WhatsApp sin pasarela; confirmación al recibir pago; transferencia, Nequi, Daviplata, Bre-B y efectivo; precios con impuestos                  | Revisión fiscal/facturación con asesor, sin inventar exención ni proceso                               |
+| Entrega      | Incluida en Bogotá y zonas cercanas; otras ciudades se cotizan; disponibilidad, costo y plazo acordados antes de pagar, también personalizados | Transportadoras, procedimiento operativo y evidencia del acuerdo                                       |
+| Devoluciones | Dirección recibida en Madrid, Cundinamarca; defectos sin costo al cliente; retracto/personalización separados de garantía                      | Garantías por referencia, logística y medio de reembolso; cambios voluntarios adicionales si se desean |
+| Datos        | Mayores de edad; Diana atiende derechos; promociones por correo/WhatsApp; existen registros externos en WhatsApp/Excel                         | Conservación, contratos/terceros, autorizaciones históricas y comprobación de herramientas externas    |
+| Medios       | Titular declara fotos propias y derechos; se identificaron además recursos de banco y generados del desarrollo                                 | Evidencia por activo, reemplazo de foto de catálogo demo y revisión final                              |
+
+La dirección empresarial está recogida en los borradores para revisión. No añadir copias de cédulas ni datos tributarios sin verificar. El cuestionario siguiente queda como referencia de alcance, no como indicación de que todas las respuestas sigan vacías.
 
 ## Cómo retomarlo
 
-Completa las respuestas siguientes o indica «pendiente». No incluyas contraseñas, documentos de identidad escaneados ni secretos. Cuando estén disponibles los datos, revisaremos los puntos abiertos antes de publicar textos o modificar formularios.
+Revisa primero [el resumen y los bloqueos](legal/README.md), después los cuatro borradores y [la auditoría](legal/auditoria.md). Completa únicamente los pendientes o corrige las respuestas consolidadas. No incluyas contraseñas, documentos de identidad escaneados ni secretos.
 
 ## 1. Identidad del vendedor
 
 - Persona natural o empresa:
 - Nombre completo o razón social:
 - Nombre comercial:
-- NIT:
+- NIT: recibido de la titular; consultar el borrador de términos (sin duplicar el identificador aquí).
 - Dirección de notificaciones y ciudad:
 - Teléfono:
 - Correo para clientes y reclamaciones:
@@ -71,20 +84,22 @@ Se inventariarán también los recursos incorporados durante el desarrollo. Acce
 
 ## Alcance solicitado para la implementación
 
-- [ ] Términos y condiciones accesibles.
-- [ ] Política de privacidad/tratamiento y autorización informada.
+Las marcas completadas indican implementación local, no despliegue ni certificación jurídica. Las limitaciones de auditoría y operación constan en `legal/implementation.md`.
+
+- [x] Términos y condiciones accesibles.
+- [x] Política de privacidad/tratamiento y autorización informada.
 - [ ] Política de cookies y tecnologías similares basada en auditoría real.
-- [ ] Política de reembolsos con retracto, garantía y demás supuestos diferenciados.
-- [ ] Casillas separadas de términos y tratamiento de datos, sin premarcar y con enlaces, donde correspondan.
-- [ ] Consentimiento de promociones independiente y opcional si existe esa finalidad.
-- [ ] Revisión formulario por formulario; no condicionar el ejercicio de derechos a nuevas aceptaciones innecesarias.
-- [ ] Registro protegido y trazable: identidad/vinculación, fecha del servidor, canal/formulario, finalidad, versión y contenido exacto mostrado, acción y revocaciones.
+- [x] Política de reembolsos con retracto, garantía y demás supuestos diferenciados.
+- [x] Casillas separadas de términos y tratamiento de datos, sin premarcar y con enlaces, donde correspondan.
+- [x] Consentimiento de promociones independiente y opcional si existe esa finalidad.
+- [x] Revisión formulario por formulario; no condicionar el ejercicio de derechos a nuevas aceptaciones innecesarias.
+- [x] Registro protegido y trazable: identidad/vinculación, fecha del servidor, canal/formulario, finalidad, versión y contenido exacto mostrado, acción y revocaciones.
 - [ ] Mecanismo de consulta/exportación de evidencia con control de acceso y conservación justificada; minimizar IP u otros identificadores si se consideraran necesarios.
-- [ ] Tratamiento de usuarios existentes sin fabricar aceptaciones retroactivas.
+- [x] Tratamiento de usuarios existentes sin fabricar aceptaciones retroactivas.
 - [ ] Inventario de cookies, localStorage, sessionStorage y rastreadores; bloqueo previo y retirada de consentimiento cuando corresponda.
-- [ ] Inventario de medios con evidencia de derechos y pendientes.
+- [x] Inventario de medios con evidencia de derechos y pendientes.
 - [ ] Revisión de información comercial, precios, entrega, reclamaciones, seguridad y derechos aplicables en Colombia.
-- [ ] Pruebas de formularios, autorizaciones, revocaciones y recuperación de evidencia.
+- [x] Pruebas de formularios, autorizaciones, revocaciones y recuperación de evidencia.
 
 ## Fuentes iniciales y cautelas
 
@@ -98,4 +113,4 @@ La implementación técnica y los borradores no garantizan cumplimiento jurídic
 
 ## Próximo paso
 
-Entregar las respuestas y evidencias. A continuación: auditoría técnica/legal, matriz de requisitos y pendientes, borradores, aprobación e implementación. Por ahora se mantiene Vercel y no se publica ninguna política ni se cambia ningún consentimiento.
+Revisar y aprobar los borradores, resolver bloqueos y completar la inspección de producción. Después: diseño e implementación de documentos, autorizaciones separadas y registro protegido, pruebas y publicación versionada. Por ahora se mantiene Vercel y no se publica ninguna política ni se cambia ningún consentimiento.

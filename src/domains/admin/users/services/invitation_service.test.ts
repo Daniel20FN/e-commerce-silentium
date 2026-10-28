@@ -1,3 +1,7 @@
+import { recordLegalDecisions } from "@/domains/legal/services/consent_service";
+jest.mock("@/domains/legal/services/consent_service", () => ({
+  recordLegalDecisions: jest.fn(),
+}));
 /** @jest-environment node */
 import { prisma } from "@/lib/prisma";
 import type { AdminUserInvitation, User as BusinessUser } from "@prisma/client";
@@ -37,6 +41,7 @@ jest.mock("@/lib/prisma", () => ({
     userProfile: { upsert: jest.fn() },
     userPreference: { upsert: jest.fn() },
     $transaction: jest.fn(),
+    $executeRaw: jest.fn(),
   },
 }));
 const db = jest.mocked(prisma);
@@ -130,12 +135,20 @@ it("normalizes addresses and rejects invalid roles and extra privilege fields", 
     acceptInvitationSchema.safeParse({
       password: "long-password",
       acceptTerms: true,
+      acceptPrivacy: true,
+      adult: true,
+      legalVersion: "2026-10-28.1",
       role: "super_admin",
     }).success,
   ).toBe(false);
   expect(
-    acceptInvitationSchema.safeParse({ password: "short", acceptTerms: true })
-      .success,
+    acceptInvitationSchema.safeParse({
+      password: "short",
+      acceptTerms: true,
+      acceptPrivacy: true,
+      adult: true,
+      legalVersion: "2026-10-28.1",
+    }).success,
   ).toBe(false);
   expect(
     acceptInvitationSchema.safeParse({
@@ -263,7 +276,13 @@ it.each([
     await expect(
       acceptInvitation(
         recipient,
-        { password: "long-password", acceptTerms: true },
+        {
+          password: "long-password",
+          acceptTerms: true,
+          acceptPrivacy: true,
+          adult: true,
+          legalVersion: "2026-10-28.1",
+        },
         passwordClient,
       ),
     ).rejects.toThrow("invitation_unavailable");
@@ -283,7 +302,13 @@ it("sets a password before consuming the invitation and activates only the store
   await expect(
     acceptInvitation(
       recipient,
-      { password: "long-password", acceptTerms: true },
+      {
+        password: "long-password",
+        acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
+      },
       passwordClient,
     ),
   ).resolves.toEqual({ redirectTo: "/admin" });
@@ -303,10 +328,15 @@ it("sets a password before consuming the invitation and activates only the store
       data: expect.objectContaining({ role: "admin", status: "active" }),
     }),
   );
-  expect(db.userPreference.upsert).toHaveBeenCalledWith(
+  expect(recordLegalDecisions).toHaveBeenCalledWith(
+    expect.anything(),
+    expect.anything(),
     expect.objectContaining({
-      create: expect.objectContaining({ acceptedTermsAt: expect.any(Date) }),
+      acceptTerms: true,
+      acceptPrivacy: true,
+      adult: true,
     }),
+    "invitation",
   );
 });
 it("does not activate if password update fails", async () => {
@@ -317,7 +347,13 @@ it("does not activate if password update fails", async () => {
   await expect(
     acceptInvitation(
       recipient,
-      { password: "long-password", acceptTerms: true },
+      {
+        password: "long-password",
+        acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
+      },
       passwordClient,
     ),
   ).rejects.toThrow("invitation_password_failed");
@@ -331,7 +367,13 @@ it("allows recovery when the password was saved but the previous database attemp
   await expect(
     acceptInvitation(
       recipient,
-      { password: "long-password", acceptTerms: true },
+      {
+        password: "long-password",
+        acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
+      },
       passwordClient,
     ),
   ).resolves.toEqual({ redirectTo: "/admin" });
@@ -342,7 +384,13 @@ it("does not grant a role after an acceptance CAS conflict", async () => {
   await expect(
     acceptInvitation(
       recipient,
-      { password: "long-password", acceptTerms: true },
+      {
+        password: "long-password",
+        acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
+      },
       passwordClient,
     ),
   ).rejects.toThrow("invitation_changed");
@@ -355,7 +403,13 @@ it("uses a conditional account update so concurrent role changes cannot be overw
   await expect(
     acceptInvitation(
       recipient,
-      { password: "long-password", acceptTerms: true },
+      {
+        password: "long-password",
+        acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
+      },
       passwordClient,
     ),
   ).rejects.toThrow("invitation_changed");
@@ -377,7 +431,13 @@ it.each(["blocked", "inactive"] as const)(
     await expect(
       acceptInvitation(
         recipient,
-        { password: "long-password", acceptTerms: true },
+        {
+          password: "long-password",
+          acceptTerms: true,
+          acceptPrivacy: true,
+          adult: true,
+          legalVersion: "2026-10-28.1",
+        },
         passwordClient,
       ),
     ).rejects.toThrow("invitation_changed");
@@ -392,7 +452,13 @@ it.each(["admin", "super_admin"] as const)(
     await expect(
       acceptInvitation(
         recipient,
-        { password: "long-password", acceptTerms: true },
+        {
+          password: "long-password",
+          acceptTerms: true,
+          acceptPrivacy: true,
+          adult: true,
+          legalVersion: "2026-10-28.1",
+        },
         passwordClient,
       ),
     ).rejects.toThrow("invitation_changed");

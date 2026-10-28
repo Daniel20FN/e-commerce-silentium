@@ -60,7 +60,6 @@ describe("lightweight single-page public information", () => {
         "{handle}",
         SALES_INSTAGRAM_HANDLE,
       ),
-      exact: true,
     });
     expect(links).toHaveLength(2);
     for (const link of links) {
@@ -76,9 +75,10 @@ describe("lightweight single-page public information", () => {
     );
     const contact = container.querySelector("#contacto");
     expect(contact).toHaveTextContent(copy.contact.emailLabel);
-    expect(
-      screen.getByRole("link", { name: SALES_EMAIL, exact: true }),
-    ).toHaveAttribute("href", `mailto:${SALES_EMAIL}`);
+    expect(screen.getByRole("link", { name: SALES_EMAIL })).toHaveAttribute(
+      "href",
+      `mailto:${SALES_EMAIL}`,
+    );
     expect(contact?.querySelector('a[href^="tel:"]')).not.toBeNull();
   });
   it("previews three categories and links to the complete category index", () => {
@@ -343,7 +343,7 @@ describe("lightweight single-page public information", () => {
     });
     expect(container.querySelector("#cambios")).toHaveAttribute("open");
   });
-  it("keeps footer information on the landing and permits only the supplied external social profile", () => {
+  it("keeps brand information on the landing while linking legal documents and the consumer authority", () => {
     const { container } = render(
       <>
         <HomePage dictionary={dictionary} categories={[]} products={[]} />
@@ -355,6 +355,11 @@ describe("lightweight single-page public information", () => {
     for (const link of footer?.querySelectorAll("a") ?? []) {
       const href = link.getAttribute("href");
       if (href === SALES_INSTAGRAM_URL) continue;
+      if (href === "https://www.sic.gov.co/") continue;
+      if (
+        /^\/legal\/(terminos|privacidad|cookies|reembolsos)$/.test(href ?? "")
+      )
+        continue;
       expect(href).toMatch(/^\/#.+/);
       expect(
         container.querySelector(href?.slice(1) ?? "missing"),

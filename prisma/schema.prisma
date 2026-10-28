@@ -65,6 +65,7 @@ model User {
   profile            UserProfile?
   addresses          UserAddress[]
   preferences        UserPreference?
+  legalConsents      LegalConsentEvent[]
   invitations        AdminUserInvitation[]
 
   @@index([email])
@@ -551,4 +552,29 @@ model OrderStockLink {
 
   @@unique([eventId, lineId])
   @@index([orderId])
+}
+
+// Immutable snapshots of all documents and decision labels served in one release.
+model LegalRelease {
+  version   String              @id
+  hash      String
+  content   String
+  createdAt DateTime            @default(now())
+  events    LegalConsentEvent[]
+}
+
+model LegalConsentEvent {
+  id         String       @id @default(cuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  version    String
+  release    LegalRelease @relation(fields: [version], references: [version], onDelete: Restrict)
+  purpose    String
+  action     String
+  source     String
+  requestId  String
+  occurredAt DateTime     @default(now())
+
+  @@unique([userId, requestId, purpose])
+  @@index([userId, occurredAt])
 }

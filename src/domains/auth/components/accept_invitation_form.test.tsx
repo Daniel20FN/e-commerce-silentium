@@ -72,7 +72,9 @@ it("does not post mismatched passwords and reports errors without displaying pas
     ),
     { target: { value: "different-password" } },
   );
-  fireEvent.click(screen.getByRole("checkbox"));
+  screen
+    .getAllByRole("checkbox")
+    .forEach((checkbox) => fireEvent.click(checkbox));
   fireEvent.click(
     screen.getByRole("button", { name: dictionary.auth.invitation.submit }),
   );
@@ -98,7 +100,13 @@ it("does not post mismatched passwords and reports errors without displaying pas
   expect(mockPost).toHaveBeenCalledWith(
     "accept-user-invitation",
     "/auth/invitations",
-    { password: "long-password", acceptTerms: true },
+    {
+      password: "long-password",
+      acceptTerms: true,
+      acceptPrivacy: true,
+      adult: true,
+      legalVersion: "2026-10-28.1",
+    },
   );
   expect(document.body.textContent).not.toContain("long-password");
 });

@@ -61,6 +61,13 @@ export default async function AdminUserDetailPage({
           {dictionary.admin.users.detail.back}
         </Button>
         <Typography variant="h4">{user.fullName}</Typography>
+        <Button
+          href={`/api/admin/legal/evidence?userId=${encodeURIComponent(user.id)}`}
+          variant="outlined"
+          sx={{ alignSelf: "flex-start" }}
+        >
+          {dictionary.legal.settings.history}
+        </Button>
       </Stack>
 
       <Grid container spacing={2.5}>

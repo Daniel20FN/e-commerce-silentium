@@ -1,8 +1,8 @@
+import type { LegalAcceptanceParams } from "@/domains/legal/types/api_params";
 import type { ApiResponse } from "@/types/api-service/api_response";
 
-export interface AcceptInvitationParams {
+export interface AcceptInvitationParams extends LegalAcceptanceParams {
   password: string;
-  acceptTerms: boolean;
 }
 export interface PendingInvitationData {
   email: string;

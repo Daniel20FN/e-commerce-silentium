@@ -1,9 +1,9 @@
-export interface RegisterApiParams {
+import type { LegalAcceptanceParams } from "@/domains/legal/types/api_params";
+export interface RegisterApiParams extends LegalAcceptanceParams {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
-  acceptTerms: boolean;
   acceptsMarketingEmails: boolean;
   acceptsWhatsAppMarketing: boolean;
 }

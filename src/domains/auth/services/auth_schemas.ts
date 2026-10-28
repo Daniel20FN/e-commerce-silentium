@@ -1,3 +1,4 @@
+import { legalAcceptanceShape } from "@/domains/legal/services/legal_schemas";
 import { z } from "zod";
 
 export const registerSchema = z.object({
@@ -5,9 +6,7 @@ export const registerSchema = z.object({
   password: z.string().min(8, { error: "password_min_length" }),
   firstName: z.string().trim().min(1, { error: "first_name_required" }),
   lastName: z.string().trim().min(1, { error: "last_name_required" }),
-  acceptTerms: z.literal(true, {
-    error: "accept_terms_required",
-  }),
+  ...legalAcceptanceShape,
   acceptsMarketingEmails: z.boolean().optional().default(false),
   acceptsWhatsAppMarketing: z.boolean().optional().default(false),
 });

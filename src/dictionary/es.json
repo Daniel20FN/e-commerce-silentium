@@ -241,7 +241,10 @@
     "photoLink": "Foto",
     "messageLabel": "Mensaje para WhatsApp",
     "close": "Volver al carrito",
-    "reviewExpired": "El carrito cambió. Vuelve a preparar el mensaje antes de continuar."
+    "reviewExpired": "El carrito cambió. Vuelve a preparar el mensaje antes de continuar.",
+    "legalNotice": "Abrir WhatsApp no confirma un pedido ni autoriza publicidad. Antes de facilitar datos personales o pagar, consulta nuestras condiciones y privacidad.",
+    "termsLink": "Términos y condiciones",
+    "privacyLink": "Política de privacidad"
   },
   "storefront": {
     "titleTemplate": "%s | Silentium",
@@ -434,7 +437,7 @@
       "firstName": "Nombre",
       "lastName": "Apellido",
       "submit": "Continuar",
-      "acceptTerms": "Acepto los términos y la política de privacidad",
+      "acceptTerms": "Acepto los términos y condiciones",
       "requiredField": "Este campo es obligatorio",
       "invalidEmail": "Ingresa un correo electrónico válido",
       "passwordMinLength": "La contraseña debe tener al menos 8 caracteres"
@@ -464,8 +467,8 @@
       "resendCooldown": "Puedes solicitar otro correo en {seconds}s.",
       "resendInitialCooldown": "Ya te enviamos un correo. Espera un momento antes de solicitar otro.",
       "resendSuccess": "Listo. Te reenviamos el correo de confirmación.",
-      "acceptsMarketingEmails": "Quiero recibir novedades y promociones por email",
-      "acceptsWhatsAppMarketing": "Quiero recibir novedades y promociones por WhatsApp"
+      "acceptsMarketingEmails": "Quiero recibir promociones por correo electrónico (opcional)",
+      "acceptsWhatsAppMarketing": "Quiero recibir promociones por WhatsApp (opcional)"
     },
     "pendingConfirmation": {
       "title": "Confirmación pendiente",
@@ -492,7 +495,10 @@
       "resend_confirmation_user_not_found": "No encontramos una cuenta pendiente para ese correo.",
       "email_already_confirmed": "Ese correo ya fue confirmado. Ya puedes iniciar sesión.",
       "unexpected_auth_error": "No pudimos completar la autenticación. Inténtalo otra vez.",
-      "auth_service_unavailable": "El servicio de acceso no está disponible. Intentá nuevamente en unos minutos."
+      "auth_service_unavailable": "El servicio de acceso no está disponible. Intentá nuevamente en unos minutos.",
+      "legal_acceptance_required": "Revisa las aceptaciones de términos, privacidad y mayoría de edad. Si la versión cambió, recarga la página.",
+      "legal_version_changed": "Revisa las aceptaciones de términos, privacidad y mayoría de edad. Si la versión cambió, recarga la página.",
+      "registration_unavailable": "No pudimos guardar el registro completo. La cuenta puede haberse creado: revisa tu correo y, al entrar, revisa tus aceptaciones en Mi cuenta."
     },
     "invitation": {
       "title": "Tu acceso a Silentium",
@@ -1992,6 +1998,241 @@
           "related": ["publicacion", "inventario", "pedidos"]
         }
       ]
+    }
+  },
+  "legal": {
+    "title": "Información legal",
+    "versionLabel": "Versión {version} · Publicación: {date}",
+    "back": "Volver a la tienda",
+    "contents": "En este documento",
+    "contact": "¿Necesitas ayuda? Escríbenos",
+    "sic": "Superintendencia de Industria y Comercio",
+    "termsLink": "Términos y condiciones",
+    "privacyLink": "Política de privacidad",
+    "controls": {
+      "terms": "Acepto los términos y condiciones",
+      "privacy": "Autorizo el tratamiento de mis datos para gestionar mi cuenta, solicitudes y compras, según la política de privacidad",
+      "adult": "Confirmo que soy mayor de 18 años",
+      "email": "Quiero recibir promociones por correo electrónico (opcional)",
+      "whatsapp": "Quiero recibir promociones por WhatsApp (opcional)"
+    },
+    "error": "Revisa las aceptaciones de términos, privacidad y mayoría de edad. Si la versión cambió, recarga la página.",
+    "settings": {
+      "title": "Privacidad y comunicaciones",
+      "intro": "Tus preferencias de publicidad son opcionales. Puedes retirarlas sin perder acceso a tu cuenta.",
+      "accept": "Guardar mis decisiones",
+      "saved": "Decisiones guardadas.",
+      "error": "No pudimos guardar o consultar tus decisiones. Inténtalo de nuevo.",
+      "loading": "Cargando tus decisiones…",
+      "history": "Consultar o descargar mis aceptaciones",
+      "empty": "No hay aceptaciones versionadas registradas. Las fechas históricas no prueban qué versión se mostró.",
+      "review": "Puedes leer y aceptar ahora los documentos vigentes; no bloqueamos el acceso a tu cuenta por este aviso.",
+      "accepted": "Documentos vigentes aceptados",
+      "rights": "Solicitar acceso, corrección, supresión o revocación por correo",
+      "purpose": {
+        "terms": "Términos",
+        "privacy": "Tratamiento de datos",
+        "adult": "Mayoría de edad",
+        "email": "Promociones por correo",
+        "whatsapp": "Promociones por WhatsApp"
+      },
+      "action": {
+        "accepted": "Aceptado",
+        "declined": "No autorizado",
+        "withdrawn": "Retirado"
+      },
+      "withdraw": "Retirar todas las promociones"
+    },
+    "documents": {
+      "terminos": {
+        "title": "Términos y condiciones",
+        "sections": [
+          {
+            "title": "Quién vende y cómo contactar",
+            "paragraphs": [
+              "Silentium para mi Hogar es el nombre comercial utilizado por Diana Milena Moreno Jaramillo, persona natural, para ofrecer productos para el hogar en Colombia.",
+              "Identificación tributaria: NIT 53011895-5.",
+              "Dirección de notificaciones: Calle 24 # 1 - 147, Madrid, Cundinamarca, Colombia.",
+              "Atención, reclamaciones y protección de datos: contacto@silentium-hogar.com.",
+              "Teléfono y WhatsApp: +57 316 6218114."
+            ]
+          },
+          {
+            "title": "Catálogo y solicitud de compra",
+            "paragraphs": [
+              "El sitio permite consultar productos y preparar una selección en el carrito. Enviar esa selección por WhatsApp inicia una solicitud: no realiza un cobro ni confirma por sí solo un pedido. Las cuentas y compras se dirigen a personas mayores de edad.",
+              "Antes de pagar, te informaremos y acordaremos por WhatsApp los productos y variantes, cantidades, disponibilidad, características relevantes, precio total, destino, costo del envío y plazo de entrega. Podrás revisar y corregir tu selección antes de aceptar. Conserva la conversación y el resumen acordado; te facilitaremos constancia de las condiciones del pedido.",
+              "Las fichas y el acuerdo deben identificar materiales, medidas, cuidados y demás características relevantes. Las imágenes de ambientación no sustituyen las fotografías ni las especificaciones de la referencia ofrecida. No se ofrecerá una imagen de demostración como prueba de un producto real."
+            ]
+          },
+          {
+            "title": "Precios y pagos",
+            "paragraphs": [
+              "Los precios se expresan en pesos colombianos e incluyen los impuestos aplicables. Cualquier cargo de transporte se informará por separado y se incorporará al total antes de pagar; no se agregarán cargos no aceptados.",
+              "Se podrán acordar pagos por transferencia, Nequi, Daviplata, Bre-B o efectivo. Antes del pago se confirmarán el medio, los datos del destinatario y las instrucciones. El pedido se confirma al recibir el pago, sin perjuicio de las obligaciones de información y entrega que resulten aplicables desde la comunicación del pedido. No existe pasarela de pago integrada y el sitio no solicita números completos de tarjetas.",
+              "No envíes contraseñas, códigos de acceso ni datos bancarios innecesarios por nuestros canales. Un comprobante no modifica las características, precio o fecha previamente acordados."
+            ]
+          },
+          {
+            "title": "Envíos y productos personalizados",
+            "paragraphs": [
+              "El envío está incluido para Bogotá y zonas cercanas, sujeto a confirmar la cobertura de la dirección antes de pagar. Para otras ciudades se cotizará el costo adicional. No se promete cobertura gratuita nacional.",
+              "La disponibilidad y fecha de entrega se acuerdan antes del pago. Si surge una indisponibilidad o incumplimiento, te informaremos y atenderemos las alternativas y derechos legales: no impondremos unilateralmente nuevas fechas ni créditos de tienda en sustitución de un reembolso procedente. Cuando no se acuerde plazo, se aplicará el plazo legal correspondiente.",
+              "Para productos personalizados se dejarán por escrito las especificaciones concretas, aprobación del cliente, precio y plazo antes del pago y la fabricación. La excepción legal de retracto para bienes confeccionados conforme a especificaciones o claramente personalizados no elimina la garantía ni los derechos ante defectos o incumplimientos. Elegir una variante ordinaria no supone automáticamente personalización."
+            ]
+          },
+          {
+            "title": "Derechos y reclamaciones",
+            "paragraphs": [
+              "Consulta el documento de [devoluciones, reembolsos y garantías](/legal/reembolsos), que diferencia retracto, garantía, entrega y reversión de pagos. Ninguna condición limita los derechos irrenunciables del consumidor ni impone renuncia a acudir a la autoridad competente.",
+              "Puedes reclamar por correo, WhatsApp o en la dirección indicada. Facilitaremos constancia de recepción y responderemos la reclamación directa de consumo dentro de los quince días hábiles legales, con razones y pruebas pertinentes. No exigimos crear una cuenta para reclamar. También puedes consultar la [Superintendencia de Industria y Comercio](https://www.sic.gov.co/)."
+            ]
+          },
+          {
+            "title": "Cuenta, datos y cambios del documento",
+            "paragraphs": [
+              "Mantén tus datos actualizados y protege tus credenciales. El tratamiento de datos se explica separadamente en la [política de privacidad](/legal/privacidad). Recibir publicidad no es requisito para crear una cuenta o comprar.",
+              "Las modificaciones futuras se identificarán con versión y fecha y se comunicarán cuando corresponda; no alterarán retroactivamente pedidos acordados ni se presumirán aceptadas por el mero silencio."
+            ]
+          }
+        ]
+      },
+      "privacidad": {
+        "title": "Política de tratamiento de datos personales",
+        "sections": [
+          {
+            "title": "Responsable y contacto",
+            "paragraphs": [
+              "Diana Milena Moreno Jaramillo, persona natural, con nombre comercial Silentium para mi Hogar, es responsable de los tratamientos del negocio. Dirección: Calle 24 # 1 - 147, Madrid, Cundinamarca, Colombia. Correo: contacto@silentium-hogar.com. Teléfono: +57 316 6218114. Diana atiende las solicitudes de protección de datos."
+            ]
+          },
+          {
+            "title": "Datos y finalidades",
+            "paragraphs": [
+              "Datos — Para qué se utilizan",
+              "Nombre, contacto y datos de cuenta — Crear y administrar la cuenta, verificar acceso y atender solicitudes",
+              "Dirección, selección de productos, pedido, entrega y constancias de pago — Cotizar, acordar y atender la compra, entrega, devoluciones y obligaciones aplicables",
+              "Comunicaciones y reclamaciones — Soporte, ejercicio de derechos y constancia de su atención",
+              "Registros técnicos y de seguridad necesarios — Proteger accesos, prevenir abuso y diagnosticar fallos, con minimización",
+              "Preferencias y evidencia de autorización — Respetar decisiones y demostrar qué se informó y autorizó",
+              "Contacto para promociones, solo con autorización específica — Ofertas por los canales elegidos de correo o WhatsApp",
+              "La información puede recibirse por el sitio, WhatsApp, correo u otros canales de atención. Existen registros previos fuera de la web; su existencia no demuestra autorización para cualquier finalidad. No solicitamos datos sensibles como requisito general de compra ni números completos de tarjeta en el sitio.",
+              "La autorización debe ser previa e informada cuando sea exigible. Informaremos qué datos se necesitan para prestar el servicio y cuáles son opcionales. La aceptación de términos de compra no sustituye la autorización de tratamiento. No se presume consentimiento por navegar, por estar en una agenda ni por haber comprado anteriormente."
+            ]
+          },
+          {
+            "title": "Promociones y menores",
+            "paragraphs": [
+              "Las promociones requieren una decisión opcional, separada y sin premarcar para cada canal. Rechazarlas no impide comprar ni gestionar la cuenta. Puedes solicitar su cese gratuitamente por el mismo canal de contacto o por nuestro correo; ello no impide mensajes estrictamente necesarios sobre un pedido o una solicitud tuya.",
+              "Respetaremos las restricciones de contacto comercial aplicables en Colombia, incluida la Ley 2300 y el Registro de Números Excluidos cuando corresponda. No utilizaremos autorizaciones genéricas para desconocer esas restricciones.",
+              "La tienda dirige cuentas y compras a mayores de edad y no busca recopilar información de menores. Si se identifica tratamiento de datos de un menor, se atenderá con las salvaguardas legales correspondientes; esta política comercial no elimina sus derechos."
+            ]
+          },
+          {
+            "title": "Proveedores y tratamiento internacional",
+            "paragraphs": [
+              "El funcionamiento utiliza Vercel para alojamiento, Supabase para autenticación, base de datos y archivos, Resend para correo transaccional, y servicios de correo/reenvío asociados a Cloudflare y Gmail. Los procesos de compra pueden usar WhatsApp, proveedores del medio de pago acordado y la transportadora necesaria para la entrega. Instagram es un enlace externo, no un requisito para comprar.",
+              "Los proveedores pueden tratar datos fuera de Colombia. La infraestructura principal de alojamiento y base de datos está en Irlanda; los servicios de correo y sus subencargados pueden operar en otros países. Aplicamos las medidas contractuales exigibles según el destinatario y el tipo de operación internacional.",
+              "Solo se facilitarán los datos necesarios para cada función, con los acuerdos y medidas exigibles. No se venderán bases de clientes. Abrir voluntariamente un servicio externo también implica el tratamiento que ese servicio informe, sin liberar a Silentium de sus propias obligaciones."
+            ]
+          },
+          {
+            "title": "Derechos y cómo ejercerlos",
+            "paragraphs": [
+              "Puedes conocer, acceder gratuitamente, actualizar y rectificar tus datos; solicitar prueba de autorización e información sobre su uso; presentar quejas ante la SIC; y solicitar supresión o revocar la autorización cuando proceda, teniendo en cuenta obligaciones legales o contractuales de conservación.",
+              "Contacta a Diana en contacto@silentium-hogar.com, por WhatsApp o en la dirección indicada. Explica la petición, los datos relacionados y cómo responderte. Verificaremos tu identidad de manera proporcionada: no exigimos indiscriminadamente copia de la cédula, una cuenta nueva, aceptar condiciones comerciales o autorizar publicidad.",
+              "Consultas: hasta diez días hábiles desde la recepción; si no es posible responder en ese término, informaremos motivos y fecha, con extensión máxima de cinco días hábiles.",
+              "Reclamos: hasta quince días hábiles desde el día siguiente a su recepción; si es necesario, informaremos motivos y fecha antes de vencer el término, con extensión máxima de ocho días hábiles.",
+              "Solicitudes incompletas: se tramitarán conforme al procedimiento legal, informando qué falta; no se usarán requisitos innecesarios para impedir el derecho.",
+              "Antes de acudir a la SIC en los casos que así lo requieren, debe agotarse el trámite ante el responsable. Consulta los canales de la [SIC](https://www.sic.gov.co/)."
+            ]
+          },
+          {
+            "title": "Conservación, seguridad y cambios",
+            "paragraphs": [
+              "Conservaremos datos solo mientras sean necesarios para finalidades informadas y obligaciones legales, con restricciones de acceso y eliminación o anonimización cuando corresponda. Los plazos y criterios se revisan por categoría, atendiendo la finalidad y las obligaciones aplicables, incluidas las copias de respaldo. No se interpreta la falta de indicaciones del contador como inexistencia de deberes legales.",
+              "Eliminar una cuenta no significa borrar inmediatamente pedidos, registros legalmente necesarios ni todas las copias de proveedores. Las solicitudes se evaluarán, responderán y ejecutarán según su alcance y fundamento. No se promete seguridad absoluta ni conservación indefinida.",
+              "Las actualizaciones tendrán versión y fecha de vigencia; los cambios sustanciales de finalidades se comunicarán y requerirán nueva autorización cuando corresponda. No se fabricarán aceptaciones retroactivas."
+            ]
+          }
+        ]
+      },
+      "cookies": {
+        "title": "Cookies y almacenamiento del navegador",
+        "sections": [
+          {
+            "title": "Tecnologías y finalidades",
+            "paragraphs": [
+              "Además de cookies, la aplicación utiliza almacenamiento local y de sesión. Esas tecnologías no equivalen automáticamente a publicidad ni quedan fuera de protección de datos por ser locales.",
+              "Tecnología y clave — Finalidad — Duración identificada",
+              "Cookie theme — Recordar tema claro/oscuro — El escritor actual no fija caducidad; cookie de sesión del navegador, sujeta a restauración de sesiones",
+              "Cookies de Supabase sb-*, eventualmente divididas — Autenticación y mantenimiento de sesión — Hasta 400 días por escritura con la configuración actual del SDK; puede renovarse con la sesión o eliminarse al cerrar sesión. La caducidad del token de acceso es distinta",
+              "localStorage silentium.cart.v1 — Conservar variantes y cantidades del carrito en ese navegador — Sin caducidad automática en el escritor actual; hasta retirada o limpieza",
+              "sessionStorage orders-tab-scope, orders-pending:* — Recuperar operaciones pendientes de pedidos en administración — Durante la sesión de pestaña y hasta limpieza por la aplicación/navegador; puede incluir datos de cliente y pedido",
+              "sessionStorage inventory-pending:*, catalog-duplication:* — Recuperar ajustes/duplicaciones pendientes de administración — Sesión de pestaña y limpieza según flujo/navegador",
+              "No incorporamos analítica o publicidad de terceros en esta versión del sitio. Los enlaces a Instagram y WhatsApp no incorporan un feed o píxel en el código revisado; al abrirlos se aplican también los tratamientos del servicio externo."
+            ]
+          },
+          {
+            "title": "Control y consentimiento",
+            "paragraphs": [
+              "Puedes cambiar el tema, gestionar la sesión y eliminar los datos del sitio desde tu navegador. Limpiarlos puede cerrar la sesión, eliminar el carrito o impedir recuperar operaciones pendientes. La retirada de una autorización no se limita a borrar cookies: también puedes ejercer tus derechos mediante contacto@silentium-hogar.com.",
+              "Antes de introducir analítica, publicidad u otros tratamientos opcionales se revisarán sus finalidades, datos, destinatarios y autorización necesaria. Cuando proceda, se bloquearán hasta una elección informada, sin premarcar, con posibilidad equivalente de rechazar y retirar.",
+              "No se añadirá un banner meramente decorativo ni se declarará que toda cookie «técnica» está automáticamente exenta de autorización bajo las normas colombianas. La información y autorización del tratamiento de cuenta deben cubrir los usos necesarios cuando sean exigibles; una autorización publicitaria no debe condicionar la compra."
+            ]
+          }
+        ]
+      },
+      "reembolsos": {
+        "title": "Devoluciones, reembolsos y garantías",
+        "sections": [
+          {
+            "title": "Cómo solicitar atención",
+            "paragraphs": [
+              "Escribe a contacto@silentium-hogar.com o al WhatsApp +57 316 6218114, indicando el pedido, producto, problema y solución solicitada. Aporta información razonablemente necesaria; las fotografías pueden ayudar, pero no se impondrán como barrera absoluta al ejercicio de derechos. No necesitas una cuenta ni aceptar publicidad.",
+              "La dirección para devoluciones es Calle 24 # 1 - 147, Madrid, Cundinamarca, Colombia. Coordinaremos la recepción y, cuando proceda, la recogida sin trasladar al consumidor gastos que corresponden al vendedor. Conserva la constancia de solicitud y de envío."
+            ]
+          },
+          {
+            "title": "Retracto en compras a distancia",
+            "paragraphs": [
+              "Cuando legalmente proceda, puedes ejercer el retracto dentro de los cinco días hábiles siguientes a la entrega del producto. Deberás devolverlo por los mismos medios y en las mismas condiciones en que lo recibiste. En este supuesto, los costos del transporte de devolución corresponden al consumidor.",
+              "Se devolverán todas las sumas pagadas, sin descuentos o retenciones improcedentes, dentro del plazo máximo legal de quince días calendario, contado desde el ejercicio del derecho y el cumplimiento de los requisitos legales de información correcta y devolución del producto. No se añadirá un plazo indefinido de inspección ni se impondrán bonos como única devolución.",
+              "La excepción para productos confeccionados conforme a especificaciones del consumidor o claramente personalizados se explicará antes de contratar. No excluimos automáticamente toda la ropa de cama ni toda elección de talla o color. La excepción al retracto no elimina la garantía legal."
+            ]
+          },
+          {
+            "title": "Defectos y garantía legal",
+            "paragraphs": [
+              "Si el producto presenta un defecto de calidad, idoneidad o seguridad, te atenderemos conforme a la garantía legal. Los gastos necesarios de transporte y reparación que correspondan a la garantía no se cobrarán al cliente. La responsabilidad legal no se traslada exclusivamente al fabricante o a la transportadora.",
+              "Se aplicará el término obligatorio o anunciado que legalmente corresponda; para productos nuevos, a falta de término obligatorio o anunciado, la ley establece un año. La ficha y la constancia de compra deben informar la garantía aplicable sin reducir los mínimos legales.",
+              "La solución se determinará conforme a la ley: reparación gratuita cuando proceda; cuando el bien no admita reparación, reposición o devolución del dinero; y ante repetición de la falla, las opciones legales del consumidor según el caso. Se respetan también las reglas legales sobre plazos y constancias de reparación, reposición o devolución.",
+              "Un daño atribuible al consumidor se evaluará con fundamento y relación causal; no se rechazará automáticamente una garantía porque el producto haya sido usado, tenga una mancha o no conserve todo su embalaje. Las instrucciones de cuidado se comunicarán oportunamente."
+            ]
+          },
+          {
+            "title": "Producto equivocado, dañado o no entregado",
+            "paragraphs": [
+              "Comunica la situación para coordinar una solución sin costos indebidos. Si no entregamos dentro del plazo aceptado o el producto no está disponible, puedes ejercer los derechos legales de terminación y devolución de todas las sumas pagadas. Cuando corresponda el supuesto del artículo 50, el reembolso no excederá quince días calendario y no tendrá descuentos o retenciones.",
+              "No estás obligado a aceptar una referencia diferente o una nueva fecha impuesta por la tienda. El reporte de un daño de transporte no queda condicionado a una renuncia o revisión inmediata frente al transportador."
+            ]
+          },
+          {
+            "title": "Reversión de pagos",
+            "paragraphs": [
+              "En los supuestos y medios de pago que cubre la normativa —entre ellos ciertas compras electrónicas fraudulentas, no solicitadas, no recibidas, defectuosas o distintas de lo pedido— puede proceder la reversión. La ley exige reclamar al proveedor y notificar al emisor del instrumento de pago dentro de los cinco días hábiles correspondientes, devolviendo el producto cuando proceda.",
+              "Te facilitaremos la información para tramitarlo. Su aplicación depende del instrumento, participantes y supuesto legal: no afirmamos que toda transferencia esté excluida ni que todos los medios ofrezcan idéntico mecanismo. No tener pasarela propia no elimina por sí solo los derechos aplicables."
+            ]
+          },
+          {
+            "title": "Cambios voluntarios y atención",
+            "paragraphs": [
+              "No se ha definido un programa adicional de cambios por gusto distinto del retracto legal. Cualquier beneficio voluntario que se ofrezca se informará antes de comprar y no sustituirá la garantía, el retracto o los derechos por incumplimiento.",
+              "Los plazos de reembolso dependen del derecho ejercido; no se impone una única condición de «sin uso» a todos los casos. Coordinaremos un medio de devolución permitido, respetando los derechos de elección aplicables. Las reclamaciones directas de consumo se responden dentro de quince días hábiles, sin confundir ese plazo con el de devolución del dinero."
+            ]
+          }
+        ]
+      }
     }
   }
 }

@@ -1,0 +1,79 @@
+{
+  "reviewDate": "2026-10-28",
+  "scope": "Recursos locales, manifiestos de procedencia y foto del catálogo de ejemplo conocida; no certificación de derechos de terceros.",
+  "catalogDemo": {
+    "source": "https://www.pexels.com/photo/white-linen-covering-a-bed-with-pillows-8251700/",
+    "author": "PNW Production",
+    "license": "https://www.pexels.com/license/",
+    "filename": "textiles-8251700.jpg",
+    "use": "Ejemplo/ambientación; sustituir con fotografía fiel antes de vender la referencia real."
+  },
+  "items": [
+    {
+      "manifest": "public/brand/provenance.json",
+      "sha256": "634f3f39e0722556f10b676053515eed37c6fd07d1998a1e9195aecad559cd74",
+      "note": "Procedencia técnica; no equivale a cesión o exclusividad acreditadas."
+    },
+    {
+      "manifest": "public/images/landing/provenance.json",
+      "sha256": "0c7523a72628035fd94f79a7fbb276183162ee3a247365dbda3d6f37025f1243",
+      "note": "Procedencia técnica; no equivale a cesión o exclusividad acreditadas."
+    },
+    {
+      "file": "public/brand/isotype.svg",
+      "sha256": "1981cdde42b4c439170bd58eba41492c038de965e5e1121e22770a3d5ff8fd7e"
+    },
+    {
+      "file": "public/brand/signature.svg",
+      "sha256": "2513406c794d5e4c70b346728cb8a05a1e1a0caeb1396438d12899fedab19473"
+    },
+    {
+      "file": "public/brand/wordmark.svg",
+      "sha256": "17644d0b3c0e8d92ccbdccb352997f8daf41ec938b88ebbbdc016fd6b095f09b"
+    },
+    {
+      "file": "public/images/landing/entre-telas-curtain-480.webp",
+      "sha256": "7fdea00e0908d32d186bb25b968f9aac7e689ea709cb3adc0f19ba890373ea2b"
+    },
+    {
+      "file": "public/images/landing/entre-telas-curtain-800.webp",
+      "sha256": "137760a43d181b06520d2a9da078238663c0e0d8142d6cc7a18ec7c8c3648a8c"
+    },
+    {
+      "file": "public/images/landing/entre-telas-room-480.webp",
+      "sha256": "6d2d052dcfce81908840265db673f2b8901320f5456de37f4f3799a743c8b277"
+    },
+    {
+      "file": "public/images/landing/entre-telas-room-800.webp",
+      "sha256": "eaa19986329f49e260ef1079c39663d76964c8d11b274bbb319148ae69175773"
+    },
+    {
+      "file": "public/images/landing/refugio-marfil.webp",
+      "sha256": "076760d78dcc853d2eef5373da210d4fac09047b2a8862d24ae928878e7b9a03"
+    },
+    {
+      "file": "public/images/landing/story-bedroom.jpg",
+      "sha256": "10feb09253e6edeac32cecd579eae75753e32be2467358c61e59c20a23650947"
+    },
+    {
+      "file": "public/images/landing/story-white-bedding.jpg",
+      "sha256": "9c3313cfc48c2c7d8312d434c77b29692b9f14d7c120f043b16c3f98c7bf3dbd"
+    },
+    {
+      "file": "src/styles/fonts/cormorant-garamond-latin-variable.woff2",
+      "sha256": "222ff3377e9c99810fada369e4b6589efd81c6b534788fb622a95d8e3604ecc6"
+    },
+    {
+      "file": "src/styles/fonts/cormorant-garamond-OFL.txt",
+      "sha256": "2d18818d1e2044bda96e663840ef64c32d1e6aa53a11d05cc8b70e4aa0dffef8"
+    },
+    {
+      "file": "src/styles/fonts/manrope-latin-variable.woff2",
+      "sha256": "562d2f2df6883d878ba9a232d2f7a130b9a5b74fca098cd2ba7a8ac2263d1908"
+    },
+    {
+      "file": "src/styles/fonts/manrope-OFL.txt",
+      "sha256": "2e9a4958fb8e5be69eca9abc48544e1ca1898ca71edc54ac3da25cd93101881e"
+    }
+  ]
+}

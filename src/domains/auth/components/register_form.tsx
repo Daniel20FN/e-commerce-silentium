@@ -1,4 +1,7 @@
 "use client";
+import { ConsentFields } from "@/domains/legal/components/consent_fields";
+import { LEGAL_VERSION } from "@/domains/legal/services/legal_release";
+import type { LegalUiCopy } from "@/domains/legal/services/legal_ui_copy";
 
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
@@ -38,7 +41,7 @@ interface RegisterFormErrors {
 }
 
 interface RegisterFormProps {
-  dictionary: Dictionary;
+  dictionary: Pick<Dictionary, "auth"> & { legal: LegalUiCopy };
 }
 
 const REGISTER_REQUEST_ID = "auth-register";
@@ -54,7 +57,7 @@ function replaceTemplate(
 }
 
 function resolveAuthErrorMessage(
-  dictionary: Dictionary,
+  dictionary: Pick<Dictionary, "auth">,
   errorCode: string | undefined,
 ): string {
   const authErrors = dictionary.auth.errors as Record<string, string>;
@@ -72,6 +75,8 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [adult, setAdult] = useState(false);
   const [acceptsMarketingEmails, setAcceptsMarketingEmails] = useState(false);
   const [acceptsWhatsAppMarketing, setAcceptsWhatsAppMarketing] =
     useState(false);
@@ -128,8 +133,8 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
       nextErrors.password = dictionary.auth.common.passwordMinLength;
     }
 
-    if (!acceptTerms) {
-      nextErrors.acceptTerms = dictionary.auth.errors.accept_terms_required;
+    if (!acceptTerms || !acceptPrivacy || !adult) {
+      nextErrors.acceptTerms = dictionary.legal.error;
     }
 
     setErrors(nextErrors);
@@ -158,6 +163,9 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         acceptTerms,
+        acceptPrivacy,
+        adult,
+        legalVersion: LEGAL_VERSION,
         acceptsMarketingEmails,
         acceptsWhatsAppMarketing,
       });
@@ -173,6 +181,8 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
       setFirstName("");
       setLastName("");
       setAcceptTerms(false);
+      setAcceptPrivacy(false);
+      setAdult(false);
       setAcceptsMarketingEmails(false);
       setAcceptsWhatsAppMarketing(false);
       setCountdownNow(Date.now());
@@ -323,14 +333,15 @@ export function RegisterForm({ dictionary }: RegisterFormProps) {
 
       <Stack spacing={0.75}>
         <Box>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={acceptTerms}
-                onChange={(event) => setAcceptTerms(event.target.checked)}
-              />
-            }
-            label={dictionary.auth.common.acceptTerms}
+          <ConsentFields
+            copy={dictionary.legal}
+            value={{ acceptTerms, acceptPrivacy, adult }}
+            disabled={isRegisterPending}
+            onChange={(key, checked) => {
+              if (key === "acceptTerms") setAcceptTerms(checked);
+              if (key === "acceptPrivacy") setAcceptPrivacy(checked);
+              if (key === "adult") setAdult(checked);
+            }}
           />
           {errors.acceptTerms ? (
             <Typography color="error" variant="caption">

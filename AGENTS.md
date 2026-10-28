@@ -266,3 +266,10 @@
 
 - `/admin/analisis` uses MUI X Charts Community, loaded only on that route. Preserve shared first-confirmation cohort and Colombia calendar semantics; inventory/aging are current snapshots, not period-filtered. See `docs/admin-analysis.md`.
 - Optional `ANALYSIS_INTEGRATION=1` with `npm run test:file -- src/domains/admin/analysis/services/analysis_service.integration.test.ts` requires explicit development DATABASE_URL. Uses isolated QA orders/catalog, cancels/soft-retires fixtures and verifies preexisting stock unchanged; never production, Storage uploads or WhatsApp messages. Stop Next/Jest before Prisma/build on Windows.
+
+### Legal documents and consent evidence
+
+- Public legal copy lives in `src/dictionary/es.json` under `legal`; current release is centralized in `src/domains/legal/services/legal_release.ts`. Bump its version whenever document copy or decision labels change; never mutate a persisted release. Keep full documents out of client form props (`getLegalUiCopy`).
+- `LegalRelease` and `LegalConsentEvent` are private, append-only evidence with RLS/no anon or authenticated SQL grants. Do not backfill legacy timestamps as versioned consent or collect IP/tokens as evidence by default. Legal pages do not certify all legal/operational compliance.
+- Registration consent originates before email verification; exports identify that assurance level. Invitations/account changes use verified sessions. Keep decisions separate, marketing optional and channel-specific, and withdrawal available without reaccepting commercial terms. Preserve identity locks and last-superadmin protection.
+- Optional `LEGAL_INTEGRATION=1` with `npm run test:file -- src/domains/legal/services/consent_service.integration.test.ts` requires explicit `.env.development` DATABASE_URL and the legal migration. It creates a synthetic business user and evidence entirely within an intentionally rolled-back transaction (no Auth account/email/catalog writes); verifies immutability, SQL denial and absence of fixtures afterward. Never change real-user consents to test. Stop Next/Jest before Prisma generation/build on Windows. See `docs/legal/implementation.md`.

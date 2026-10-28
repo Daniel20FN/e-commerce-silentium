@@ -1,6 +1,7 @@
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import { AcceptInvitationForm } from "@/domains/auth/components/accept_invitation_form";
 import { AuthShell } from "@/domains/auth/components/auth_shell";
+import { getLegalUiCopy } from "@/domains/legal/services/legal_ui_copy";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,7 +16,12 @@ export default function InvitationPage() {
       title={dictionary.auth.invitation.title}
       subtitle={dictionary.auth.invitation.subtitle}
     >
-      <AcceptInvitationForm dictionary={{ auth: dictionary.auth }} />
+      <AcceptInvitationForm
+        dictionary={{
+          auth: dictionary.auth,
+          legal: getLegalUiCopy(dictionary),
+        }}
+      />
     </AuthShell>
   );
 }

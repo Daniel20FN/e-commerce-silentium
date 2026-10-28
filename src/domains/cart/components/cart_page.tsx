@@ -482,6 +482,24 @@ export function CartPage({
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
             <Typography>{copy.reviewHelp}</Typography>
+            <Typography variant="body2">
+              {copy.legalNotice}{" "}
+              <Link
+                href="/legal/terminos"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {copy.termsLink}
+              </Link>
+              {" · "}
+              <Link
+                href="/legal/privacidad"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {copy.privacyLink}
+              </Link>
+            </Typography>
             {expired ? (
               <Alert severity="warning">{copy.reviewExpired}</Alert>
             ) : null}
