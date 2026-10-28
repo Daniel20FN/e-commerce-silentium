@@ -51,7 +51,7 @@ import {
 import { useAtomValue, useSetAtom } from "jotai";
 import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 const LOGOUT_REQUEST_ID = "auth-logout";
 
@@ -81,6 +81,10 @@ export function Navbar({
   const setCurrentUser = useSetAtom(currentUserAtom);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigationId = useId();
+  const profileButtonId = `${navigationId}-profile-button`;
+  const profileMenuId = `${navigationId}-profile-menu`;
+  const mobileNavigationId = `${navigationId}-mobile-navigation`;
 
   const navItems: NavItem[] = [
     {
@@ -400,8 +404,12 @@ export function Navbar({
                     </Typography>
                     <Tooltip title={dictionary.landing.sessionMenu}>
                       <IconButton
+                        id={profileButtonId}
                         onClick={handleProfileClick}
                         aria-label={dictionary.landing.sessionMenu}
+                        aria-haspopup="menu"
+                        aria-expanded={Boolean(anchorEl)}
+                        aria-controls={anchorEl ? profileMenuId : undefined}
                         size="small"
                         sx={(theme) => ({
                           border: `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
@@ -440,8 +448,12 @@ export function Navbar({
                   >
                     <Tooltip title={dictionary.landing.sessionMenu}>
                       <IconButton
+                        id={profileButtonId}
                         onClick={handleProfileClick}
                         aria-label={dictionary.landing.sessionMenu}
+                        aria-haspopup="menu"
+                        aria-expanded={Boolean(anchorEl)}
+                        aria-controls={anchorEl ? profileMenuId : undefined}
                         sx={(theme) => ({
                           color: "text.primary",
                           border: `1px solid ${alpha(
@@ -477,6 +489,9 @@ export function Navbar({
                 sx={{ display: { lg: "none" }, color: "text.primary" }}
                 onClick={handleDrawerToggle}
                 aria-label={dictionary.storefront.openNavigation}
+                aria-haspopup="dialog"
+                aria-expanded={mobileOpen}
+                aria-controls={mobileOpen ? mobileNavigationId : undefined}
               >
                 <MenuIcon />
               </IconButton>
@@ -490,6 +505,10 @@ export function Navbar({
         open={Boolean(anchorEl)}
         onClose={handleProfileClose}
         slotProps={{
+          list: {
+            id: profileMenuId,
+            "aria-labelledby": profileButtonId,
+          },
           paper: {
             sx: {
               mt: 1,
@@ -555,6 +574,12 @@ export function Navbar({
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
+        slotProps={{
+          paper: {
+            id: mobileNavigationId,
+            "aria-label": dictionary.landing.mainNavigation,
+          },
+        }}
         sx={{
           display: { xs: "block", lg: "none" },
           "& .MuiDrawer-paper": {

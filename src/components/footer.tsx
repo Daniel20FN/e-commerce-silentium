@@ -163,6 +163,13 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
               component={NavigationLink}
               key={slug}
               href={`/legal/${slug}`}
+              rel={
+                slug === "privacidad"
+                  ? "privacy-policy"
+                  : slug === "terminos"
+                    ? "terms-of-service"
+                    : undefined
+              }
               sx={{ fontSize: "0.875rem", py: 1 }}
             >
               {dictionary.legal.documents[slug].title}

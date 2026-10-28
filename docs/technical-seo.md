@@ -1,5 +1,7 @@
 # Indexación del catálogo
 
+Configuración de Google aún pendiente: [Search Console — pasos para terminar](search-console-pendiente.md).
+
 ## Qué se mantiene automáticamente
 
 | Recurso        | Comportamiento                                                                                                  |
