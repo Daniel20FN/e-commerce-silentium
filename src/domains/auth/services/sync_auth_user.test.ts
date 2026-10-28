@@ -1,3 +1,5 @@
+jest.mock("server-only", () => ({}));
+import { recordLegalDecisions } from "@/domains/legal/services/consent_service";
 import { prisma } from "@/lib/prisma";
 import { UserRole, UserStatus } from "@prisma/client";
 import type { User } from "@supabase/supabase-js";
@@ -22,6 +24,9 @@ jest.mock("@/lib/prisma", () => ({
       upsert: jest.fn(),
     },
   },
+}));
+jest.mock("@/domains/legal/services/consent_service", () => ({
+  recordLegalDecisions: jest.fn(),
 }));
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
@@ -57,6 +62,35 @@ describe("syncAuthUser", () => {
       if (typeof callback !== "function") throw new Error("Unexpected batch");
       return callback(prisma as never);
     });
+  });
+
+  it("passes the actual optional channel decisions to evidence without overwriting them before recording", async () => {
+    mockUserFindFirst.mockResolvedValue(null);
+    mockUserCreate.mockResolvedValue({ id: "new-owner" });
+    mockUserFindUnique.mockResolvedValue({ id: "new-owner" });
+    await syncAuthUser({
+      authUser: createSupabaseUser(),
+      legalAcceptance: {
+        acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
+      },
+      acceptsMarketingEmails: true,
+      acceptsWhatsAppMarketing: false,
+    });
+    expect(recordLegalDecisions).toHaveBeenCalledWith(
+      expect.anything(),
+      "new-owner",
+      expect.objectContaining({
+        acceptsMarketingEmails: true,
+        acceptsWhatsAppMarketing: false,
+      }),
+      "registration",
+    );
+    expect(mockUserPreferenceUpsert.mock.calls[0][0].update).not.toHaveProperty(
+      "acceptsMarketingEmails",
+    );
   });
 
   it("preserves profile edits instead of restoring old signup metadata", async () => {
@@ -193,7 +227,7 @@ describe("syncAuthUser", () => {
       },
       update: {
         acceptedTermsAt,
-        acceptedPrivacyPolicyAt: acceptedTermsAt,
+
         acceptsMarketingEmails: true,
         acceptsWhatsAppMarketing: false,
       },
@@ -202,7 +236,6 @@ describe("syncAuthUser", () => {
         acceptsMarketingEmails: true,
         acceptsWhatsAppMarketing: false,
         acceptedTermsAt,
-        acceptedPrivacyPolicyAt: acceptedTermsAt,
       },
     });
     expect(result).toBe(syncedUser);

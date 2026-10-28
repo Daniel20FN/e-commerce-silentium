@@ -1,3 +1,5 @@
+import { recordLegalDecisions } from "@/domains/legal/services/consent_service";
+import type { LegalAcceptanceParams } from "@/domains/legal/types/api_params";
 import { prisma } from "@/lib/prisma";
 import { UserStatus } from "@prisma/client";
 import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
@@ -14,6 +16,7 @@ export interface SyncAuthUserInput {
   authUser: SupabaseAuthUser;
   profile?: SyncAuthUserProfileInput;
   acceptedTermsAt?: Date;
+  legalAcceptance?: LegalAcceptanceParams;
   acceptsMarketingEmails?: boolean;
   acceptsWhatsAppMarketing?: boolean;
 }
@@ -183,28 +186,45 @@ export async function syncAuthUser(
         ...(input.acceptedTermsAt
           ? {
               acceptedTermsAt: input.acceptedTermsAt,
-              acceptedPrivacyPolicyAt: input.acceptedTermsAt,
             }
           : {}),
-        ...(input.acceptsMarketingEmails !== undefined
+        ...(!input.legalAcceptance && input.acceptsMarketingEmails !== undefined
           ? { acceptsMarketingEmails: input.acceptsMarketingEmails }
           : {}),
-        ...(input.acceptsWhatsAppMarketing !== undefined
+        ...(!input.legalAcceptance &&
+        input.acceptsWhatsAppMarketing !== undefined
           ? { acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing }
           : {}),
       },
       create: {
         userId: user.id,
-        acceptsMarketingEmails: input.acceptsMarketingEmails ?? false,
-        acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing ?? false,
+        acceptsMarketingEmails: input.legalAcceptance
+          ? false
+          : (input.acceptsMarketingEmails ?? false),
+        acceptsWhatsAppMarketing: input.legalAcceptance
+          ? false
+          : (input.acceptsWhatsAppMarketing ?? false),
         ...(input.acceptedTermsAt
           ? {
               acceptedTermsAt: input.acceptedTermsAt,
-              acceptedPrivacyPolicyAt: input.acceptedTermsAt,
             }
           : {}),
       },
     });
+
+    if (input.legalAcceptance) {
+      await recordLegalDecisions(
+        tx,
+        user.id,
+        {
+          ...input.legalAcceptance,
+          acceptsMarketingEmails: input.acceptsMarketingEmails ?? false,
+          acceptsWhatsAppMarketing: input.acceptsWhatsAppMarketing ?? false,
+          requestId: `registration:${input.authUser.id}:${input.legalAcceptance.legalVersion}`,
+        },
+        "registration",
+      );
+    }
 
     const syncedUser = await tx.user.findUnique({
       where: {

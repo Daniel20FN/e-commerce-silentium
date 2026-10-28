@@ -1,6 +1,7 @@
 import { BrandLogo } from "@/components/brand_logo";
 import NavigationLink from "@/components/navigation_link";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { LEGAL_SLUGS } from "@/domains/legal/services/legal_release";
 import { CompanyValues } from "@/values/app_values";
 import {
   SALES_INSTAGRAM_HANDLE,
@@ -148,6 +149,34 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
             </Box>
           ))}
         </Box>
+        <Stack
+          component="nav"
+          aria-label={dictionary.legal.title}
+          direction="row"
+          useFlexGap
+          flexWrap="wrap"
+          spacing={2}
+          sx={{ pb: 3 }}
+        >
+          {LEGAL_SLUGS.map((slug) => (
+            <Link
+              component={NavigationLink}
+              key={slug}
+              href={`/legal/${slug}`}
+              sx={{ fontSize: "0.875rem", py: 1 }}
+            >
+              {dictionary.legal.documents[slug].title}
+            </Link>
+          ))}
+          <Link
+            href="https://www.sic.gov.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ fontSize: "0.875rem", py: 1 }}
+          >
+            {dictionary.legal.sic}
+          </Link>
+        </Stack>
         <Divider />
         <Stack
           direction={{ xs: "column", sm: "row" }}

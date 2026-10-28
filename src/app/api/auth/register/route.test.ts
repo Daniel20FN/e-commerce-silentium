@@ -60,12 +60,19 @@ describe("POST /api/auth/register", () => {
     const response = await POST(
       new NextRequest("http://localhost/api/auth/register", {
         method: "POST",
+        headers: {
+          origin: "http://localhost",
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           email: "CLIENTE@example.com",
           password: "password123",
           firstName: " Ana ",
           lastName: " Pérez ",
           acceptTerms: true,
+          acceptPrivacy: true,
+          adult: true,
+          legalVersion: "2026-10-28.1",
           acceptsMarketingEmails: true,
           acceptsWhatsAppMarketing: false,
         }),
@@ -92,7 +99,12 @@ describe("POST /api/auth/register", () => {
         firstName: "Ana",
         lastName: "Pérez",
       },
-      acceptedTermsAt: expect.any(Date),
+      legalAcceptance: {
+        acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
+      },
       acceptsMarketingEmails: true,
       acceptsWhatsAppMarketing: false,
     });
@@ -111,6 +123,10 @@ describe("POST /api/auth/register", () => {
     const response = await POST(
       new NextRequest("http://localhost/api/auth/register", {
         method: "POST",
+        headers: {
+          origin: "http://localhost",
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           email: "invalid-email",
           password: "short",
@@ -151,12 +167,19 @@ describe("POST /api/auth/register", () => {
     const response = await POST(
       new NextRequest("http://localhost/api/auth/register", {
         method: "POST",
+        headers: {
+          origin: "http://localhost",
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           email: "cliente@example.com",
           password: "password123",
           firstName: "Ana",
           lastName: "Pérez",
           acceptTerms: true,
+          acceptPrivacy: true,
+          adult: true,
+          legalVersion: "2026-10-28.1",
         }),
       }),
     );
@@ -193,12 +216,19 @@ describe("POST /api/auth/register", () => {
     const response = await POST(
       new NextRequest("http://localhost/api/auth/register", {
         method: "POST",
+        headers: {
+          origin: "http://localhost",
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           email: "cliente@example.com",
           password: "password123",
           firstName: "Ana",
           lastName: "Pérez",
           acceptTerms: true,
+          acceptPrivacy: true,
+          adult: true,
+          legalVersion: "2026-10-28.1",
         }),
       }),
     );

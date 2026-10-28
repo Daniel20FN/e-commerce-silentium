@@ -1,8 +1,14 @@
 import { hasAdminAccess } from "@/domains/admin/services/admin_roles";
+import {
+  lockUserAccess,
+  lockUserIdentity,
+} from "@/domains/auth/services/user_access_lock";
 import type {
   AcceptInvitationData,
   AcceptInvitationParams,
 } from "@/domains/auth/types/invitation_api";
+import { recordLegalDecisions } from "@/domains/legal/services/consent_service";
+import { LEGAL_VERSION } from "@/domains/legal/services/legal_release";
 import { prisma } from "@/lib/prisma";
 import type { AdminUserInvitation } from "@prisma/client";
 import type { User } from "@supabase/supabase-js";
@@ -45,7 +51,12 @@ export async function acceptInvitation(
   input: AcceptInvitationParams,
   supabase: PasswordUpdater,
 ): Promise<AcceptInvitationData> {
-  if (!input.acceptTerms)
+  if (
+    !input.acceptTerms ||
+    !input.acceptPrivacy ||
+    !input.adult ||
+    input.legalVersion !== LEGAL_VERSION
+  )
     throw new InvitationError("invitation_invalid_fields");
   const invitation = await pendingInvitation(recipient);
   const { error } = await supabase.auth.updateUser({
@@ -55,6 +66,8 @@ export async function acceptInvitation(
   if (error && error.code !== "same_password")
     throw new InvitationError("invitation_password_failed");
   await prisma.$transaction(async (tx) => {
+    await lockUserAccess(tx);
+    await lockUserIdentity(tx, recipient.id);
     const now = new Date();
     const consumed = await tx.adminUserInvitation.updateMany({
       where: {
@@ -117,15 +130,17 @@ export async function acceptInvitation(
         lastName: invitation.lastName,
       },
     });
-    await tx.userPreference.upsert({
-      where: { userId: accountId },
-      create: {
-        userId: accountId,
-        acceptedTermsAt: now,
-        acceptedPrivacyPolicyAt: now,
+    await recordLegalDecisions(
+      tx,
+      accountId,
+      {
+        ...input,
+        acceptsMarketingEmails: false,
+        acceptsWhatsAppMarketing: false,
+        requestId: `invitation:${invitation.id}`,
       },
-      update: { acceptedTermsAt: now, acceptedPrivacyPolicyAt: now },
-    });
+      "invitation",
+    );
   });
   return { redirectTo: hasAdminAccess(invitation.role) ? "/admin" : "/" };
 }

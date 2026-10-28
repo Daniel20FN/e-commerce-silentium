@@ -29,6 +29,10 @@ it("projects only public URLs, never stock, costs, personal data or invented mod
       "/",
       "/productos",
       "/categorias",
+      "/legal/terminos",
+      "/legal/privacidad",
+      "/legal/cookies",
+      "/legal/reembolsos",
       "/categorias/cama",
       "/productos/linen",
     ].map((path) => ({ url: `${STOREFRONT_ORIGIN}${path}` })),
@@ -43,7 +47,7 @@ it("projects only public URLs, never stock, costs, personal data or invented mod
     },
     select: { slug: true },
     orderBy: { id: "asc" },
-    take: 49997,
+    take: 49993,
   });
   expect(JSON.stringify(sitemap)).not.toMatch(
     /lastModified|lastmod|carrito|account|admin|ofertas|colecciones/,

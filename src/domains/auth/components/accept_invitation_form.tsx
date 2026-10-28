@@ -1,12 +1,13 @@
 "use client";
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { ConsentFields } from "@/domains/legal/components/consent_fields";
+import { LEGAL_VERSION } from "@/domains/legal/services/legal_release";
+import type { LegalUiCopy } from "@/domains/legal/services/legal_ui_copy";
 import {
   Alert,
   Box,
   Button,
-  Checkbox,
-  FormControlLabel,
   Stack,
   TextField,
   Typography,
@@ -24,7 +25,7 @@ import type {
 export function AcceptInvitationForm({
   dictionary,
 }: {
-  dictionary: Pick<Dictionary, "auth">;
+  dictionary: Pick<Dictionary, "auth"> & { legal: LegalUiCopy };
 }) {
   const { cancellableApi, isPending } = useCancellableApiContext();
   const [invitation, setInvitation] = useState<PendingInvitationData | null>(
@@ -35,6 +36,8 @@ export function AcceptInvitationForm({
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [adult, setAdult] = useState(false);
   const copy = dictionary.auth.invitation;
   const busy = isPending("accept-user-invitation");
   const sessionSetup = useRef<Promise<void> | null>(null);
@@ -84,6 +87,9 @@ export function AcceptInvitationForm({
       >("accept-user-invitation", "/auth/invitations", {
         password,
         acceptTerms,
+        acceptPrivacy,
+        adult,
+        legalVersion: LEGAL_VERSION,
       });
       if (!result) throw new Error("invitation_unavailable");
       setPassword("");
@@ -131,16 +137,15 @@ export function AcceptInvitationForm({
               inputProps={{ minLength: 8, maxLength: 128 }}
               onChange={(event) => setConfirmation(event.target.value)}
             />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  required
-                  checked={acceptTerms}
-                  disabled={busy}
-                  onChange={(event) => setAcceptTerms(event.target.checked)}
-                />
-              }
-              label={dictionary.auth.common.acceptTerms}
+            <ConsentFields
+              copy={dictionary.legal}
+              value={{ acceptTerms, acceptPrivacy, adult }}
+              disabled={busy}
+              onChange={(key, checked) => {
+                if (key === "acceptTerms") setAcceptTerms(checked);
+                if (key === "acceptPrivacy") setAcceptPrivacy(checked);
+                if (key === "adult") setAdult(checked);
+              }}
             />
             <Button type="submit" variant="contained" disabled={busy}>
               {busy ? copy.submitting : copy.submit}

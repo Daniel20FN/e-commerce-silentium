@@ -1,3 +1,4 @@
+import { legalAcceptanceShape } from "@/domains/legal/services/legal_schemas";
 import { z } from "zod";
 import { ADMIN_USER_ROLE_VALUES } from "../types/shared";
 
@@ -13,6 +14,6 @@ export const userInvitationSchema = z
 export const acceptInvitationSchema = z
   .object({
     password: z.string().min(8).max(128),
-    acceptTerms: z.literal(true),
+    ...legalAcceptanceShape,
   })
   .strict();

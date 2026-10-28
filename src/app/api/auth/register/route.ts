@@ -16,7 +16,14 @@ function createJsonResponse(
 export async function POST(
   request: NextRequest,
 ): Promise<NextResponse<RegisterApiResponse>> {
-  const payload = registerSchema.safeParse(await request.json());
+  if (
+    request.headers.get("origin") !== request.nextUrl.origin ||
+    !request.headers.get("content-type")?.startsWith("application/json")
+  )
+    return createJsonResponse({ type: "forbidden", message: "forbidden" }, 403);
+  const payload = registerSchema.safeParse(
+    await request.json().catch(() => null),
+  );
 
   if (!payload.success) {
     return createJsonResponse(
@@ -65,6 +72,8 @@ export async function POST(
     );
   }
 
+  if (data.user?.identities?.length === 0) return response;
+
   if (!data.user) {
     return createJsonResponse(
       {
@@ -87,16 +96,34 @@ export async function POST(
     );
   }
 
-  await syncAuthUser({
-    authUser: data.user,
-    profile: {
-      firstName: payload.data.firstName,
-      lastName: payload.data.lastName,
-    },
-    acceptedTermsAt: new Date(),
-    acceptsMarketingEmails: payload.data.acceptsMarketingEmails,
-    acceptsWhatsAppMarketing: payload.data.acceptsWhatsAppMarketing,
-  });
-
+  try {
+    await syncAuthUser({
+      authUser: data.user,
+      profile: {
+        firstName: payload.data.firstName,
+        lastName: payload.data.lastName,
+      },
+      legalAcceptance: {
+        acceptTerms: payload.data.acceptTerms,
+        acceptPrivacy: payload.data.acceptPrivacy,
+        adult: payload.data.adult,
+        legalVersion: payload.data.legalVersion,
+      },
+      acceptsMarketingEmails: payload.data.acceptsMarketingEmails,
+      acceptsWhatsAppMarketing: payload.data.acceptsWhatsAppMarketing,
+    });
+  } catch (error) {
+    console.error("registration_legal_persistence_failed");
+    return createJsonResponse(
+      {
+        type: "service_unavailable",
+        message:
+          error instanceof Error && error.message === "legal_version_changed"
+            ? "legal_version_changed"
+            : "registration_unavailable",
+      },
+      503,
+    );
+  }
   return response;
 }

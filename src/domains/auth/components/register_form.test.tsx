@@ -1,4 +1,5 @@
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
+import actualDictionary from "@/dictionary/es.json";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { RegisterForm } from "./register_form";
 
@@ -10,6 +11,13 @@ const mockUseCancellableApiContext = jest.mocked(useCancellableApiContext);
 const mockPost = jest.fn();
 
 const dictionary = {
+  legal: {
+    ...actualDictionary.legal,
+    controls: {
+      ...actualDictionary.legal.controls,
+      terms: "Acepto los t�rminos",
+    },
+  },
   auth: {
     common: {
       firstName: "Nombre",
@@ -80,7 +88,9 @@ describe("RegisterForm", () => {
     fireEvent.change(screen.getByLabelText("Contrase�a"), {
       target: { value: "password123" },
     });
-    fireEvent.click(screen.getByLabelText("Acepto los t�rminos"));
+    fireEvent.click(screen.getByLabelText(dictionary.legal.controls.terms));
+    fireEvent.click(screen.getByLabelText(dictionary.legal.controls.privacy));
+    fireEvent.click(screen.getByLabelText(dictionary.legal.controls.adult));
     fireEvent.click(
       screen.getByLabelText("Quiero recibir promociones por email"),
     );
@@ -94,6 +104,9 @@ describe("RegisterForm", () => {
         firstName: "Ana",
         lastName: "P�rez",
         acceptTerms: true,
+        acceptPrivacy: true,
+        adult: true,
+        legalVersion: "2026-10-28.1",
         acceptsMarketingEmails: true,
         acceptsWhatsAppMarketing: false,
       });
@@ -113,7 +126,7 @@ describe("RegisterForm", () => {
         screen.getByLabelText(dictionary.auth.common.password),
       ).toHaveValue("");
       expect(
-        screen.getByLabelText(dictionary.auth.common.acceptTerms),
+        screen.getByLabelText(dictionary.legal.controls.terms),
       ).not.toBeChecked();
       expect(
         screen.getByLabelText(dictionary.auth.register.acceptsMarketingEmails),

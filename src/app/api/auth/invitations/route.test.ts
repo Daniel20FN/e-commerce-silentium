@@ -22,7 +22,13 @@ const recipient = {
   email_confirmed_at: "2026-10-22T00:00:00Z",
 };
 function request(
-  body: object = { password: "long-password", acceptTerms: true },
+  body: object = {
+    password: "long-password",
+    acceptTerms: true,
+    acceptPrivacy: true,
+    adult: true,
+    legalVersion: "2026-10-28.1",
+  },
 ): NextRequest {
   return new NextRequest("http://localhost/api/auth/invitations", {
     method: "POST",
@@ -69,9 +75,22 @@ it("requires authenticated ownership before lookup or password changes", async (
   expect(acceptInvitation).not.toHaveBeenCalled();
 });
 it.each([
-  { password: "short", acceptTerms: true },
+  {
+    password: "short",
+    acceptTerms: true,
+    acceptPrivacy: true,
+    adult: true,
+    legalVersion: "2026-10-28.1",
+  },
   { password: "long-password", acceptTerms: false },
-  { password: "long-password", acceptTerms: true, role: "super_admin" },
+  {
+    password: "long-password",
+    acceptTerms: true,
+    acceptPrivacy: true,
+    adult: true,
+    legalVersion: "2026-10-28.1",
+    role: "super_admin",
+  },
 ])(
   "rejects invalid password, missing consent and client privilege claims: %j",
   async (input) => {
@@ -85,7 +104,13 @@ it("passes only the verified identity and password/consent to acceptance", async
   expect(response.status).toBe(200);
   expect(acceptInvitation).toHaveBeenCalledWith(
     recipient,
-    { password: "long-password", acceptTerms: true },
+    {
+      password: "long-password",
+      acceptTerms: true,
+      acceptPrivacy: true,
+      adult: true,
+      legalVersion: "2026-10-28.1",
+    },
     expect.anything(),
   );
   await expect(response.json()).resolves.toEqual({

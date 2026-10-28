@@ -1,3 +1,4 @@
+import { LEGAL_SLUGS } from "@/domains/legal/services/legal_release";
 import { prisma } from "@/lib/prisma";
 import type { MetadataRoute } from "next";
 import "server-only";
@@ -22,6 +23,7 @@ export async function buildPublicSitemap(): Promise<MetadataRoute.Sitemap> {
     "/",
     "/productos",
     "/categorias",
+    ...LEGAL_SLUGS.map((slug) => `/legal/${slug}`),
     ...categories.map((item) => `/categorias/${encodeURIComponent(item.slug)}`),
   ];
   const remaining = 50000 - paths.length;
