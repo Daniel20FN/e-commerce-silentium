@@ -76,6 +76,9 @@ describe("auth middleware", () => {
     expect(matcher.test("/robots.txt")).toBe(false);
     expect(matcher.test("/productos/sitemap.xml-example")).toBe(true);
     expect(matcher.test("/api/account")).toBe(true);
+    // MCP authenticates with Bearer tokens only: it never touches session cookies.
+    expect(matcher.test("/api/mcp")).toBe(false);
+    expect(matcher.test("/api/mcp-other")).toBe(true);
   });
   it.each([
     "/admin/productos/qa/preview",
