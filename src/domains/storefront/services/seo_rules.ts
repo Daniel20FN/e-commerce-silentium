@@ -58,5 +58,6 @@ export function seoPrivatePath(path: string): boolean {
     "/login",
     "/register",
     "/auth",
+    "/oauth",
   ].some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }

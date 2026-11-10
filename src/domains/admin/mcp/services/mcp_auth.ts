@@ -1,3 +1,12 @@
+import { oauthContext } from "@/domains/admin/mcp_oauth/services/oauth_origin";
+import {
+  isAccessTokenShape,
+  readBearerValue,
+} from "@/domains/admin/mcp_oauth/services/oauth_rules";
+import {
+  resolveOAuthAccessToken,
+  touchOAuthGrant,
+} from "@/domains/admin/mcp_oauth/services/oauth_token_service";
 import { hasAdminAccess } from "@/domains/admin/services/admin_roles";
 import { isDeletedAccount } from "@/domains/auth/services/deleted_account";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
@@ -49,6 +58,9 @@ export async function authenticateMcpRequest(
 ): Promise<McpAuthResult> {
   const header = request.headers.get("authorization");
   if (!header) return reject(401, "missing_token");
+  const bearer = readBearerValue(header);
+  if (bearer && isAccessTokenShape(bearer))
+    return authenticateOAuthBearer(bearer, request, now);
   const secret = extractBearerSecret(header);
   if (!secret) return reject(401, "invalid_token");
 
@@ -117,4 +129,38 @@ async function touchLastUsed(
     // Usage bookkeeping must never block an authenticated request.
     console.error("mcp_token_touch_failed");
   }
+}
+
+/**
+ * OAuth access tokens resolve to the same actor as personal tokens: the grant
+ * must be live and issued for this exact resource, and the owner's role and
+ * status are re-read on every request.
+ */
+async function authenticateOAuthBearer(
+  secret: string,
+  request: Request,
+  now: Date,
+): Promise<McpAuthResult> {
+  const { resource } = oauthContext(request.url);
+  const resolved = await resolveOAuthAccessToken(secret, resource, now);
+  if (!resolved.ok) return reject(401, resolved.code);
+  const { user } = resolved;
+  if (user.status !== "active" || isDeletedAccount(user.email))
+    return reject(403, "user_unavailable");
+  if (!hasAdminAccess(user.role)) return reject(403, "forbidden_role");
+  await touchOAuthGrant(resolved.grantId, resolved.lastUsedAt, now);
+  return {
+    ok: true,
+    actor: {
+      id: user.id,
+      label:
+        [user.profile?.firstName, user.profile?.lastName]
+          .filter(Boolean)
+          .join(" ") || user.email,
+      role: user.role,
+      tokenId: resolved.grantId,
+      scopes: resolved.scopes,
+      expiresAt: resolved.expiresAt,
+    },
+  };
 }

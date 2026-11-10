@@ -14,3 +14,7 @@ export function GET(request: Request): Promise<Response> {
 export function DELETE(request: Request): Promise<Response> {
   return handleMcpRequest(request);
 }
+
+export function OPTIONS(request: Request): Promise<Response> {
+  return handleMcpRequest(request);
+}
