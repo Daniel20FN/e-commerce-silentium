@@ -80,7 +80,7 @@ export function getMcpPrompt(
     ? cleanArgument(args?.[text.argumentName])
     : "";
   const message = value
-    ? `${text.message}\n\n${texts.withArgument.replace("{value}", value)}`
+    ? `${text.message}\n\n${texts.withArgument.replace("{value}", () => value)}`
     : text.message;
   return {
     description: text.description,

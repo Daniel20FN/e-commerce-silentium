@@ -82,6 +82,9 @@ export const storeTools = [
       const unavailable: PriorityBlock[] = [];
       settled.forEach((result, index) => {
         if (result.status === "rejected") {
+          console.error("mcp_store_overview_block_failed", {
+            block: OVERVIEW_BLOCKS[index],
+          });
           unavailable.push(OVERVIEW_BLOCKS[index]);
           return;
         }

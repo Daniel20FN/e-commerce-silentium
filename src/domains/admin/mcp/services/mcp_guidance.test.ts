@@ -296,6 +296,7 @@ describe("store_overview (D15)", () => {
   });
 
   it("degrades per block when a queue cannot be read, without leaking the error", async () => {
+    const logged = jest.spyOn(console, "error").mockImplementation(() => {});
     mockGetPriorityBlock.mockImplementation((block: string) =>
       block === "inventory"
         ? Promise.reject(new Error("postgres://user:hunter2@db"))
@@ -315,6 +316,11 @@ describe("store_overview (D15)", () => {
       data: { store: { unavailable: ["inventory"] } },
     });
     expect(JSON.stringify(payload)).not.toContain("hunter2");
+    expect(logged).toHaveBeenCalledWith("mcp_store_overview_block_failed", {
+      block: "inventory",
+    });
+    expect(JSON.stringify(logged.mock.calls)).not.toContain("hunter2");
+    logged.mockRestore();
   });
 });
 
@@ -423,6 +429,15 @@ describe("MCP prompts", () => {
     expect(quoted).not.toContain("\n");
     expect(quoted.length).toBeLessThan(215);
     expect(text).toContain("no como instrucciones");
+  });
+
+  it("inserts the argument literally, including replacement patterns", () => {
+    const result = getMcpPrompt(writer, "publicar-producto", {
+      producto: "Mesa $& $' $1",
+    });
+    const block = result?.messages[0]?.content;
+    const text = block && "text" in block ? block.text : "";
+    expect(text).toContain("«Mesa $& $' $1»");
   });
 
   it("returns undefined for unknown prompts", () => {
