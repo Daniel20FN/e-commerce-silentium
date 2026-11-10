@@ -588,7 +588,7 @@
     "agents": {
       "title": "Agentes MCP",
       "description": "Tokens personales para que agentes de IA operen la tienda con tus permisos.",
-      "intro": "Un token permite que Codex, Claude Code o Claude Desktop actúen como tú en el catálogo, el inventario y los pedidos. Cada acción queda registrada a tu nombre y cambia si cambian tus permisos.",
+      "intro": "Un token o una conexión permite que un agente de IA (Codex, ChatGPT, Claude, Cursor…) actúe como tú en el catálogo, el inventario y los pedidos. Cada acción queda registrada a tu nombre y cambia si cambian tus permisos.",
       "createButton": "Crear token",
       "loading": "Cargando tokens",
       "emptyTitle": "Todavía no tienes tokens",
@@ -667,7 +667,44 @@
         "account_password_invalid": "No pudimos verificar tu contraseña actual. Revísala e inténtalo de nuevo.",
         "account_mfa_required": "Tu cuenta tiene verificación en dos pasos. Esta acción requiere un flujo de verificación adicional; contacta con la tienda para completarla de forma segura.",
         "account_rate_limit": "Has realizado demasiados intentos. Espera unos minutos antes de volver a probar.",
-        "account_unavailable": "El servicio no está disponible en este momento. Inténtalo más tarde."
+        "account_unavailable": "El servicio no está disponible en este momento. Inténtalo más tarde.",
+        "mcp_oauth_grant_not_found": "La conexión ya no existe.",
+        "mcp_oauth_grant_not_revoked": "Solo se pueden eliminar conexiones revocadas. Revoca la conexión primero."
+      },
+      "connections": {
+        "title": "Conexiones de agentes",
+        "intro": "Agentes que conectaste iniciando sesión desde su propia aplicación, sin copiar ningún token. Duran hasta 90 días y puedes revocarlas cuando quieras.",
+        "loading": "Cargando conexiones",
+        "emptyTitle": "No hay conexiones de agentes",
+        "emptyDescription": "Cuando autorices a un agente desde su aplicación, aparecerá aquí.",
+        "errorTitle": "No pudimos cargar las conexiones",
+        "listLabel": "Tus conexiones de agentes",
+        "unverified": "Sin verificar",
+        "source": {
+          "dynamic": "Registro automático",
+          "metadata_document": "Documento de metadatos"
+        },
+        "fields": {
+          "scopes": "Permisos",
+          "created": "Conectado",
+          "lastUsed": "Último uso",
+          "expires": "Vence",
+          "redirect": "Vuelve a"
+        },
+        "revoke": {
+          "title": "Revocar conexión",
+          "body": "La conexión de {name} dejará de funcionar de inmediato: se cancelan su acceso y su renovación automática. Para volver a usarla tendrás que autorizarla de nuevo. Esta acción no se puede deshacer.",
+          "confirm": "Revocar conexión",
+          "cancel": "Cancelar",
+          "success": "Conexión revocada"
+        },
+        "delete": {
+          "title": "Eliminar conexión",
+          "body": "La conexión de {name} ya está revocada. Se quitará del listado para siempre. Esta acción no se puede deshacer.",
+          "confirm": "Eliminar conexión",
+          "cancel": "Cancelar",
+          "success": "Conexión eliminada"
+        }
       }
     },
     "navigation": {
@@ -2354,6 +2391,50 @@
           }
         ]
       }
+    }
+  },
+  "mcpOAuth": {
+    "consent": {
+      "title": "Conectar un agente",
+      "subtitle": "Un agente de IA pide permiso para actuar como tú en la administración de Silentium.",
+      "clientLabel": "Aplicación que lo solicita",
+      "clientUriLabel": "Sitio web declarado",
+      "unverified": "Sin verificar",
+      "unverifiedHelp": "El nombre y el sitio los declara la propia aplicación; Silentium no los ha verificado. Continúa solo si fuiste tú quien inició la conexión.",
+      "redirectLabel": "Al terminar volverás a",
+      "localWarning": "Esa dirección apunta a tu propio equipo. Continúa solo si estás ejecutando tú mismo el agente.",
+      "accountLabel": "Actuará como",
+      "accessTitle": "¿Qué podrá hacer?",
+      "accessRead": "Solo lectura",
+      "accessReadHelp": "Consultar catálogo, inventario, pedidos y análisis. No puede cambiar nada.",
+      "accessReadWrite": "Lectura y escritura",
+      "accessReadWriteHelp": "Además puede crear y modificar productos, inventario, publicación y pedidos. Cada acción queda registrada a tu nombre.",
+      "requestedHint": "El agente pidió: {scopes}. Lo que se concede lo decides tú.",
+      "scopeRead": "lectura",
+      "scopeWrite": "escritura",
+      "validity": "La conexión dura hasta 90 días. Puedes revocarla en Administración → Agentes MCP.",
+      "approve": "Permitir acceso",
+      "deny": "Cancelar",
+      "working": "Procesando…",
+      "errors": {
+        "generic": "No pudimos completar la acción. Inténtalo de nuevo.",
+        "validation_error": "La solicitud ya no es válida. Vuelve a iniciar la conexión desde tu agente.",
+        "unauthorized": "Tu sesión expiró. Inicia sesión de nuevo.",
+        "forbidden": "No tienes permiso para conectar agentes.",
+        "oauth_grant_limit": "Alcanzaste el máximo de conexiones activas. Revoca alguna en Administración → Agentes MCP antes de crear otra."
+      }
+    },
+    "denied": {
+      "title": "Acceso no permitido",
+      "subtitle": "Tu cuenta no puede conectar agentes.",
+      "body": "Solo las cuentas de administración pueden autorizar agentes. Inicia sesión con una cuenta de administrador e inténtalo de nuevo desde tu agente."
+    },
+    "invalid": {
+      "title": "No podemos continuar",
+      "subtitle": "La solicitud de conexión no es válida.",
+      "invalid_client": "La aplicación que intenta conectarse no es válida o no pudimos comprobar su registro.",
+      "invalid_redirect_uri": "La dirección de retorno de la aplicación no está registrada. Por seguridad no te redirigimos.",
+      "hint": "Cierra esta página y vuelve a intentarlo desde tu agente."
     }
   }
 }
