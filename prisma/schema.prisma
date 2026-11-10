@@ -67,6 +67,7 @@ model User {
   preferences        UserPreference?
   legalConsents      LegalConsentEvent[]
   invitations        AdminUserInvitation[]
+  mcpAccessTokens    McpAccessToken[]
 
   @@index([email])
   @@index([role])
@@ -91,6 +92,29 @@ model AdminUserInvitation {
   failureCode    String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+enum McpTokenScope {
+  read
+  write
+}
+
+// Personal access tokens for the remote MCP endpoint. Private table: only the
+// SHA-256 hash of the secret is stored, never the plaintext.
+model McpAccessToken {
+  id         String          @id @default(cuid())
+  userId     String
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  tokenHash  String          @unique
+  prefix     String
+  scopes     McpTokenScope[]
+  expiresAt  DateTime
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime        @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model UserProfile {

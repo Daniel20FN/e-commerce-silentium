@@ -95,3 +95,18 @@ it("keeps analysis separate from operational home and lookalike paths", () => {
     getAdminNavigationSections(dictionary, { role: "admin" })[0].href,
   ).toBe("/admin");
 });
+it("lists the MCP agent tokens section for every administrator", () => {
+  for (const role of ["admin", "super_admin"] as const)
+    expect(getAdminNavigationSections(dictionary, { role })).toContainEqual({
+      href: "/admin/agentes",
+      label: dictionary.admin.navigation.agents,
+      section: ADMIN_ROUTE_SECTION.agents,
+    });
+  expect(resolveAdminRouteMetadata("/admin/agentes", dictionary)).toMatchObject(
+    {
+      section: ADMIN_ROUTE_SECTION.agents,
+      navigationHref: "/admin/agentes",
+      title: dictionary.admin.agents.title,
+    },
+  );
+});

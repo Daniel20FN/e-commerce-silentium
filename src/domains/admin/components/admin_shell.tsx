@@ -22,6 +22,7 @@ import {
   Menu as MenuIcon,
   PeopleOutlined,
   ReceiptLongOutlined,
+  SmartToyOutlined,
   StorefrontOutlined,
 } from "@mui/icons-material";
 import {
@@ -164,6 +165,7 @@ export function AdminShell({
     [ADMIN_ROUTE_SECTION.categories]: <CategoryOutlined />,
     [ADMIN_ROUTE_SECTION.products]: <Inventory2Outlined />,
     [ADMIN_ROUTE_SECTION.orders]: <ReceiptLongOutlined />,
+    [ADMIN_ROUTE_SECTION.agents]: <SmartToyOutlined />,
     [ADMIN_ROUTE_SECTION.guide]: <MenuBookOutlined />,
   };
 
