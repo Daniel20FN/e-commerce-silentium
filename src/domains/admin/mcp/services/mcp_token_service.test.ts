@@ -7,6 +7,7 @@ import {
 import {
   McpTokenError,
   createMcpToken,
+  deleteRevokedMcpToken,
   listMcpTokens,
   revokeMcpToken,
 } from "./mcp_token_service";
@@ -14,6 +15,7 @@ import {
 const db = {
   count: jest.fn(),
   create: jest.fn(),
+  deleteMany: jest.fn(),
   findMany: jest.fn(),
   findFirst: jest.fn(),
   updateMany: jest.fn(),
@@ -24,6 +26,7 @@ jest.mock("@/lib/prisma", () => ({
     mcpAccessToken: {
       count: (...args: unknown[]) => db.count(...args),
       create: (...args: unknown[]) => db.create(...args),
+      deleteMany: (...args: unknown[]) => db.deleteMany(...args),
       findMany: (...args: unknown[]) => db.findMany(...args),
       findFirst: (...args: unknown[]) => db.findFirst(...args),
       updateMany: (...args: unknown[]) => db.updateMany(...args),
@@ -122,5 +125,40 @@ describe("MCP token service", () => {
     await expect(revokeMcpToken("user_2", "tok_1", now)).rejects.toBeInstanceOf(
       McpTokenError,
     );
+  });
+});
+
+describe("deleteRevokedMcpToken", () => {
+  beforeEach(() => jest.resetAllMocks());
+
+  it("deletes with an atomic owner and revoked condition", async () => {
+    db.deleteMany.mockResolvedValue({ count: 1 });
+    await expect(deleteRevokedMcpToken("user_1", "tok_1")).resolves.toEqual({
+      id: "tok_1",
+    });
+    expect(db.deleteMany).toHaveBeenCalledWith({
+      where: { id: "tok_1", userId: "user_1", revokedAt: { not: null } },
+    });
+    expect(db.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("refuses a token of the caller that is not revoked with a conflict", async () => {
+    db.deleteMany.mockResolvedValue({ count: 0 });
+    db.findFirst.mockResolvedValue({ id: "tok_1" });
+    await expect(
+      deleteRevokedMcpToken("user_1", "tok_1"),
+    ).rejects.toMatchObject({ code: "mcp_token_not_revoked", status: 409 });
+    expect(db.findFirst).toHaveBeenCalledWith({
+      where: { id: "tok_1", userId: "user_1" },
+      select: { id: true },
+    });
+  });
+
+  it("treats unknown tokens and tokens of other users as missing", async () => {
+    db.deleteMany.mockResolvedValue({ count: 0 });
+    db.findFirst.mockResolvedValue(null);
+    await expect(
+      deleteRevokedMcpToken("user_2", "tok_1"),
+    ).rejects.toMatchObject({ code: "mcp_token_not_found", status: 404 });
   });
 });

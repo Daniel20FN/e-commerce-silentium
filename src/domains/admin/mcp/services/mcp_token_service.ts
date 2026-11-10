@@ -13,7 +13,10 @@ import {
 
 export class McpTokenError extends Error {
   constructor(
-    public readonly code: "mcp_token_limit" | "mcp_token_not_found",
+    public readonly code:
+      | "mcp_token_limit"
+      | "mcp_token_not_found"
+      | "mcp_token_not_revoked",
     public readonly status: 404 | 409,
   ) {
     super(code);
@@ -96,4 +99,27 @@ export async function revokeMcpToken(
   if (!record || (result.count === 0 && !record.revokedAt))
     throw new McpTokenError("mcp_token_not_found", 404);
   return toMcpTokenDto(record, now);
+}
+
+/**
+ * Physically deletes one of the caller's own tokens, only if it is already
+ * revoked. The condition lives in the DELETE itself, so a token that is still
+ * active can never be removed, not even by a race with another request.
+ */
+export async function deleteRevokedMcpToken(
+  userId: string,
+  tokenId: string,
+): Promise<{ id: string }> {
+  const result = await prisma.mcpAccessToken.deleteMany({
+    where: { id: tokenId, userId, revokedAt: { not: null } },
+  });
+  if (result.count > 0) return { id: tokenId };
+  const existing = await prisma.mcpAccessToken.findFirst({
+    where: { id: tokenId, userId },
+    select: { id: true },
+  });
+  // Other users' and unknown tokens look missing; own tokens that are still
+  // active or merely expired must be revoked first.
+  if (!existing) throw new McpTokenError("mcp_token_not_found", 404);
+  throw new McpTokenError("mcp_token_not_revoked", 409);
 }

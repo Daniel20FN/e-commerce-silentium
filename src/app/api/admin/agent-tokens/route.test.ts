@@ -3,6 +3,7 @@
 import { AccountError } from "@/domains/account/services/account_errors";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import { NextRequest } from "next/server";
+import { DELETE as purge } from "./[tokenId]/permanent/route";
 import { DELETE as revoke } from "./[tokenId]/route";
 import { GET, POST } from "./route";
 
@@ -11,6 +12,7 @@ const mockWithVerifiedPassword = jest.fn();
 const mockCreateToken = jest.fn();
 const mockListTokens = jest.fn();
 const mockRevokeToken = jest.fn();
+const mockDeleteToken = jest.fn();
 
 jest.mock("@/lib/prisma", () => ({ prisma: {} }));
 jest.mock("@/lib/supabase/server", () => ({
@@ -29,6 +31,7 @@ jest.mock("@/domains/admin/mcp/services/mcp_token_service", () => ({
   createMcpToken: (...args: unknown[]) => mockCreateToken(...args),
   listMcpTokens: (...args: unknown[]) => mockListTokens(...args),
   revokeMcpToken: (...args: unknown[]) => mockRevokeToken(...args),
+  deleteRevokedMcpToken: (...args: unknown[]) => mockDeleteToken(...args),
 }));
 
 const { McpTokenError } = jest.requireActual<
@@ -261,6 +264,80 @@ describe("/api/admin/agent-tokens", () => {
       );
       expect(response.status).toBe(403);
       expect(mockRevokeToken).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe("/api/admin/agent-tokens/[tokenId]/permanent", () => {
+  const context = { params: Promise.resolve({ tokenId: "tok_1" }) };
+  const purgeRequest = (origin?: string | null) =>
+    request("DELETE", { url: `${URL_BASE}/tok_1/permanent`, origin });
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    mockResolveCurrentUser.mockResolvedValue(user);
+  });
+
+  it("deletes the caller own revoked token with no-store headers", async () => {
+    mockDeleteToken.mockResolvedValue({ id: "tok_1" });
+    const response = await purge(purgeRequest(), context);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(await response.json()).toEqual({ data: { id: "tok_1" } });
+    expect(mockDeleteToken).toHaveBeenCalledWith("user_1", "tok_1");
+    expect(mockRevokeToken).not.toHaveBeenCalled();
+  });
+
+  it("rejects anonymous visitors", async () => {
+    mockResolveCurrentUser.mockResolvedValue(null);
+    const response = await purge(purgeRequest(), context);
+    expect(response.status).toBe(401);
+    expect(mockDeleteToken).not.toHaveBeenCalled();
+  });
+
+  it.each(["customer", "support"] as const)(
+    "rejects the %s role",
+    async (role) => {
+      mockResolveCurrentUser.mockResolvedValue({ ...user, role });
+      const response = await purge(purgeRequest(), context);
+      expect(response.status).toBe(403);
+      expect(mockDeleteToken).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([["https://evil.example"], [null]])(
+    "rejects cross-origin or missing-origin requests (%s)",
+    async (origin) => {
+      const response = await purge(purgeRequest(origin), context);
+      expect(response.status).toBe(403);
+      expect(mockDeleteToken).not.toHaveBeenCalled();
+    },
+  );
+
+  it("rejects malformed ids", async () => {
+    const response = await purge(purgeRequest(), {
+      params: Promise.resolve({ tokenId: "x".repeat(129) }),
+    });
+    expect(response.status).toBe(400);
+    expect(mockDeleteToken).not.toHaveBeenCalled();
+  });
+
+  it("answers 404 for unknown or foreign tokens", async () => {
+    mockDeleteToken.mockRejectedValue(
+      new McpTokenError("mcp_token_not_found", 404),
+    );
+    expect((await purge(purgeRequest(), context)).status).toBe(404);
+  });
+
+  it("answers 409 for tokens that are not revoked", async () => {
+    mockDeleteToken.mockRejectedValue(
+      new McpTokenError("mcp_token_not_revoked", 409),
+    );
+    const response = await purge(purgeRequest(), context);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      message: "mcp_token_not_revoked",
     });
   });
 });

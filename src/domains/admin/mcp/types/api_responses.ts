@@ -15,9 +15,15 @@ export interface McpTokenRevokeApiResponseData {
   token: McpTokenDto;
 }
 
+export interface McpTokenDeleteApiResponseData {
+  id: string;
+}
+
 export type McpTokensListApiResponse =
   ApiResponse<McpTokensListApiResponseData>;
 export type McpTokenCreateApiResponse =
   ApiResponse<McpTokenCreateApiResponseData>;
 export type McpTokenRevokeApiResponse =
   ApiResponse<McpTokenRevokeApiResponseData>;
+export type McpTokenDeleteApiResponse =
+  ApiResponse<McpTokenDeleteApiResponseData>;

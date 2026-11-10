@@ -43,6 +43,14 @@ const revokedToken: McpTokenDto = {
   revokedAt: "2026-11-11T12:00:00.000Z",
 };
 
+const expiredToken: McpTokenDto = {
+  ...activeToken,
+  id: "tok_3",
+  name: "Token vencido",
+  state: "expired",
+  expiresAt: "2026-11-01T12:00:00.000Z",
+};
+
 function renderPage() {
   return render(
     <CancellableApiProvider>
@@ -85,6 +93,13 @@ describe("agent tokens admin page", () => {
     expect(
       within(second).queryByRole("button", { name: /Revocar/ }),
     ).toBeNull();
+    // Only revoked tokens can be deleted.
+    expect(
+      within(first).queryByRole("button", { name: /Eliminar/ }),
+    ).toBeNull();
+    expect(
+      within(second).getByRole("button", { name: /Eliminar/ }),
+    ).toBeVisible();
     expect(apiService.get).toHaveBeenCalledWith(
       "/admin/agent-tokens",
       undefined,
@@ -258,5 +273,76 @@ describe("agent tokens admin page", () => {
         ).getByText(copy.states.revoked),
       ).toBeInTheDocument(),
     );
+  });
+
+  it("does not offer deletion for expired tokens", async () => {
+    jest.mocked(apiService.get).mockResolvedValue({ tokens: [expiredToken] });
+    renderPage();
+    const list = await screen.findByRole("list", { name: copy.listLabel });
+    expect(within(list).queryByRole("button", { name: /Eliminar/ })).toBeNull();
+  });
+
+  async function openDeleteDialog() {
+    const list = await screen.findByRole("list", { name: copy.listLabel });
+    fireEvent.click(
+      within(within(list).getAllByRole("listitem")[1]).getByRole("button", {
+        name: /Eliminar/,
+      }),
+    );
+    return screen.findByRole("dialog");
+  }
+
+  it("deletes a revoked token after confirmation and removes the row", async () => {
+    jest.mocked(apiService.delete).mockResolvedValue({ id: "tok_2" });
+    renderPage();
+    const dialog = await openDeleteDialog();
+    expect(
+      within(dialog).getByText(/no se puede deshacer/),
+    ).toBeInTheDocument();
+    expect(apiService.delete).not.toHaveBeenCalled();
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: copy.delete.confirm }),
+    );
+    await waitFor(() =>
+      expect(apiService.delete).toHaveBeenCalledWith(
+        "/admin/agent-tokens/tok_2/permanent",
+        undefined,
+        copy.delete.success,
+        expect.any(AbortSignal),
+      ),
+    );
+    await waitFor(() =>
+      expect(
+        within(screen.getByRole("list", { name: copy.listLabel })).getAllByRole(
+          "listitem",
+        ),
+      ).toHaveLength(1),
+    );
+    expect(screen.queryByText(revokedToken.name)).toBeNull();
+  });
+
+  it("shows the error and keeps the row when deletion fails", async () => {
+    jest
+      .mocked(apiService.delete)
+      .mockRejectedValue(new Error("mcp_token_not_revoked"));
+    renderPage();
+    const dialog = await openDeleteDialog();
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: copy.delete.confirm }),
+    );
+    expect(
+      await within(dialog).findByText(copy.errors.mcp_token_not_revoked),
+    ).toBeInTheDocument();
+    expect(screen.getByText(revokedToken.name)).toBeInTheDocument();
+  });
+
+  it("can cancel the deletion without calling the API", async () => {
+    renderPage();
+    const dialog = await openDeleteDialog();
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: copy.delete.cancel }),
+    );
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(apiService.delete).not.toHaveBeenCalled();
   });
 });

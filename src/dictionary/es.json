@@ -648,6 +648,14 @@
         "cancel": "Cancelar",
         "success": "Token revocado"
       },
+      "delete": {
+        "button": "Eliminar",
+        "title": "Eliminar token",
+        "body": "El token {name} ya está revocado. Se quitará del listado para siempre. Esta acción no se puede deshacer.",
+        "confirm": "Eliminar token",
+        "cancel": "Cancelar",
+        "success": "Token eliminado"
+      },
       "errors": {
         "generic": "No pudimos completar la acción. Inténtalo de nuevo.",
         "validation_error": "Revisa el nombre, los permisos y la vigencia del token.",
@@ -655,6 +663,7 @@
         "forbidden": "No tienes permiso para gestionar tokens.",
         "mcp_token_limit": "Alcanzaste el máximo de tokens activos. Revoca alguno antes de crear otro.",
         "mcp_token_not_found": "El token ya no existe.",
+        "mcp_token_not_revoked": "Solo se pueden eliminar tokens revocados. Revoca el token primero.",
         "account_password_invalid": "No pudimos verificar tu contraseña actual. Revísala e inténtalo de nuevo.",
         "account_mfa_required": "Tu cuenta tiene verificación en dos pasos. Esta acción requiere un flujo de verificación adicional; contacta con la tienda para completarla de forma segura.",
         "account_rate_limit": "Has realizado demasiados intentos. Espera unos minutos antes de volver a probar.",

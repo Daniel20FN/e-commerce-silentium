@@ -2,7 +2,11 @@
 
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
-import { ContentCopyOutlined, VpnKeyOutlined } from "@mui/icons-material";
+import {
+  ContentCopyOutlined,
+  DeleteOutline,
+  VpnKeyOutlined,
+} from "@mui/icons-material";
 import {
   Alert,
   Box,
@@ -24,6 +28,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import type { McpTokenCreateParams } from "../types/api_params";
 import type {
   McpTokenCreateApiResponse,
+  McpTokenDeleteApiResponse,
   McpTokenRevokeApiResponse,
   McpTokensListApiResponse,
 } from "../types/api_responses";
@@ -38,6 +43,7 @@ type AgentsCopy = Dictionary["admin"]["agents"];
 const LIST_REQUEST_ID = "admin-agent-tokens-list";
 const CREATE_REQUEST_ID = "admin-agent-tokens-create";
 const REVOKE_REQUEST_ID = "admin-agent-tokens-revoke";
+const DELETE_REQUEST_ID = "admin-agent-tokens-delete";
 const DEFAULT_EXPIRY_DAYS = MCP_TOKEN_EXPIRY_DAYS_VALUES[0];
 const BUSINESS_TIME_ZONE = "America/Bogota";
 const STATE_COLOR: Record<McpTokenState, "success" | "default" | "error"> = {
@@ -311,10 +317,12 @@ function TokenCard({
   copy,
   token,
   onRevoke,
+  onDelete,
 }: {
   copy: AgentsCopy;
   token: McpTokenDto;
   onRevoke: (token: McpTokenDto) => void;
+  onDelete: (token: McpTokenDto) => void;
 }) {
   return (
     <Paper
@@ -391,6 +399,18 @@ function TokenCard({
             {copy.revoke.button}
           </Button>
         )}
+        {token.state === "revoked" && (
+          <Button
+            color="error"
+            variant="outlined"
+            fullWidth
+            startIcon={<DeleteOutline />}
+            aria-label={`${copy.delete.button} ${token.name}`}
+            onClick={() => onDelete(token)}
+          >
+            {copy.delete.button}
+          </Button>
+        )}
       </Box>
     </Paper>
   );
@@ -405,7 +425,10 @@ export function AgentTokensPage({ dictionary }: { dictionary: Dictionary }) {
   const [createOpen, setCreateOpen] = useState(false);
   const [revoking, setRevoking] = useState<McpTokenDto | null>(null);
   const [revokeError, setRevokeError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<McpTokenDto | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const revokeBusy = isPending(REVOKE_REQUEST_ID);
+  const deleteBusy = isPending(DELETE_REQUEST_ID);
 
   useEffect(() => {
     let active = true;
@@ -453,6 +476,31 @@ export function AgentTokensPage({ dictionary }: { dictionary: Dictionary }) {
     } catch (error) {
       const message = errorMessage(copy, error);
       setRevokeError(message);
+      enqueueSnackbar(message, { variant: "error", preventDuplicate: true });
+    }
+  }
+
+  async function confirmDelete(): Promise<void> {
+    if (!deleting || deleteBusy) return;
+    setDeleteError(null);
+    try {
+      const result = await cancellableApi.delete<
+        McpTokenDeleteApiResponse,
+        undefined
+      >(
+        DELETE_REQUEST_ID,
+        `/admin/agent-tokens/${encodeURIComponent(deleting.id)}/permanent`,
+        undefined,
+        copy.delete.success,
+      );
+      if (!result) return;
+      setTokens(
+        (current) => current?.filter((token) => token.id !== result.id) ?? null,
+      );
+      setDeleting(null);
+    } catch (error) {
+      const message = errorMessage(copy, error);
+      setDeleteError(message);
       enqueueSnackbar(message, { variant: "error", preventDuplicate: true });
     }
   }
@@ -532,6 +580,10 @@ export function AgentTokensPage({ dictionary }: { dictionary: Dictionary }) {
                 setRevokeError(null);
                 setRevoking(target);
               }}
+              onDelete={(target) => {
+                setDeleteError(null);
+                setDeleting(target);
+              }}
             />
           ))}
         </Stack>
@@ -577,6 +629,41 @@ export function AgentTokensPage({ dictionary }: { dictionary: Dictionary }) {
             onClick={() => void confirmRevoke()}
           >
             {copy.revoke.confirm}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={deleting !== null}
+        onClose={() => {
+          if (!deleteBusy) setDeleting(null);
+        }}
+        fullWidth
+        maxWidth="xs"
+        aria-labelledby="agent-token-delete-title"
+      >
+        <DialogTitle id="agent-token-delete-title">
+          {copy.delete.title}
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            {deleteError && <Alert severity="error">{deleteError}</Alert>}
+            <Typography>
+              {copy.delete.body.replace("{name}", deleting?.name ?? "")}
+            </Typography>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ flexWrap: "wrap", gap: 1 }}>
+          <Button disabled={deleteBusy} onClick={() => setDeleting(null)}>
+            {copy.delete.cancel}
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            disabled={deleteBusy}
+            onClick={() => void confirmDelete()}
+          >
+            {copy.delete.confirm}
           </Button>
         </DialogActions>
       </Dialog>
