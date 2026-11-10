@@ -104,8 +104,10 @@ jest.mock("@/domains/admin/analysis/services/analysis_service", () =>
 const actor: McpActor = {
   id: "user_1",
   label: "Ana Gómez",
+  role: "admin",
   tokenId: "tok_1",
   scopes: ["read", "write"],
+  expiresAt: new Date("2026-12-10T00:00:00Z"),
 };
 const readOnlyActor: McpActor = { ...actor, scopes: ["read"] };
 const REVISION = "2026-11-10T12:00:00.000Z";

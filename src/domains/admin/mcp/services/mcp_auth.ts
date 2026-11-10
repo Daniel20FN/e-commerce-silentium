@@ -1,5 +1,6 @@
 import { hasAdminAccess } from "@/domains/admin/services/admin_roles";
 import { isDeletedAccount } from "@/domains/auth/services/deleted_account";
+import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import { prisma } from "@/lib/prisma";
 import "server-only";
 import type { McpTokenScopeValue } from "../types/mcp_token";
@@ -13,8 +14,11 @@ export interface McpActor {
   /** Business user id, recorded as the actor of every mutation. */
   id: string;
   label: string;
+  /** Owner's current administrative role, re-read on every request. */
+  role: CurrentUserDto["role"];
   tokenId: string;
   scopes: readonly McpTokenScopeValue[];
+  expiresAt: Date;
 }
 
 export type McpAuthFailureCode =
@@ -86,8 +90,10 @@ export async function authenticateMcpRequest(
         [user.profile?.firstName, user.profile?.lastName]
           .filter(Boolean)
           .join(" ") || user.email,
+      role: user.role,
       tokenId: token.id,
       scopes: token.scopes,
+      expiresAt: token.expiresAt,
     },
   };
 }

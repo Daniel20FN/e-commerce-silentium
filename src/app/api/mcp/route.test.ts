@@ -223,6 +223,103 @@ describe("/api/mcp", () => {
       expect(names).not.toContain("catalog_create_product");
     });
 
+    it("sends beginner-oriented instructions and advertises prompts on initialize", async () => {
+      const secret = mockToken();
+      const body = await (await POST(rpc(secret, initialize))).json();
+      expect(body.result.capabilities.prompts).toBeDefined();
+      expect(body.result.instructions).toContain("store_overview");
+      expect(body.result.instructions).toContain("explicit confirmation");
+    });
+
+    it("lists the guided prompts and returns their messages with a valid token", async () => {
+      const secret = mockToken({ scopes: ["read", "write"] });
+      const list = await POST(
+        rpc(secret, { jsonrpc: "2.0", id: 5, method: "prompts/list" }),
+      );
+      expect(list.status).toBe(200);
+      expect(list.headers.get("Cache-Control")).toBe("private, no-store");
+      const prompts: { name: string; description: string }[] = (
+        await list.json()
+      ).result.prompts;
+      expect(prompts.map((prompt) => prompt.name)).toEqual(
+        expect.arrayContaining([
+          "primer-producto",
+          "revisar-stock-bajo",
+          "registrar-pedido",
+          "publicar-producto",
+        ]),
+      );
+
+      const get = await POST(
+        rpc(secret, {
+          jsonrpc: "2.0",
+          id: 6,
+          method: "prompts/get",
+          params: {
+            name: "publicar-producto",
+            arguments: { producto: "Mesa Aurora" },
+          },
+        }),
+      );
+      const result = (await get.json()).result;
+      expect(result.messages[0].role).toBe("user");
+      expect(result.messages[0].content.text).toContain("publication_publish");
+      expect(result.messages[0].content.text).toContain("Mesa Aurora");
+    });
+
+    it("only offers read-compatible prompts to read-scope tokens", async () => {
+      const secret = mockToken({ scopes: ["read"] });
+      const list = await POST(
+        rpc(secret, { jsonrpc: "2.0", id: 5, method: "prompts/list" }),
+      );
+      const names: string[] = (await list.json()).result.prompts.map(
+        (prompt: { name: string }) => prompt.name,
+      );
+      expect(names).toEqual(["revisar-stock-bajo"]);
+      const denied = await POST(
+        rpc(secret, {
+          jsonrpc: "2.0",
+          id: 6,
+          method: "prompts/get",
+          params: { name: "primer-producto" },
+        }),
+      );
+      expect((await denied.json()).error.code).toBe(-32602);
+    });
+
+    it("answers an unknown prompt with a JSON-RPC error", async () => {
+      const secret = mockToken({ scopes: ["read", "write"] });
+      const response = await POST(
+        rpc(secret, {
+          jsonrpc: "2.0",
+          id: 7,
+          method: "prompts/get",
+          params: { name: "no-existe" },
+        }),
+      );
+      const body = await response.json();
+      expect(body.error.code).toBe(-32602);
+      expect(body.result).toBeUndefined();
+    });
+
+    it("rejects prompts/list without a token", async () => {
+      const response = await POST(
+        rpc(null, { jsonrpc: "2.0", id: 5, method: "prompts/list" }),
+      );
+      expect(response.status).toBe(401);
+    });
+
+    it("serves the guide and overview tools over HTTP", async () => {
+      const secret = mockToken();
+      const { isError, payload } = await toolResult(
+        await POST(
+          rpc(secret, toolCall("guide_get_topic", { topic: "inventario" })),
+        ),
+      );
+      expect(isError).toBe(false);
+      expect(payload).toMatchObject({ data: { id: "inventario" } });
+    });
+
     it("runs a read tool and returns JSON content", async () => {
       mockGetProductDetail.mockResolvedValue({ id: "p1", name: "Mesa" });
       const secret = mockToken();

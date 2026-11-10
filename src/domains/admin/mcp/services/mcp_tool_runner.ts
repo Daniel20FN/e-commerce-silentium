@@ -39,6 +39,12 @@ export async function executeMcpTool(
       throw new McpToolError("forbidden", "insufficient_scope");
     const data = await tool.run(rawInput ?? {}, {
       actor: { id: actor.id, label: actor.label },
+      session: {
+        label: actor.label,
+        role: actor.role,
+        scopes: actor.scopes,
+        expiresAt: actor.expiresAt,
+      },
     });
     return { content: [{ type: "text", text: stringify({ data }) }] };
   } catch (error) {

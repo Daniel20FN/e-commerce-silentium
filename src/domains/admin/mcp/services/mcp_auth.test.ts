@@ -78,8 +78,10 @@ describe("authenticateMcpRequest", () => {
       actor: {
         id: "user_1",
         label: "Ana Gómez",
+        role: "admin",
         tokenId: "tok_1",
         scopes: ["read"],
+        expiresAt: new Date("2026-12-10T00:00:00Z"),
       },
     });
   });

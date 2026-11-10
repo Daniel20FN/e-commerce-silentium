@@ -4,10 +4,12 @@ import { actorHasScope } from "./mcp_tool_runner";
 import type { McpToolDefinition } from "./mcp_tool_types";
 import { analysisTools } from "./tools/analysis_tools";
 import { catalogTools } from "./tools/catalog_tools";
+import { guideTools } from "./tools/guide_tools";
 import { inventoryTools } from "./tools/inventory_tools";
 import { mediaTools } from "./tools/media_tools";
 import { orderTools } from "./tools/order_tools";
 import { publicationTools } from "./tools/publication_tools";
+import { storeTools } from "./tools/store_tools";
 
 /**
  * Every tool exposed through MCP. Users, invitations, roles, legal evidence
@@ -20,6 +22,8 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
   ...orderTools,
   ...mediaTools,
   ...analysisTools,
+  ...guideTools,
+  ...storeTools,
 ];
 
 export function findMcpTool(name: string): McpToolDefinition | undefined {

@@ -1,6 +1,7 @@
 import type { InventoryActor } from "@/domains/admin/inventory/services/inventory_context";
 import type { z } from "zod";
 import type { McpTokenScopeValue } from "../types/mcp_token";
+import type { McpActor } from "./mcp_auth";
 
 export type McpToolGroup =
   | "catalog"
@@ -8,7 +9,9 @@ export type McpToolGroup =
   | "inventory"
   | "orders"
   | "media"
-  | "analysis";
+  | "analysis"
+  | "guide"
+  | "store";
 
 /**
  * Handlers receive exactly the audit actor the admin panel passes to services
@@ -16,7 +19,17 @@ export type McpToolGroup =
  */
 export interface McpToolContext {
   actor: InventoryActor;
+  /**
+   * Read-only facts about the connection (never passed to domain services):
+   * only the guidance tools use it to describe the session to its owner.
+   */
+  session: McpToolSession;
 }
+
+export type McpToolSession = Pick<
+  McpActor,
+  "label" | "role" | "scopes" | "expiresAt"
+>;
 
 /** Behavioral hints published to MCP clients (MCP `ToolAnnotations`). */
 export interface McpToolAnnotations {

@@ -31,6 +31,8 @@ const ALLOWED_TOOLS = [
   "catalog_update_prices",
   "catalog_update_product",
   "catalog_update_variant",
+  "guide_get_topic",
+  "guide_search",
   "inventory_add_stock",
   "inventory_adjust_stock",
   "inventory_get",
@@ -57,6 +59,7 @@ const ALLOWED_TOOLS = [
   "publication_restore",
   "publication_trash",
   "publication_unpublish",
+  "store_overview",
 ];
 
 const DENIED_PATTERN =

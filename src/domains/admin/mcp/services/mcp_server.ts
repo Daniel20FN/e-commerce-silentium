@@ -1,9 +1,15 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
+  ErrorCode,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
   ListToolsRequestSchema,
+  McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 import type { McpActor } from "./mcp_auth";
+import { MCP_SERVER_INSTRUCTIONS } from "./mcp_instructions";
+import { getMcpPrompt, listMcpPrompts } from "./mcp_prompts";
 import {
   findMcpTool,
   toolInputJsonSchema,
@@ -12,9 +18,7 @@ import {
 import { executeMcpTool } from "./mcp_tool_runner";
 
 export const MCP_SERVER_NAME = "silentium-admin";
-export const MCP_SERVER_VERSION = "1.0.0";
-const MCP_SERVER_INSTRUCTIONS =
-  "Administration tools for the Silentium Hogar store. Every call acts as the token owner, applies the same rules as the admin panel and records them as the actor. Read a record first and send back its revision (updatedAt, revision or expectedRevision) on writes; a conflict error means someone else changed it.";
+export const MCP_SERVER_VERSION = "1.1.0";
 
 /**
  * Builds a request-scoped MCP server bound to the authenticated actor. The
@@ -24,7 +28,7 @@ export function createMcpServer(actor: McpActor): Server {
   const server = new Server(
     { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },
     {
-      capabilities: { tools: {} },
+      capabilities: { tools: {}, prompts: {} },
       instructions: MCP_SERVER_INSTRUCTIONS,
     },
   );
@@ -38,6 +42,20 @@ export function createMcpServer(actor: McpActor): Server {
       annotations: tool.annotations,
     })),
   }));
+
+  server.setRequestHandler(ListPromptsRequestSchema, () => ({
+    prompts: listMcpPrompts(actor),
+  }));
+
+  server.setRequestHandler(GetPromptRequestSchema, (request) => {
+    const prompt = getMcpPrompt(
+      actor,
+      request.params.name,
+      request.params.arguments,
+    );
+    if (!prompt) throw new McpError(ErrorCode.InvalidParams, "Unknown prompt");
+    return prompt;
+  });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const tool = findMcpTool(request.params.name);

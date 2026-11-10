@@ -52,8 +52,10 @@ jest.mock("@/lib/supabase/admin", () => ({
 const actor: McpActor = {
   id: "user_1",
   label: "Ana Gómez",
+  role: "admin",
   tokenId: "tok_1",
   scopes: ["read", "write"],
+  expiresAt: new Date("2026-12-10T00:00:00Z"),
 };
 const EMPTY_GALLERY_REVISION = createHash("sha256").update("[]").digest("hex");
 const PNG_BYTES = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13]);
