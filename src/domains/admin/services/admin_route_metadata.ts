@@ -29,6 +29,7 @@ export const ADMIN_ROUTE_SECTION = {
   categories: "categories",
   products: "products",
   orders: "orders",
+  agents: "agents",
   guide: "guide",
 } as const;
 
@@ -86,6 +87,11 @@ export function getAdminNavigationSections(
       section: ADMIN_ROUTE_SECTION.orders,
     },
     {
+      href: "/admin/agentes",
+      label: dictionary.admin.navigation.agents,
+      section: ADMIN_ROUTE_SECTION.agents,
+    },
+    {
       href: "/admin/guia",
       label: dictionary.admin.navigation.guide,
       section: ADMIN_ROUTE_SECTION.guide,
@@ -134,6 +140,14 @@ export function resolveAdminRouteMetadata(
       description: dictionary.admin.orders.description,
       matches: (path) =>
         path === "/admin/pedidos" || path.startsWith("/admin/pedidos/"),
+    },
+    {
+      href: "/admin/agentes",
+      navigationHref: "/admin/agentes",
+      section: ADMIN_ROUTE_SECTION.agents,
+      title: dictionary.admin.agents.title,
+      description: dictionary.admin.agents.description,
+      matches: (path) => path === "/admin/agentes",
     },
     {
       href: "/admin/productos",

@@ -585,6 +585,82 @@
         "unexpected": "No pudimos completar la operación. Reintenta sin cerrar el formulario."
       }
     },
+    "agents": {
+      "title": "Agentes MCP",
+      "description": "Tokens personales para que agentes de IA operen la tienda con tus permisos.",
+      "intro": "Un token permite que Codex, Claude Code o Claude Desktop actúen como tú en el catálogo, el inventario y los pedidos. Cada acción queda registrada a tu nombre y cambia si cambian tus permisos.",
+      "createButton": "Crear token",
+      "loading": "Cargando tokens",
+      "emptyTitle": "Todavía no tienes tokens",
+      "emptyDescription": "Crea uno para conectar un agente. Solo verás el token completo una vez.",
+      "errorTitle": "No pudimos cargar tus tokens",
+      "retry": "Reintentar",
+      "listLabel": "Tus tokens de acceso",
+      "never": "Nunca",
+      "fields": {
+        "name": "Nombre",
+        "prefix": "Prefijo",
+        "scopes": "Permisos",
+        "created": "Creado",
+        "lastUsed": "Último uso",
+        "expires": "Vence",
+        "state": "Estado"
+      },
+      "scopes": {
+        "read": "Lectura",
+        "write": "Escritura"
+      },
+      "states": {
+        "active": "Activo",
+        "expired": "Vencido",
+        "revoked": "Revocado"
+      },
+      "create": {
+        "title": "Crear token de acceso",
+        "name": "Nombre del token",
+        "nameHelp": "Por ejemplo, el agente o el equipo donde lo usarás.",
+        "access": "Permisos",
+        "accessRead": "Solo lectura",
+        "accessReadWrite": "Lectura y escritura",
+        "accessHelp": "Con escritura, el agente puede modificar catálogo, inventario, publicación y pedidos.",
+        "expiry": "Vigencia",
+        "expiryOption": "{days} días",
+        "expiryHelp": "Todos los tokens vencen; el máximo es de 90 días.",
+        "password": "Contraseña actual",
+        "passwordHelp": "La verificamos otra vez para confirmar que eres tú. No se guarda.",
+        "submit": "Crear token",
+        "cancel": "Cancelar"
+      },
+      "secret": {
+        "title": "Copia tu token ahora",
+        "warning": "Este es el único momento en que se muestra el token completo. Guárdalo en un lugar seguro: quien lo tenga podrá actuar con tus permisos hasta que lo revoques o venza.",
+        "label": "Token de acceso",
+        "copy": "Copiar token",
+        "copied": "Token copiado",
+        "copyFailed": "No pudimos copiarlo automáticamente. Selecciónalo y cópialo a mano.",
+        "done": "Ya lo guardé"
+      },
+      "revoke": {
+        "button": "Revocar",
+        "title": "Revocar token",
+        "body": "El token {name} dejará de funcionar de inmediato. Los agentes que lo usen perderán el acceso. Esta acción no se puede deshacer.",
+        "confirm": "Revocar token",
+        "cancel": "Cancelar",
+        "success": "Token revocado"
+      },
+      "errors": {
+        "generic": "No pudimos completar la acción. Inténtalo de nuevo.",
+        "validation_error": "Revisa el nombre, los permisos y la vigencia del token.",
+        "unauthorized": "Tu sesión expiró. Inicia sesión de nuevo.",
+        "forbidden": "No tienes permiso para gestionar tokens.",
+        "mcp_token_limit": "Alcanzaste el máximo de tokens activos. Revoca alguno antes de crear otro.",
+        "mcp_token_not_found": "El token ya no existe.",
+        "account_password_invalid": "No pudimos verificar tu contraseña actual. Revísala e inténtalo de nuevo.",
+        "account_mfa_required": "Tu cuenta tiene verificación en dos pasos. Esta acción requiere un flujo de verificación adicional; contacta con la tienda para completarla de forma segura.",
+        "account_rate_limit": "Has realizado demasiados intentos. Espera unos minutos antes de volver a probar.",
+        "account_unavailable": "El servicio no está disponible en este momento. Inténtalo más tarde."
+      }
+    },
     "navigation": {
       "panel": "Panel de Administración",
       "dashboard": "Dashboard",
@@ -594,6 +670,7 @@
       "products": "Productos",
       "orders": "Pedidos",
       "analysis": "Análisis",
+      "agents": "Agentes MCP",
       "guide": "Guía de uso"
     },
     "layout": {
