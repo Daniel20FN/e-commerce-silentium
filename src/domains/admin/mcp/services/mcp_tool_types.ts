@@ -1,6 +1,6 @@
+import type { InventoryActor } from "@/domains/admin/inventory/services/inventory_context";
 import type { z } from "zod";
 import type { McpTokenScopeValue } from "../types/mcp_token";
-import type { McpActor } from "./mcp_auth";
 
 export type McpToolGroup =
   | "catalog"
@@ -10,8 +10,12 @@ export type McpToolGroup =
   | "media"
   | "analysis";
 
+/**
+ * Handlers receive exactly the audit actor the admin panel passes to services
+ * (`{ id, label }`); token metadata and scopes never leave the MCP layer.
+ */
 export interface McpToolContext {
-  actor: McpActor;
+  actor: InventoryActor;
 }
 
 /** Behavioral hints published to MCP clients (MCP `ToolAnnotations`). */

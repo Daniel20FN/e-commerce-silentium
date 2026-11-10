@@ -196,7 +196,7 @@ describe("MCP tools delegate to the domain services", () => {
         "p1",
         expect.objectContaining({ sku: "SKU-1", priceCents: 1000 }),
         undefined,
-        expect.objectContaining({ id: "user_1", label: "Ana Gómez" }),
+        { id: "user_1", label: "Ana Gómez" },
       );
 
       service("confirmAdminVariantGeneration").mockResolvedValue({
@@ -210,7 +210,7 @@ describe("MCP tools delegate to the domain services", () => {
       expect(service("confirmAdminVariantGeneration")).toHaveBeenCalledWith(
         "p1",
         { variants: [expect.objectContaining({ sku: "SKU-1" })] },
-        expect.objectContaining({ id: "user_1" }),
+        { id: "user_1", label: "Ana Gómez" },
       );
     });
 
@@ -248,7 +248,7 @@ describe("MCP tools delegate to the domain services", () => {
           expectedUpdatedAt: REVISION,
           copyCosts: false,
         },
-        expect.objectContaining({ id: "user_1" }),
+        { id: "user_1", label: "Ana Gómez" },
       );
     });
 
@@ -410,7 +410,7 @@ describe("MCP tools delegate to the domain services", () => {
       expect(service("mutateInventory")).toHaveBeenCalledWith(
         "p1",
         expect.objectContaining({ operationId: OPERATION_ID, kind: "entry" }),
-        expect.objectContaining({ id: "user_1", label: "Ana Gómez" }),
+        { id: "user_1", label: "Ana Gómez" },
       );
     });
 
@@ -458,7 +458,7 @@ describe("MCP tools delegate to the domain services", () => {
       expect(service("setInventoryMinimum")).toHaveBeenCalledWith(
         "p1",
         expect.objectContaining({ minimum: 2 }),
-        expect.objectContaining({ id: "user_1" }),
+        { id: "user_1", label: "Ana Gómez" },
       );
     });
   });
@@ -485,7 +485,7 @@ describe("MCP tools delegate to the domain services", () => {
       });
       expect(service("createOrder")).toHaveBeenCalledWith(
         expect.objectContaining({ customerName: "Cliente Prueba" }),
-        expect.objectContaining({ id: "user_1" }),
+        { id: "user_1", label: "Ana Gómez" },
       );
     });
 
@@ -505,7 +505,7 @@ describe("MCP tools delegate to the domain services", () => {
           expectedRevision: 2,
           reason: "Cliente desiste",
         },
-        expect.objectContaining({ id: "user_1" }),
+        { id: "user_1", label: "Ana Gómez" },
       );
     });
 

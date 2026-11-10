@@ -41,7 +41,7 @@ Los nombres llevan el prefijo de su grupo. «R» exige alcance `read`; «W» exi
 
 ### Imágenes
 
-- **Subida firmada (recomendada):** `media_get_gallery` → `media_prepare_upload` devuelve `{ imageId, signedUrl }` → el agente envía los bytes con `PUT` a `signedUrl` (multipart `cacheControl` + archivo, como el panel) → `media_complete_upload`. Se acepta JPEG, PNG, WebP o AVIF de hasta 5 MB.
+- **Subida firmada (recomendada):** `media_get_gallery` → `media_prepare_upload` devuelve `{ imageId, signedUrl }` → el agente envía los bytes con `PUT` a `signedUrl` (multipart `cacheControl` + archivo, como el panel; si Storage lo rechaza, añade la clave pública del proyecto en la cabecera `apikey`, como hace el panel; este recorrido aún no se ha probado contra Storage real) → `media_complete_upload`. Se acepta JPEG, PNG, WebP o AVIF de hasta 5 MB.
 - **Alternativa pequeña:** `media_upload_image_base64` recibe el archivo codificado en base64. El tamaño decodificado se limita a **2 MiB** (≈2,8 MB de base64) para quedar por debajo del límite de 4,5 MB del cuerpo de las funciones de Vercel; el límite se aplica a la longitud del texto antes de decodificar. Usa la misma validación del servicio existente (tipo MIME, firma del archivo y tamaño).
 
 ## Conectar clientes
@@ -87,7 +87,7 @@ Comprueba con `/mcp`: un `401` indica token inválido, revocado o vencido.
 
 ### Claude Desktop
 
-Los conectores remotos de Claude Desktop usan OAuth y no admiten una cabecera `Authorization` estática, así que se conecta mediante el puente `mcp-remote` (paquete de la comunidad; verifica su versión vigente). En `claude_desktop_config.json`:
+Los conectores remotos de Claude Desktop usan OAuth y no admiten una cabecera `Authorization` estática, así que se conecta mediante el puente `mcp-remote` (paquete de la comunidad, documentado en su README; verifica su versión vigente). La forma `Authorization:${VAR}` sin espacios es el rodeo que recomienda para Windows. En `claude_desktop_config.json`:
 
 ```json
 {
@@ -98,6 +98,8 @@ Los conectores remotos de Claude Desktop usan OAuth y no admiten una cabecera `A
         "-y",
         "mcp-remote",
         "https://www.silentium-hogar.com/api/mcp",
+        "--transport",
+        "http-only",
         "--header",
         "Authorization:${SILENTIUM_AUTH}"
       ],

@@ -37,7 +37,9 @@ export async function executeMcpTool(
   try {
     if (!actorHasScope(actor, tool))
       throw new McpToolError("forbidden", "insufficient_scope");
-    const data = await tool.run(rawInput ?? {}, { actor });
+    const data = await tool.run(rawInput ?? {}, {
+      actor: { id: actor.id, label: actor.label },
+    });
     return { content: [{ type: "text", text: stringify({ data }) }] };
   } catch (error) {
     const payload = toToolErrorPayload(error);
