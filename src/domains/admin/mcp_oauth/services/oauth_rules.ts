@@ -232,6 +232,14 @@ const httpsUrl = z
     }
   });
 
+/**
+ * Clients may declare extra grant or response types (e.g. ChatGPT declares the
+ * jwt-bearer grant). Unsupported values are ignored rather than rejected: this
+ * server only ever issues authorization_code/refresh_token for "code", so the
+ * list only has to contain what the client will actually use here.
+ */
+const declaredValues = z.array(z.string().max(200)).max(10);
+
 const sharedClientFields = {
   redirect_uris: redirectUriList,
   client_name: z
@@ -241,13 +249,31 @@ const sharedClientFields = {
     .max(OAUTH_CLIENT_NAME_MAX_LENGTH)
     .optional(),
   client_uri: httpsUrl.optional(),
-  grant_types: z
-    .array(z.enum(["authorization_code", "refresh_token"]))
-    .max(2)
+  grant_types: declaredValues
+    .refine((values) => values.includes("authorization_code"))
     .optional(),
-  response_types: z.array(z.literal("code")).max(1).optional(),
+  response_types: declaredValues
+    .refine((values) => values.includes("code"))
+    .optional(),
   scope: z.string().max(200).optional(),
 };
+
+/**
+ * True when a metadata document allows authenticating as a public client:
+ * no method, "none", or "none" listed among the supported methods (ChatGPT
+ * prefers private_key_jwt but also supports "none").
+ */
+function allowsPublicClient(document: {
+  token_endpoint_auth_method?: string;
+  token_endpoint_auth_methods_supported?: readonly string[];
+}): boolean {
+  const method = document.token_endpoint_auth_method;
+  return (
+    method === undefined ||
+    method === "none" ||
+    (document.token_endpoint_auth_methods_supported ?? []).includes("none")
+  );
+}
 
 /** RFC 7591 registration request. Unknown members are ignored. */
 export const dynamicRegistrationSchema = z.object({
@@ -257,15 +283,20 @@ export const dynamicRegistrationSchema = z.object({
 });
 
 /**
- * Client ID Metadata Document: public clients only. The MCP authorization spec
- * (2026-07-28) requires client_name, so unlike DCR it cannot be omitted.
+ * Client ID Metadata Document: always registered as a public client (PKCE).
+ * Documents preferring another method are accepted only if they also support
+ * "none"; this server does not verify client assertions. The MCP authorization
+ * spec (2026-07-28) requires client_name, so unlike DCR it cannot be omitted.
  */
-export const clientMetadataDocumentSchema = z.object({
-  ...sharedClientFields,
-  client_name: z.string().trim().min(1).max(OAUTH_CLIENT_NAME_MAX_LENGTH),
-  client_id: z.string().max(OAUTH_CLIENT_ID_MAX_LENGTH),
-  token_endpoint_auth_method: z.literal("none").optional(),
-});
+export const clientMetadataDocumentSchema = z
+  .object({
+    ...sharedClientFields,
+    client_name: z.string().trim().min(1).max(OAUTH_CLIENT_NAME_MAX_LENGTH),
+    client_id: z.string().max(OAUTH_CLIENT_ID_MAX_LENGTH),
+    token_endpoint_auth_method: z.string().max(100).optional(),
+    token_endpoint_auth_methods_supported: declaredValues.optional(),
+  })
+  .refine(allowsPublicClient);
 
 export type DynamicRegistrationInput = z.infer<
   typeof dynamicRegistrationSchema

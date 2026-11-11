@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import "server-only";
+import { z } from "zod";
 import type {
   OAuthClientAuthMethod,
   OAuthClientRecord,
 } from "../types/oauth_types";
 import type { ClientDocumentFetcher } from "./oauth_cimd";
-import { fetchClientMetadataDocument } from "./oauth_cimd";
+import { CimdError, fetchClientMetadataDocument } from "./oauth_cimd";
 import { OAuthError } from "./oauth_http";
 import type {
   ClientMetadataDocument,
@@ -217,9 +218,12 @@ export async function resolveClientForAuthorization(
       update: data,
       select: clientSelect,
     });
-  } catch {
-    // A refresh failure keeps working with the last validated document.
-    console.error("mcp_oauth_client_metadata_failed");
+  } catch (error) {
+    // A refresh failure keeps working with the last validated document. The
+    // reason is a fixed CimdError code (never document content or URLs).
+    console.error("mcp_oauth_client_metadata_failed", {
+      reason: error instanceof CimdError ? error.message : "unexpected",
+    });
     return stored;
   }
 }
@@ -240,6 +244,31 @@ function decodeBasic(header: string): { id: string; secret: string } | null {
   }
 }
 
+const JWT_BEARER_ASSERTION_TYPE =
+  "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+
+const assertionClaimsSchema = z.object({ sub: z.string().max(2048) });
+
+/**
+ * Reads the client_id a JWT client assertion names (RFC 7523 3: `sub`). The
+ * signature is NOT verified, so the result may only identify a public client,
+ * which is never trusted beyond what PKCE and the code binding already prove.
+ */
+function assertedClientId(params: URLSearchParams): string | null {
+  if (params.get("client_assertion_type") !== JWT_BEARER_ASSERTION_TYPE)
+    return null;
+  const payload = params.get("client_assertion")?.split(".")[1];
+  if (!payload || payload.length > 8192) return null;
+  try {
+    const claims = assertionClaimsSchema.safeParse(
+      JSON.parse(Buffer.from(payload, "base64url").toString("utf8")),
+    );
+    return claims.success ? claims.data.sub : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Authenticates the client of a token or revocation request (RFC 6749 2.3). */
 export async function authenticateOAuthClient(
   headers: Headers,
@@ -254,7 +283,8 @@ export async function authenticateOAuthClient(
       "invalid_request",
       "Use a single client authentication method",
     );
-  const clientId = basic?.id ?? bodyId;
+  const assertedId = basic || bodyId ? null : assertedClientId(params);
+  const clientId = basic?.id ?? bodyId ?? assertedId;
   const secret = basic?.secret ?? bodySecret ?? null;
   if (!clientId || clientId.length > 2048)
     throw new OAuthError(
@@ -277,6 +307,13 @@ export async function authenticateOAuthClient(
       Boolean(basic),
     );
   const method: OAuthClientAuthMethod = client.authMethod;
+  if (assertedId && method !== "none")
+    throw new OAuthError(
+      "invalid_client",
+      "Client authentication failed",
+      401,
+      false,
+    );
   if (method !== "none") {
     if (
       !secret ||
