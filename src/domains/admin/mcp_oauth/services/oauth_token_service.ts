@@ -13,7 +13,6 @@ import {
   OAUTH_ACCESS_TOKEN_TTL_MS,
   OAUTH_GRANT_TTL_MS,
   OAUTH_LAST_USED_WINDOW_MS,
-  OAUTH_RETIRED_REFRESH_KEPT,
   generateAccessToken,
   generateRefreshToken,
   hashSecret,
@@ -285,22 +284,16 @@ export async function refreshAccessToken(
   return tokenResponse(access, refresh, grant.scopes, accessExpiresAt, now);
 }
 
-/** Keeps a few rotated refresh tokens for reuse detection and drops the rest. */
+/**
+ * Drops lapsed access tokens. Rotated (used) refresh tokens are deliberately
+ * kept until the grant itself is purged: presenting any of them again must
+ * still revoke the grant, however old it is (reuse detection, OAuth 2.1).
+ */
 async function pruneGrantTokens(grantId: string, now: Date): Promise<void> {
   try {
     await prisma.mcpOAuthToken.deleteMany({
       where: { grantId, kind: "access", expiresAt: { lt: now } },
     });
-    const stale = await prisma.mcpOAuthToken.findMany({
-      where: { grantId, kind: "refresh", usedAt: { not: null } },
-      orderBy: { createdAt: "desc" },
-      skip: OAUTH_RETIRED_REFRESH_KEPT,
-      select: { id: true },
-    });
-    if (stale.length > 0)
-      await prisma.mcpOAuthToken.deleteMany({
-        where: { id: { in: stale.map((token) => token.id) } },
-      });
   } catch {
     console.error("mcp_oauth_token_prune_failed");
   }

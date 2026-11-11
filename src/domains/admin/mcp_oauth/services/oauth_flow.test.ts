@@ -821,16 +821,52 @@ describe("refresh tokens (D4)", () => {
     ).resolves.toEqual({ ok: false, code: "invalid_token" });
   });
 
-  it("prunes rotated refresh tokens beyond the few kept for reuse detection", async () => {
+  it("keeps every rotated refresh token so a very old one still triggers reuse detection", async () => {
     const { record, tokens } = await connect();
-    let current = tokens.refresh_token;
-    for (let i = 1; i <= 6; i += 1)
-      current = (await refresh(record, current, later(i * 1_000)))
-        .refresh_token;
+    const first = tokens.refresh_token;
+    let current = first;
+    let latest = tokens;
+    // Eight rotations, one per hour: far beyond any short retention window.
+    for (let i = 1; i <= 8; i += 1) {
+      latest = await refresh(
+        record,
+        current,
+        later(i * OAUTH_ACCESS_TOKEN_TTL_MS),
+      );
+      current = latest.refresh_token;
+    }
     const used = db.tokens.rows.filter(
       (row) => row.kind === "refresh" && row.usedAt,
     );
-    expect(used.length).toBeLessThanOrEqual(3);
+    expect(used).toHaveLength(8);
+    // Days later, the very first (long rotated) token is replayed.
+    const replayAt = later(5 * 24 * 60 * 60 * 1000);
+    await expect(refresh(record, first, replayAt)).rejects.toMatchObject({
+      error: "invalid_grant",
+    });
+    expect(db.grants.rows[0]?.revokedAt).toEqual(replayAt);
+    await expect(
+      refresh(record, current, later(5 * 24 * 60 * 60 * 1000 + 1_000)),
+    ).rejects.toMatchObject({ error: "invalid_grant" });
+    await expect(
+      resolveOAuthAccessToken(
+        latest.access_token,
+        RESOURCE,
+        later(5 * 24 * 60 * 60 * 1000 + 1_000),
+      ),
+    ).resolves.toEqual({ ok: false, code: "revoked_token" });
+  });
+
+  it("only drops lapsed access tokens while rotating", async () => {
+    const { record, tokens } = await connect();
+    await refresh(
+      record,
+      tokens.refresh_token,
+      later(2 * OAUTH_ACCESS_TOKEN_TTL_MS),
+    );
+    const kinds = db.tokens.rows.map((row) => row.kind);
+    expect(kinds.filter((kind) => kind === "access")).toHaveLength(1);
+    expect(kinds.filter((kind) => kind === "refresh")).toHaveLength(2);
   });
 
   it("serves refresh and revocation over HTTP", async () => {

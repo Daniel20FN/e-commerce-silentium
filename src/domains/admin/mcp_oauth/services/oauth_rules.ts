@@ -24,7 +24,6 @@ export const OAUTH_REDIRECT_URI_MAX_LENGTH = 512;
 export const OAUTH_CLIENT_NAME_MAX_LENGTH = 100;
 export const OAUTH_STATE_MAX_LENGTH = 1024;
 export const OAUTH_CLIENT_ID_MAX_LENGTH = 512;
-export const OAUTH_RETIRED_REFRESH_KEPT = 3;
 /** Revoked/expired grants are physically removed after this long. */
 export const OAUTH_EXPIRED_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 
