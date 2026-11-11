@@ -6,7 +6,7 @@
  * Reflect.set is used (not jest.replaceProperty) so suites calling
  * jest.restoreAllMocks() keep the setting for the whole file.
  */
-export function useLocalDevelopmentOrigin(): void {
+export function enableLocalDevelopmentOrigin(): void {
   const original = process.env.NODE_ENV;
   beforeAll(() => {
     Reflect.set(process.env, "NODE_ENV", "development");

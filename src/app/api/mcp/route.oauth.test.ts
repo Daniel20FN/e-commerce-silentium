@@ -7,7 +7,7 @@ import {
 import { challengeForVerifier } from "@/domains/admin/mcp_oauth/services/oauth_rules";
 import { exchangeAuthorizationCode } from "@/domains/admin/mcp_oauth/services/oauth_token_service";
 import { fakeOAuthDb as db } from "@/domains/admin/mcp_oauth/testing/fake_db";
-import { useLocalDevelopmentOrigin } from "@/domains/admin/mcp_oauth/testing/local_development";
+import { enableLocalDevelopmentOrigin } from "@/domains/admin/mcp_oauth/testing/local_development";
 import type { OAuthClientRecord } from "@/domains/admin/mcp_oauth/types/oauth_types";
 import { OPTIONS, POST } from "./route";
 
@@ -113,7 +113,7 @@ async function toolNames(secret: string): Promise<string[]> {
   );
 }
 
-useLocalDevelopmentOrigin();
+enableLocalDevelopmentOrigin();
 
 describe("/api/mcp with OAuth access tokens (D1, D5)", () => {
   beforeEach(() => {

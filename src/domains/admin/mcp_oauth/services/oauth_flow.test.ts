@@ -1,7 +1,7 @@
 /** @jest-environment node */
 
 import { fakeOAuthDb as db } from "../testing/fake_db";
-import { useLocalDevelopmentOrigin } from "../testing/local_development";
+import { enableLocalDevelopmentOrigin } from "../testing/local_development";
 import type { OAuthClientRecord } from "../types/oauth_types";
 import {
   buildAuthorizationRedirect,
@@ -150,7 +150,7 @@ beforeEach(() => {
   });
 });
 
-useLocalDevelopmentOrigin();
+enableLocalDevelopmentOrigin();
 
 describe("dynamic client registration (D2)", () => {
   it("registers a public client without issuing a secret", async () => {
@@ -290,31 +290,6 @@ describe("dynamic client registration (D2)", () => {
         new URLSearchParams({ client_id: body.client_id }),
       ),
     ).rejects.toMatchObject({ error: "invalid_client" });
-  });
-
-  it("caps unused registrations and purges abandoned ones", async () => {
-    for (let i = 0; i < 200; i += 1)
-      db.clients.insert({
-        clientId: `slcid_${i}`,
-        source: "dynamic",
-        name: "x",
-        redirectUris: [REDIRECT],
-        authMethod: "none",
-        secretHash: null,
-      });
-    const blocked = await handleRegistration(
-      jsonRequest({ redirect_uris: [REDIRECT] }),
-    );
-    expect(blocked.status).toBe(503);
-    // Clients abandoned for over 24 h are purged before the cap is checked.
-    db.clients.rows.forEach((row) => {
-      row.createdAt = new Date(Date.now() - 25 * 3600 * 1000);
-    });
-    const allowed = await handleRegistration(
-      jsonRequest({ redirect_uris: [REDIRECT] }),
-    );
-    expect(allowed.status).toBe(201);
-    expect(db.clients.rows).toHaveLength(1);
   });
 });
 

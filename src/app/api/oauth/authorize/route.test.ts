@@ -2,7 +2,7 @@
 
 import { challengeForVerifier } from "@/domains/admin/mcp_oauth/services/oauth_rules";
 import { fakeOAuthDb as db } from "@/domains/admin/mcp_oauth/testing/fake_db";
-import { useLocalDevelopmentOrigin } from "@/domains/admin/mcp_oauth/testing/local_development";
+import { enableLocalDevelopmentOrigin } from "@/domains/admin/mcp_oauth/testing/local_development";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
 import { NextRequest } from "next/server";
 import { POST } from "./route";
@@ -66,7 +66,7 @@ function decision(
 
 let clientId: string;
 
-useLocalDevelopmentOrigin();
+enableLocalDevelopmentOrigin();
 
 describe("POST /api/oauth/authorize (consent decision, D3 D6)", () => {
   beforeEach(() => {

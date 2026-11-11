@@ -147,12 +147,17 @@ model McpOAuthClient {
   authMethod        McpOAuthClientAuthMethod @default(none)
   secretHash        String?
   metadataExpiresAt DateTime?
+  // HMAC-SHA256 of the registering network (IPv4 or IPv6 /64), keyed with a
+  // server secret. Only for per-source registration limits; never a raw IP, and
+  // cleared as soon as the client is authorized.
+  registrantHash    String?
   createdAt         DateTime                 @default(now())
   updatedAt         DateTime                 @updatedAt
   grants            McpOAuthGrant[]
   codes             McpOAuthCode[]
 
   @@index([source, createdAt])
+  @@index([registrantHash, createdAt])
 }
 
 // Single-use, short-lived authorization codes. Only the SHA-256 hash is stored.

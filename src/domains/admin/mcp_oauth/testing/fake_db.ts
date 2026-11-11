@@ -185,6 +185,10 @@ export function createFakeOAuthDb() {
       const none = (cond as { none?: unknown }).none;
       if (none) return !grants.rows.some((g) => g.clientRowId === row.id);
     }
+    if (key === "codes") {
+      const none = (cond as { none?: unknown }).none;
+      if (none) return !codes.rows.some((c) => c.clientRowId === row.id);
+    }
     return null;
   });
   const tokens: Table = new Table("token", (row) => ({

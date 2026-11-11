@@ -8,7 +8,7 @@ import { GET as getPrmPath } from "@/app/.well-known/oauth-protected-resource/ap
 import { GET as getPrm } from "@/app/.well-known/oauth-protected-resource/route";
 import { GET as getOidc } from "@/app/.well-known/openid-configuration/route";
 import { STOREFRONT_ORIGIN } from "@/domains/storefront/services/seo_rules";
-import { useLocalDevelopmentOrigin } from "../testing/local_development";
+import { enableLocalDevelopmentOrigin } from "../testing/local_development";
 import { oauthContext, trustedOAuthOrigin } from "./oauth_origin";
 
 jest.mock("@/lib/prisma", () => ({ prisma: {} }));
@@ -110,7 +110,7 @@ describe("trusted origin", () => {
 });
 
 describe("discovery documents (D1)", () => {
-  useLocalDevelopmentOrigin();
+  enableLocalDevelopmentOrigin();
 
   const request = (path: string) => new Request(`${local}${path}`);
 

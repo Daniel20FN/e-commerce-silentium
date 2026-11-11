@@ -15,6 +15,7 @@ CREATE TABLE public."McpOAuthClient" (
     "authMethod" public."McpOAuthClientAuthMethod" NOT NULL DEFAULT 'none',
     "secretHash" TEXT,
     "metadataExpiresAt" TIMESTAMP(3),
+    "registrantHash" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -22,6 +23,7 @@ CREATE TABLE public."McpOAuthClient" (
     CONSTRAINT "mcp_oauth_client_name_present" CHECK (length(btrim("name")) BETWEEN 1 AND 100),
     CONSTRAINT "mcp_oauth_client_id_length" CHECK (length("clientId") BETWEEN 1 AND 2048),
     CONSTRAINT "mcp_oauth_client_redirects_bounded" CHECK (cardinality("redirectUris") BETWEEN 1 AND 10),
+    CONSTRAINT "mcp_oauth_client_registrant_hmac" CHECK ("registrantHash" IS NULL OR "registrantHash" ~ '^[0-9a-f]{64}$'),
     CONSTRAINT "mcp_oauth_client_secret_sha256" CHECK ("secretHash" IS NULL OR "secretHash" ~ '^[0-9a-f]{64}$'),
     CONSTRAINT "mcp_oauth_client_secret_matches_method" CHECK (("authMethod" = 'none') = ("secretHash" IS NULL))
 );
@@ -77,6 +79,8 @@ CREATE TABLE public."McpOAuthToken" (
 CREATE UNIQUE INDEX "McpOAuthClient_clientId_key" ON public."McpOAuthClient"("clientId");
 
 CREATE INDEX "McpOAuthClient_source_createdAt_idx" ON public."McpOAuthClient"("source", "createdAt");
+
+CREATE INDEX "McpOAuthClient_registrantHash_createdAt_idx" ON public."McpOAuthClient"("registrantHash", "createdAt");
 
 CREATE UNIQUE INDEX "McpOAuthCode_codeHash_key" ON public."McpOAuthCode"("codeHash");
 

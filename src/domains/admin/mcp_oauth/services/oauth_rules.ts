@@ -14,9 +14,14 @@ export const OAUTH_LAST_USED_WINDOW_MS = 60_000;
 
 // Abuse limits.
 export const OAUTH_MAX_ACTIVE_GRANTS_PER_USER = 25;
-export const OAUTH_MAX_DYNAMIC_CLIENTS = 1000;
-export const OAUTH_MAX_UNUSED_DYNAMIC_CLIENTS = 200;
-export const OAUTH_UNUSED_CLIENT_RETENTION_MS = 24 * 60 * 60 * 1000;
+// Dynamic registration is an open endpoint. Defence in depth, none of which can
+// lock legitimate clients out: a per-source hourly limit, fast purge of clients
+// nobody authorized, and a high global ceiling that evicts the OLDEST unused
+// registrations instead of refusing new ones.
+export const OAUTH_MAX_UNUSED_PER_SOURCE = 20;
+export const OAUTH_SOURCE_WINDOW_MS = 60 * 60 * 1000;
+export const OAUTH_MAX_UNUSED_DYNAMIC_CLIENTS = 5000;
+export const OAUTH_UNUSED_CLIENT_RETENTION_MS = 2 * 60 * 60 * 1000;
 export const OAUTH_MAX_METADATA_CLIENTS = 500;
 export const OAUTH_REGISTRATION_BODY_MAX_BYTES = 16_384;
 export const OAUTH_MAX_REDIRECT_URIS = 5;

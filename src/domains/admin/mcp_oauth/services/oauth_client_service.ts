@@ -12,9 +12,10 @@ import type {
   DynamicRegistrationInput,
 } from "./oauth_rules";
 import {
-  OAUTH_MAX_DYNAMIC_CLIENTS,
   OAUTH_MAX_METADATA_CLIENTS,
   OAUTH_MAX_UNUSED_DYNAMIC_CLIENTS,
+  OAUTH_MAX_UNUSED_PER_SOURCE,
+  OAUTH_SOURCE_WINDOW_MS,
   OAUTH_UNUSED_CLIENT_RETENTION_MS,
   fallbackClientName,
   generateClientId,
@@ -43,11 +44,34 @@ export async function purgeAbandonedClients(now: Date): Promise<void> {
   const cutoff = new Date(now.getTime() - OAUTH_UNUSED_CLIENT_RETENTION_MS);
   try {
     await prisma.mcpOAuthClient.deleteMany({
-      where: { createdAt: { lt: cutoff }, grants: { none: {} } },
+      where: {
+        createdAt: { lt: cutoff },
+        grants: { none: {} },
+        codes: { none: {} },
+      },
     });
   } catch {
     console.error("mcp_oauth_client_purge_failed");
   }
+}
+
+/** Evicts the oldest never-authorized dynamic clients beyond `keep`. */
+async function evictOldestUnusedClients(keep: number): Promise<void> {
+  const unusedWhere = {
+    source: "dynamic",
+    grants: { none: {} },
+    codes: { none: {} },
+  } as const;
+  const excess = await prisma.mcpOAuthClient.findMany({
+    where: unusedWhere,
+    orderBy: { createdAt: "desc" },
+    skip: keep,
+    select: { id: true },
+  });
+  if (excess.length > 0)
+    await prisma.mcpOAuthClient.deleteMany({
+      where: { ...unusedWhere, id: { in: excess.map((client) => client.id) } },
+    });
 }
 
 export interface RegisteredClient {
@@ -58,29 +82,36 @@ export interface RegisteredClient {
 }
 
 /**
- * RFC 7591 registration. Open endpoint, so it is bounded: abandoned clients are
- * purged first, then the number of unused and total dynamic clients is capped.
+ * RFC 7591 registration. Open endpoint, so it is bounded without ever letting
+ * anonymous callers block legitimate ones: clients nobody authorized are purged
+ * after a couple of hours, each network may leave only a few unused
+ * registrations per hour (429, keyed by a hashed source, see
+ * oauth_registrant.ts) and the global ceiling of unused registrations evicts
+ * the oldest ones instead of refusing new clients.
  */
 export async function registerDynamicClient(
   input: DynamicRegistrationInput,
   now: Date = new Date(),
+  registrantHash: string | null = null,
 ): Promise<RegisteredClient> {
   await purgeAbandonedClients(now);
-  const [total, unused] = await Promise.all([
-    prisma.mcpOAuthClient.count({ where: { source: "dynamic" } }),
-    prisma.mcpOAuthClient.count({
-      where: { source: "dynamic", grants: { none: {} } },
-    }),
-  ]);
-  if (
-    total >= OAUTH_MAX_DYNAMIC_CLIENTS ||
-    unused >= OAUTH_MAX_UNUSED_DYNAMIC_CLIENTS
-  )
-    throw new OAuthError(
-      "temporarily_unavailable",
-      "Client registration is temporarily unavailable",
-      503,
-    );
+  if (registrantHash) {
+    const fromSource = await prisma.mcpOAuthClient.count({
+      where: {
+        source: "dynamic",
+        registrantHash,
+        grants: { none: {} },
+        createdAt: { gt: new Date(now.getTime() - OAUTH_SOURCE_WINDOW_MS) },
+      },
+    });
+    if (fromSource >= OAUTH_MAX_UNUSED_PER_SOURCE)
+      throw new OAuthError(
+        "temporarily_unavailable",
+        "Too many registrations from this network; try again later",
+        429,
+      );
+  }
+  await evictOldestUnusedClients(OAUTH_MAX_UNUSED_DYNAMIC_CLIENTS - 1);
   const authMethod = resolveAuthMethod(input.token_endpoint_auth_method);
   const secret = authMethod === "none" ? null : generateClientSecret();
   const client = await prisma.mcpOAuthClient.create({
@@ -92,6 +123,7 @@ export async function registerDynamicClient(
       redirectUris: input.redirect_uris,
       authMethod,
       secretHash: secret ? hashSecret(secret) : null,
+      registrantHash,
     },
     select: clientSelect,
   });

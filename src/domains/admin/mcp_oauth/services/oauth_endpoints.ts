@@ -11,6 +11,7 @@ import {
   readLimitedText,
 } from "./oauth_http";
 import { oauthContext } from "./oauth_origin";
+import { registrantHashFromHeaders } from "./oauth_registrant";
 import {
   OAUTH_REGISTRATION_BODY_MAX_BYTES,
   dynamicRegistrationSchema,
@@ -67,7 +68,11 @@ export async function handleRegistration(request: Request): Promise<Response> {
         "invalid_client_metadata",
         "authorization_code grant is required",
       );
-    const registered = await registerDynamicClient(parsed.data);
+    const registered = await registerDynamicClient(
+      parsed.data,
+      new Date(),
+      registrantHashFromHeaders(request.headers),
+    );
     return oauthJson(201, dynamicRegistrationResponse(registered));
   } catch (error) {
     if (error instanceof OAuthError) return oauthErrorResponse(error);

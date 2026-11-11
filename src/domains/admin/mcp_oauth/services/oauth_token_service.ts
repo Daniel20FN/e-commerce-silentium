@@ -175,6 +175,7 @@ export async function exchangeAuthorizationCode(
     },
     select: { id: true },
   });
+  await forgetRegistrant(client.id);
   await prisma.mcpOAuthCode.update({
     where: { id: record.id },
     data: { grantId: grant.id },
@@ -282,6 +283,18 @@ export async function refreshAccessToken(
   });
   await pruneGrantTokens(grant.id, now);
   return tokenResponse(access, refresh, grant.scopes, accessExpiresAt, now);
+}
+
+/** Authorized clients no longer need the hashed registration source. */
+async function forgetRegistrant(clientRowId: string): Promise<void> {
+  try {
+    await prisma.mcpOAuthClient.updateMany({
+      where: { id: clientRowId, registrantHash: { not: null } },
+      data: { registrantHash: null },
+    });
+  } catch {
+    console.error("mcp_oauth_registrant_cleanup_failed");
+  }
 }
 
 /**
