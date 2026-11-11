@@ -7,6 +7,10 @@ import {
   buildAuthorizationRedirect,
   validateAuthorizationRequest,
 } from "@/domains/admin/mcp_oauth/services/oauth_authorization_service";
+import {
+  projectOAuthConsentDictionary,
+  projectOAuthNoticeDictionary,
+} from "@/domains/admin/mcp_oauth/services/oauth_dictionary";
 import { oauthContext } from "@/domains/admin/mcp_oauth/services/oauth_origin";
 import {
   onlyLoopbackRedirects,
@@ -66,6 +70,7 @@ export default async function OAuthAuthorizePage({
 }) {
   const raw = await searchParams;
   const dictionary = getDictionary("es");
+  const notice = projectOAuthNoticeDictionary(dictionary);
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(raw))
     for (const item of Array.isArray(value) ? value : [value])
@@ -78,7 +83,7 @@ export default async function OAuthAuthorizePage({
   if (!canAccessAdmin(user) || user.status !== "active")
     return (
       <OAuthNoticeScreen
-        dictionary={dictionary}
+        dictionary={notice}
         title={dictionary.mcpOAuth.denied.title}
         subtitle={dictionary.mcpOAuth.denied.subtitle}
         body={dictionary.mcpOAuth.denied.body}
@@ -100,7 +105,7 @@ export default async function OAuthAuthorizePage({
   if (!validation.ok && validation.kind === "page")
     return (
       <OAuthNoticeScreen
-        dictionary={dictionary}
+        dictionary={notice}
         title={dictionary.mcpOAuth.invalid.title}
         subtitle={dictionary.mcpOAuth.invalid.subtitle}
         body={dictionary.mcpOAuth.invalid[validation.code]}
@@ -120,7 +125,7 @@ export default async function OAuthAuthorizePage({
   const { request } = validation;
   return (
     <OAuthConsentScreen
-      dictionary={dictionary}
+      dictionary={projectOAuthConsentDictionary(dictionary)}
       authorization={params}
       accountLabel={currentUserLabel(user)}
       client={{

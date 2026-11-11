@@ -18,6 +18,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useState, type FormEvent } from "react";
+import type {
+  OAuthConsentDictionary,
+  OAuthNoticeDictionary,
+} from "../services/oauth_dictionary";
 import { navigateTo } from "../services/oauth_navigation";
 import type { OAuthDecisionParams } from "../types/api_params";
 import type { OAuthDecisionApiResponse } from "../types/api_responses";
@@ -38,7 +42,7 @@ export interface OAuthConsentClientInfo {
 }
 
 interface OAuthConsentScreenProps {
-  dictionary: Pick<Dictionary, "general" | "mcpOAuth">;
+  dictionary: OAuthConsentDictionary;
   authorization: OAuthAuthorizeParams;
   client: OAuthConsentClientInfo;
   accountLabel: string;
@@ -242,7 +246,7 @@ export function OAuthConsentScreen({
 }
 
 interface OAuthNoticeScreenProps {
-  dictionary: Pick<Dictionary, "general">;
+  dictionary: OAuthNoticeDictionary;
   title: string;
   subtitle: string;
   body: string;
