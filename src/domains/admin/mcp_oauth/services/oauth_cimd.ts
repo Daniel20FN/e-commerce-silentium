@@ -1,5 +1,8 @@
-import { lookup } from "node:dns";
+import type { LookupAddress, LookupAllOptions } from "node:dns";
+import { lookup as dnsLookup } from "node:dns";
+import type { ClientRequest, IncomingMessage } from "node:http";
 import https from "node:https";
+import type { LookupFunction } from "node:net";
 import { isIP } from "node:net";
 import type { ClientMetadataDocument } from "./oauth_rules";
 import {
@@ -59,25 +62,50 @@ export function isPublicIpAddress(address: string): boolean {
   return false;
 }
 
-type LookupCallback = (
-  error: NodeJS.ErrnoException | null,
-  address: string,
-  family: number,
+export type CimdResolver = (
+  hostname: string,
+  options: LookupAllOptions,
+  callback: (
+    error: NodeJS.ErrnoException | null,
+    addresses: LookupAddress[],
+  ) => void,
 ) => void;
 
-/** DNS lookup used by the connection itself, so the checked IP is the one dialed. */
-function guardedLookup(
-  hostname: string,
-  _options: unknown,
-  callback: LookupCallback,
-): void {
-  lookup(hostname, { all: true, verbatim: true }, (error, addresses) => {
-    if (error) return callback(error, "", 4);
-    const first = addresses[0];
-    if (!first || !addresses.every((entry) => isPublicIpAddress(entry.address)))
-      return callback(new Error("cimd_blocked_address"), "", 4);
-    return callback(null, first.address, first.family);
-  });
+export interface GuardedLookupDeps {
+  resolve?: CimdResolver;
+  isAllowed?: (address: string) => boolean;
+}
+
+/**
+ * DNS lookup used by the connection itself, so the checked IP is the one
+ * dialed. Node (>= 20, autoSelectFamily) calls it with `{ all: true }` and
+ * expects an address array; the single-address form is used otherwise. Every
+ * resolved address must be public or the whole lookup is refused.
+ */
+export function createGuardedLookup(
+  deps: GuardedLookupDeps = {},
+): LookupFunction {
+  const resolve = deps.resolve ?? dnsLookup;
+  const isAllowed = deps.isAllowed ?? isPublicIpAddress;
+  return (hostname, options, callback) => {
+    const wantsAll = options.all === true;
+    const family =
+      options.family === 4 || options.family === 6 ? options.family : 0;
+    resolve(hostname, { all: true, verbatim: true, family }, (error, found) => {
+      if (error) return callback(error, wantsAll ? [] : "", 4);
+      const addresses = family
+        ? found.filter((entry) => entry.family === family)
+        : found;
+      const first = addresses[0];
+      if (!first || !addresses.every((entry) => isAllowed(entry.address))) {
+        const blocked = new Error("cimd_blocked_address");
+        return callback(blocked, wantsAll ? [] : "", 4);
+      }
+      return wantsAll
+        ? callback(null, addresses)
+        : callback(null, first.address, first.family);
+    });
+  };
 }
 
 export function ttlFromCacheControl(header: string | undefined): number {
@@ -98,26 +126,56 @@ export type ClientDocumentFetcher = (
   url: string,
 ) => Promise<FetchedClientDocument>;
 
+export type CimdTransport = (
+  url: string,
+  options: https.RequestOptions,
+  onResponse: (response: IncomingMessage) => void,
+) => ClientRequest;
+
+export interface ClientDocumentFetcherDeps {
+  transport?: CimdTransport;
+  lookup?: LookupFunction;
+}
+
 /**
- * Fetches and validates a Client ID Metadata Document. Guards: https only, a
+ * Builds the fetcher of Client ID Metadata Documents. Guards: https only, a
  * URL shape that rules out IP literals, ports and fragments, public IPs only
  * (checked on the dialed connection), no redirects, 5 s timeout, 16 KB cap, and
- * the document's client_id must equal the URL exactly.
+ * the document's client_id must equal the URL exactly. Dependencies are
+ * injectable only so tests can exercise the real request path offline.
  */
-export const fetchClientMetadataDocument: ClientDocumentFetcher = (url) => {
+export function createClientMetadataFetcher(
+  deps: ClientDocumentFetcherDeps = {},
+): ClientDocumentFetcher {
+  const transport: CimdTransport = deps.transport ?? https.request;
+  const lookup = deps.lookup ?? createGuardedLookup();
+  return (url) => fetchDocument(url, transport, lookup);
+}
+
+export const fetchClientMetadataDocument: ClientDocumentFetcher =
+  createClientMetadataFetcher();
+
+function fetchDocument(
+  url: string,
+  transport: CimdTransport,
+  lookup: LookupFunction,
+): Promise<FetchedClientDocument> {
   if (!isAcceptableMetadataDocumentUrl(url))
     return Promise.reject(new CimdError("cimd_invalid_url"));
   return new Promise<FetchedClientDocument>((resolve, reject) => {
-    const request = https.request(
+    const request = transport(
       url,
       {
         method: "GET",
         timeout: CIMD_TIMEOUT_MS,
+        // One-off request: never reuse pooled sockets, so every fetch is dialed
+        // through the guarded lookup.
+        agent: false,
         headers: {
           Accept: "application/json",
           "User-Agent": "silentium-oauth",
         },
-        lookup: guardedLookup as never,
+        lookup,
       },
       (response) => {
         const status = response.statusCode ?? 0;
@@ -160,4 +218,4 @@ export const fetchClientMetadataDocument: ClientDocumentFetcher = (url) => {
     request.on("error", () => reject(new CimdError("cimd_fetch_failed")));
     request.end();
   });
-};
+}

@@ -252,9 +252,13 @@ export const dynamicRegistrationSchema = z.object({
   application_type: z.enum(["native", "web"]).optional(),
 });
 
-/** Client ID Metadata Document: public clients only. */
+/**
+ * Client ID Metadata Document: public clients only. The MCP authorization spec
+ * (2026-07-28) requires client_name, so unlike DCR it cannot be omitted.
+ */
 export const clientMetadataDocumentSchema = z.object({
   ...sharedClientFields,
+  client_name: z.string().trim().min(1).max(OAUTH_CLIENT_NAME_MAX_LENGTH),
   client_id: z.string().max(OAUTH_CLIENT_ID_MAX_LENGTH),
   token_endpoint_auth_method: z.literal("none").optional(),
 });

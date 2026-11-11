@@ -122,7 +122,7 @@ function metadataClientData(
   now: Date,
 ) {
   return {
-    name: document.client_name ?? fallbackClientName(document.redirect_uris),
+    name: document.client_name,
     clientUri: document.client_uri ?? null,
     redirectUris: document.redirect_uris,
     metadataExpiresAt: new Date(now.getTime() + ttlSeconds * 1000),
