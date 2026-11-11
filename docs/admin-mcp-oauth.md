@@ -76,7 +76,7 @@ Si el cliente envía `resource`, debe identificar este servidor: `<origen>/api/m
 
 ## Migración
 
-`prisma/migrations/20261112000000_mcp_oauth/migration.sql` (aditiva; tablas nuevas, sin tocar las existentes). Dev y producción comparten base de datos: aplícala con `prisma migrate deploy` **solo** tras confirmar con `prisma migrate status` que es la única pendiente, y antes de publicar; sin ella los endpoints OAuth responden `503` y `/admin/agentes` no lista conexiones (los tokens personales siguen funcionando).
+`prisma/migrations/20261112000000_mcp_oauth/migration.sql` (aditiva; tablas nuevas, sin tocar las existentes) y `prisma/migrations/20261113000000_mcp_oauth_registrant/migration.sql` (añade `McpOAuthClient.registrantHash`, su restricción e índice; es una migración aparte para que sea segura aunque la primera ya estuviera aplicada). Dev y producción comparten base de datos: aplícala con `prisma migrate deploy` **solo** tras confirmar con `prisma migrate status` que son las únicas pendientes, y antes de publicar; sin ella los endpoints OAuth responden `503` y `/admin/agentes` no lista conexiones (los tokens personales siguen funcionando).
 
 ## Cómo conectar cada cliente
 
@@ -96,7 +96,7 @@ Pruebas unitarias (la base de datos se simula en memoria con `src/domains/admin/
 
 ### Prueba manual de extremo a extremo (local)
 
-1. Aplicar la migración a la base de desarrollo **solo con autorización** (`prisma migrate status` debe mostrar solo `20261112000000_mcp_oauth` pendiente).
+1. Aplicar la migración a la base de desarrollo **solo con autorización** (`prisma migrate status` debe mostrar solo `20261112000000_mcp_oauth` y `20261113000000_mcp_oauth_registrant` pendientes (o solo la segunda si la primera ya se aplicó)).
 2. Desde el worktree: `npx next dev -p 3124` (modo desarrollo: necesario para que el emisor siga la petición `localhost`).
 3. `curl -i http://localhost:3124/.well-known/oauth-protected-resource/api/mcp`, `curl -i http://localhost:3124/.well-known/oauth-authorization-server` y `curl -i -X POST http://localhost:3124/api/mcp` (esperado `401` con `resource_metadata`).
 4. Conectar MCP Inspector (o `claude mcp add --transport http silentium-local http://localhost:3124/api/mcp` y `/mcp`), iniciar sesión como administrador, elegir permisos y comprobar `tools/list`, una lectura (`guide_search`, `store_overview`) y la renovación.
