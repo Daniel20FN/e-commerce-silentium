@@ -835,7 +835,16 @@ describe("refresh tokens (D4)", () => {
 
   it("serves refresh and revocation over HTTP", async () => {
     const { clientId, record } = await registerPublicClient();
-    const tokens = await exchange(record, await issueCode(record));
+    // handleToken uses the real clock: issue and exchange "now", never at the
+    // fixed t0, or this test would break once the 90-day grant lapses.
+    const now = new Date();
+    const tokens = await exchange(
+      record,
+      await issueCode(record, "read", { now }),
+      {
+        now,
+      },
+    );
     const refreshed = await handleToken(
       formRequest({
         grant_type: "refresh_token",
