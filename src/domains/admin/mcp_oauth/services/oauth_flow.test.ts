@@ -329,6 +329,45 @@ describe("Client ID Metadata Documents (D2)", () => {
     expect(fetchDocument).toHaveBeenCalledTimes(2);
   });
 
+  it("identifies a public metadata client from a JWT client assertion without client_id", async () => {
+    await resolveClientForAuthorization(url, {
+      now: t0,
+      fetchDocument: jest.fn().mockResolvedValue({ document, ttlSeconds: 600 }),
+    });
+    const segment = (value: object): string =>
+      Buffer.from(JSON.stringify(value)).toString("base64url");
+    const assertion = (sub: string): URLSearchParams =>
+      new URLSearchParams({
+        client_assertion_type:
+          "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        client_assertion: `${segment({ alg: "RS256" })}.${segment({ iss: sub, sub })}.firma`,
+      });
+
+    await expect(
+      authenticateOAuthClient(new Headers(), assertion(url)),
+    ).resolves.toMatchObject({ clientId: url, authMethod: "none" });
+    await expect(
+      authenticateOAuthClient(
+        new Headers(),
+        assertion("https://otro.example.com/client.json"),
+      ),
+    ).rejects.toMatchObject({ error: "invalid_client" });
+
+    const confidential = await handleRegistration(
+      jsonRequest({
+        client_name: "Confidencial",
+        redirect_uris: [REDIRECT],
+        token_endpoint_auth_method: "client_secret_post",
+      }),
+    );
+    const { client_id: confidentialId } = (await confidential.json()) as {
+      client_id: string;
+    };
+    await expect(
+      authenticateOAuthClient(new Headers(), assertion(confidentialId)),
+    ).rejects.toMatchObject({ error: "invalid_client", status: 401 });
+  });
+
   it("never fetches when fetching is disabled and keeps the stored copy on refresh errors", async () => {
     const fetchDocument = jest.fn().mockRejectedValue(new Error("down"));
     await expect(
