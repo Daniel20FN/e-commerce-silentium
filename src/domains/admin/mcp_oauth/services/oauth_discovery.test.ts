@@ -8,6 +8,7 @@ import { GET as getPrmPath } from "@/app/.well-known/oauth-protected-resource/ap
 import { GET as getPrm } from "@/app/.well-known/oauth-protected-resource/route";
 import { GET as getOidc } from "@/app/.well-known/openid-configuration/route";
 import { STOREFRONT_ORIGIN } from "@/domains/storefront/services/seo_rules";
+import { useLocalDevelopmentOrigin } from "../testing/local_development";
 import { oauthContext, trustedOAuthOrigin } from "./oauth_origin";
 
 jest.mock("@/lib/prisma", () => ({ prisma: {} }));
@@ -15,14 +16,50 @@ jest.mock("@/lib/prisma", () => ({ prisma: {} }));
 const local = "http://localhost:3124";
 
 describe("trusted origin", () => {
-  it("honours loopback request origins in development only", () => {
-    expect(trustedOAuthOrigin(`${local}/x`, {})).toEqual({
+  const dev = { NODE_ENV: "development" };
+
+  it("honours loopback request origins only in explicit local development", () => {
+    expect(trustedOAuthOrigin(`${local}/x`, dev)).toEqual({
       origin: local,
       localDevelopment: true,
     });
-    expect(trustedOAuthOrigin("http://127.0.0.1:3000/x", {})).toMatchObject({
+    expect(trustedOAuthOrigin("http://127.0.0.1:3000/x", dev)).toMatchObject({
       origin: "http://127.0.0.1:3000",
     });
+  });
+
+  it.each([
+    ["next start (production build)", { NODE_ENV: "production" }],
+    ["tests", { NODE_ENV: "test" }],
+    ["NODE_ENV unset (self-hosted)", {}],
+    [
+      "Vercel production",
+      { NODE_ENV: "development", VERCEL_ENV: "production" },
+    ],
+    ["Vercel preview", { NODE_ENV: "production", VERCEL_ENV: "preview" }],
+  ])("never trusts a loopback Host in %s", (_name, env) => {
+    expect(trustedOAuthOrigin(`${local}/x`, env)).toEqual({
+      origin: STOREFRONT_ORIGIN,
+      localDevelopment: false,
+    });
+    expect(
+      trustedOAuthOrigin(`${local}/x`, {
+        ...env,
+        APP_PUBLIC_URL: "https://tienda.example",
+      }).origin,
+    ).toBe("https://tienda.example");
+  });
+
+  it("does not trust non-loopback hosts even in development", () => {
+    expect(trustedOAuthOrigin("https://evil.example/x", dev).origin).toBe(
+      STOREFRONT_ORIGIN,
+    );
+    expect(
+      trustedOAuthOrigin("http://192.168.1.20:3124/x", {
+        ...dev,
+        APP_PUBLIC_URL: "https://tienda.example",
+      }).origin,
+    ).toBe("https://tienda.example");
   });
 
   it("never trusts the Host header in production", () => {
@@ -58,7 +95,9 @@ describe("trusted origin", () => {
   });
 
   it("derives every endpoint from the same origin with no trailing slash", () => {
-    const context = oauthContext(`${local}/api/mcp`, {});
+    const context = oauthContext(`${local}/api/mcp`, {
+      NODE_ENV: "development",
+    });
     expect(context).toMatchObject({
       issuer: local,
       resource: `${local}/api/mcp`,
@@ -71,6 +110,8 @@ describe("trusted origin", () => {
 });
 
 describe("discovery documents (D1)", () => {
+  useLocalDevelopmentOrigin();
+
   const request = (path: string) => new Request(`${local}${path}`);
 
   it("serves protected resource metadata at the root and path-suffixed URLs", async () => {

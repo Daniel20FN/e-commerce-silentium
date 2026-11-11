@@ -1,6 +1,7 @@
 /** @jest-environment node */
 
 import { fakeOAuthDb as db } from "../testing/fake_db";
+import { useLocalDevelopmentOrigin } from "../testing/local_development";
 import type { OAuthClientRecord } from "../types/oauth_types";
 import {
   buildAuthorizationRedirect,
@@ -148,6 +149,8 @@ beforeEach(() => {
     profile: { firstName: "Ana", lastName: "Gómez" },
   });
 });
+
+useLocalDevelopmentOrigin();
 
 describe("dynamic client registration (D2)", () => {
   it("registers a public client without issuing a secret", async () => {

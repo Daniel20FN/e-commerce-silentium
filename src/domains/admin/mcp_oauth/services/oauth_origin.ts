@@ -54,14 +54,16 @@ export interface OAuthContext {
 /**
  * Resolves the origin all OAuth URLs derive from. Production never trusts the
  * Host header: it uses APP_PUBLIC_URL, Vercel's production URL or the canonical
- * storefront origin. The request origin is honoured only for loopback hosts and
- * never on Vercel production, so local servers can be tested end to end.
+ * storefront origin. The request origin is honoured only in explicit local
+ * development (`NODE_ENV=development`, i.e. `next dev`) and only for loopback
+ * hosts, so local servers can be tested end to end. Any other mode (`next
+ * start`, previews, tests, unset NODE_ENV) requires the configured origin.
  */
 export function trustedOAuthOrigin(
   requestUrl: string,
   env: OAuthEnv = process.env,
 ): { origin: string; localDevelopment: boolean } {
-  if (env.VERCEL_ENV !== "production") {
+  if (env.NODE_ENV === "development" && env.VERCEL_ENV !== "production") {
     try {
       const url = new URL(requestUrl);
       if (
