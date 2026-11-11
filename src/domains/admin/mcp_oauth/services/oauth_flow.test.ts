@@ -651,7 +651,8 @@ describe("authorization code exchange (D3)", () => {
 
   it("serves the token endpoint over HTTP with RFC 6749 errors and no-store", async () => {
     const { clientId, record } = await registerPublicClient();
-    const code = await issueCode(record, "read_write");
+    // handleToken uses the real clock, so the code must be issued "now".
+    const code = await issueCode(record, "read_write", { now: new Date() });
     const ok = await handleToken(
       formRequest({
         grant_type: "authorization_code",
