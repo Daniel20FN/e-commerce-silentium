@@ -1,3 +1,8 @@
+import {
+  OAUTH_CORS_HEADERS,
+  oauthPreflight,
+} from "@/domains/admin/mcp_oauth/services/oauth_http";
+import { oauthContext } from "@/domains/admin/mcp_oauth/services/oauth_origin";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { authenticateMcpRequest, type McpAuthFailureCode } from "./mcp_auth";
 import { createMcpServer } from "./mcp_server";
@@ -10,6 +15,11 @@ const PRIVATE_HEADERS = {
   "X-Robots-Tag": "noindex, nofollow, noarchive",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
+  // Bearer-only endpoint: no cookies, so cross-origin (browser) clients are safe.
+  "Access-Control-Allow-Origin":
+    OAUTH_CORS_HEADERS["Access-Control-Allow-Origin"],
+  "Access-Control-Expose-Headers":
+    OAUTH_CORS_HEADERS["Access-Control-Expose-Headers"],
 } as const;
 
 function privateJson(
@@ -23,11 +33,17 @@ function privateJson(
   });
 }
 
-function authFailure(status: 401 | 403, code: McpAuthFailureCode): Response {
+function authFailure(
+  request: Request,
+  status: 401 | 403,
+  code: McpAuthFailureCode,
+): Response {
+  // RFC 9728 section 5.1 / MCP authorization: point clients at the metadata.
+  const metadata = oauthContext(request.url).protectedResourceMetadataPathUrl;
   const challenge =
     code === "missing_token"
-      ? 'Bearer realm="silentium-admin"'
-      : `Bearer realm="silentium-admin", error="invalid_token"`;
+      ? `Bearer realm="silentium-admin", resource_metadata="${metadata}", scope="read"`
+      : `Bearer realm="silentium-admin", error="invalid_token", resource_metadata="${metadata}", scope="read"`;
   return privateJson(
     status,
     { error: code },
@@ -51,6 +67,7 @@ function withPrivateHeaders(response: Response): Response {
  * else reads the body; cookies are never consulted.
  */
 export async function handleMcpRequest(request: Request): Promise<Response> {
+  if (request.method === "OPTIONS") return oauthPreflight("POST, GET, DELETE");
   let auth: Awaited<ReturnType<typeof authenticateMcpRequest>>;
   try {
     auth = await authenticateMcpRequest(request);
@@ -58,7 +75,7 @@ export async function handleMcpRequest(request: Request): Promise<Response> {
     console.error("mcp_auth_failed");
     return privateJson(503, { error: "service_unavailable" });
   }
-  if (!auth.ok) return authFailure(auth.status, auth.code);
+  if (!auth.ok) return authFailure(request, auth.status, auth.code);
 
   if (request.method !== "POST")
     return privateJson(405, { error: "method_not_allowed" }, { Allow: "POST" });

@@ -2,6 +2,7 @@
 
 import { useCancellableApiContext } from "@/context/use_cancellable_api_context";
 import type { Dictionary } from "@/dictionary/services/get-dictionary";
+import { OAuthConnectionsSection } from "@/domains/admin/mcp_oauth/components/oauth_connections_section";
 import {
   ContentCopyOutlined,
   DeleteOutline,
@@ -667,6 +668,8 @@ export function AgentTokensPage({ dictionary }: { dictionary: Dictionary }) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <OAuthConnectionsSection copy={copy} />
     </Stack>
   );
 }

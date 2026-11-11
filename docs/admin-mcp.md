@@ -2,7 +2,7 @@
 
 Permite que administradores (`admin` y `super_admin`) operen la tienda desde agentes compatibles con MCP (Codex, Claude Code, Claude Desktop) mediante un endpoint remoto: `POST /api/mcp` (Streamable HTTP, sin estado, runtime Node). Cada herramienta reutiliza directamente los servicios de dominio del panel, de modo que reglas de negocio, bloqueos, comprobaciones de revisión y actor de auditoría son los mismos que en la interfaz.
 
-Incluye una capa de guía para personas sin experiencia: instrucciones del servidor, herramientas de guía y resumen de la tienda, y recetas guiadas (prompts). No expone usuarios, invitaciones, roles, evidencia legal ni autoservicio de cuenta. Tampoco implementa el servidor OAuth 2.1 de Supabase (posible evolución futura).
+Incluye una capa de guía para personas sin experiencia: instrucciones del servidor, herramientas de guía y resumen de la tienda, y recetas guiadas (prompts). No expone usuarios, invitaciones, roles, evidencia legal ni autoservicio de cuenta. No usa el servidor OAuth 2.1 de Supabase. Además de los tokens personales, cualquier cliente MCP puede conectarse con OAuth 2.1 contra el servidor de autorización propio de la aplicación: ver `docs/admin-mcp-oauth.md`.
 
 ## Modelo de seguridad
 

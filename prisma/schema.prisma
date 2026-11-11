@@ -68,6 +68,8 @@ model User {
   legalConsents      LegalConsentEvent[]
   invitations        AdminUserInvitation[]
   mcpAccessTokens    McpAccessToken[]
+  mcpOAuthGrants     McpOAuthGrant[]
+  mcpOAuthCodes      McpOAuthCode[]
 
   @@index([email])
   @@index([role])
@@ -115,6 +117,105 @@ model McpAccessToken {
   createdAt  DateTime        @default(now())
 
   @@index([userId, createdAt])
+}
+
+enum McpOAuthClientSource {
+  dynamic
+  metadata_document
+}
+
+enum McpOAuthClientAuthMethod {
+  none
+  client_secret_basic
+  client_secret_post
+}
+
+enum McpOAuthTokenKind {
+  access
+  refresh
+}
+
+// OAuth 2.1 clients of the MCP authorization server: registered through RFC 7591
+// (dynamic) or resolved from a Client ID Metadata Document. Private table.
+model McpOAuthClient {
+  id                String                   @id @default(cuid())
+  clientId          String                   @unique
+  source            McpOAuthClientSource
+  name              String
+  clientUri         String?
+  redirectUris      String[]
+  authMethod        McpOAuthClientAuthMethod @default(none)
+  secretHash        String?
+  metadataExpiresAt DateTime?
+  // HMAC-SHA256 of the registering network (IPv4 or IPv6 /64), keyed with a
+  // server secret. Only for per-source registration limits; never a raw IP, and
+  // cleared as soon as the client is authorized.
+  registrantHash    String?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  grants            McpOAuthGrant[]
+  codes             McpOAuthCode[]
+
+  @@index([source, createdAt])
+  @@index([registrantHash, createdAt])
+}
+
+// Single-use, short-lived authorization codes. Only the SHA-256 hash is stored.
+model McpOAuthCode {
+  id            String          @id @default(cuid())
+  codeHash      String          @unique
+  clientRowId   String
+  client        McpOAuthClient  @relation(fields: [clientRowId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scopes        McpTokenScope[]
+  redirectUri   String
+  resource      String
+  codeChallenge String
+  expiresAt     DateTime
+  usedAt        DateTime?
+  grantId       String?
+  createdAt     DateTime        @default(now())
+
+  @@index([expiresAt])
+  @@index([userId])
+}
+
+// A user's authorization of one client for the MCP resource. Revoking the grant
+// kills its access and refresh tokens; it never lasts beyond expiresAt.
+model McpOAuthGrant {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientRowId String
+  client      McpOAuthClient  @relation(fields: [clientRowId], references: [id], onDelete: Cascade)
+  scopes      McpTokenScope[]
+  resource    String
+  expiresAt   DateTime
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime        @default(now())
+  tokens      McpOAuthToken[]
+
+  @@index([userId, createdAt])
+  @@index([clientRowId])
+  @@index([expiresAt])
+}
+
+// Access and refresh tokens of a grant, hash only. Rotated refresh tokens keep
+// their row (usedAt set) so presenting one again revokes the whole grant.
+model McpOAuthToken {
+  id        String            @id @default(cuid())
+  grantId   String
+  grant     McpOAuthGrant     @relation(fields: [grantId], references: [id], onDelete: Cascade)
+  kind      McpOAuthTokenKind
+  tokenHash String            @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime          @default(now())
+
+  @@index([grantId, kind, createdAt])
+  @@index([expiresAt])
 }
 
 model UserProfile {

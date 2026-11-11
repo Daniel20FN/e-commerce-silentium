@@ -1,4 +1,6 @@
 import { AccountError } from "@/domains/account/services/account_errors";
+import { OAuthConsentError } from "@/domains/admin/mcp_oauth/services/oauth_authorization_service";
+import { McpOAuthGrantError } from "@/domains/admin/mcp_oauth/services/oauth_grant_service";
 import { canAccessAdmin } from "@/domains/admin/services/admin_roles";
 import { resolveCurrentUser } from "@/domains/auth/services/resolve_current_user";
 import type { CurrentUserDto } from "@/domains/auth/types/current_user";
@@ -84,7 +86,9 @@ export async function agentTokenRoute<T>(
     if (
       error instanceof AgentTokenRouteError ||
       error instanceof AccountError ||
-      error instanceof McpTokenError
+      error instanceof McpTokenError ||
+      error instanceof McpOAuthGrantError ||
+      error instanceof OAuthConsentError
     ) {
       status = error.status;
       body = { type: typeForStatus(status), message: error.code };

@@ -1,5 +1,6 @@
 import { CancellableApiProvider } from "@/context/use_cancellable_api_context";
 import dictionary from "@/dictionary/es.json";
+import type { McpOAuthGrantDto } from "@/domains/admin/mcp_oauth/types/oauth_types";
 import { apiService } from "@/types/api-service/api_service";
 import {
   act,
@@ -51,6 +52,26 @@ const expiredToken: McpTokenDto = {
   expiresAt: "2026-11-01T12:00:00.000Z",
 };
 
+/** The page also lists OAuth connections; route each GET by its URL. */
+function mockLists(options: {
+  tokens?: McpTokenDto[];
+  grants?: McpOAuthGrantDto[];
+  /** Rejects the first token list request only (a retry then succeeds). */
+  tokensError?: Error;
+}) {
+  let pendingError = options.tokensError;
+  jest.mocked(apiService.get).mockImplementation((url: string) => {
+    if (url === "/admin/agent-connections")
+      return Promise.resolve({ grants: options.grants ?? [] });
+    if (pendingError) {
+      const error = pendingError;
+      pendingError = undefined;
+      return Promise.reject(error);
+    }
+    return Promise.resolve({ tokens: options.tokens ?? [activeToken] });
+  });
+}
+
 function renderPage() {
   return render(
     <CancellableApiProvider>
@@ -69,9 +90,7 @@ async function openCreateDialog() {
 describe("agent tokens admin page", () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.mocked(apiService.get).mockResolvedValue({
-      tokens: [activeToken, revokedToken],
-    });
+    mockLists({ tokens: [activeToken, revokedToken] });
   });
 
   it("lists tokens with prefix, permissions, usage, expiry and state from the dictionary", async () => {
@@ -109,14 +128,14 @@ describe("agent tokens admin page", () => {
   });
 
   it("shows an empty state", async () => {
-    jest.mocked(apiService.get).mockResolvedValue({ tokens: [] });
+    mockLists({ tokens: [] });
     renderPage();
     expect(await screen.findByText(copy.emptyTitle)).toBeInTheDocument();
   });
 
   it("offers a retry when the list cannot be loaded", async () => {
     jest.spyOn(console, "error").mockImplementation(() => undefined);
-    jest.mocked(apiService.get).mockRejectedValueOnce(new Error("boom"));
+    mockLists({ tokensError: new Error("boom") });
     renderPage();
     expect(await screen.findByText(copy.errorTitle)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: copy.retry }));
@@ -276,7 +295,7 @@ describe("agent tokens admin page", () => {
   });
 
   it("does not offer deletion for expired tokens", async () => {
-    jest.mocked(apiService.get).mockResolvedValue({ tokens: [expiredToken] });
+    mockLists({ tokens: [expiredToken] });
     renderPage();
     const list = await screen.findByRole("list", { name: copy.listLabel });
     expect(within(list).queryByRole("button", { name: /Eliminar/ })).toBeNull();
