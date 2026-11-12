@@ -50,6 +50,7 @@
 - Navigation performance: `vercel.json` pins functions to `dub1`, colocated with the confirmed Supabase `eu-west-1` database; verify before changing regions. Public links use `NavigationLink`/native Next pending feedback; public document loading boundaries are intentionally absent so readers without JavaScript can see the content. Private routes retain scoped loading boundaries. Keep public dictionary props projected, and do not introduce shared caches for stock/auth/account/admin to hide latency. See `docs/navigation-performance.md` and `docs/geo-readability.md`.
 - Streaming hydration: `CartBootstrap` may restore browser atoms before a delayed island hydrates. Keep `useHydrated` gates for cart count/content/notices and AddToCart readiness; never hide hydration errors with suppression. `cart_nav_hydration.test.tsx` covers SSR followed by pre-hydration store restoration for all three cart islands.
 
+- Vercel Web Analytics: `SiteAnalytics` (`src/components/site_analytics.tsx`) is mounted once in the root layout and only reports on Vercel deployments. Its `beforeSend` (`analytics_redaction.ts`) strips query/fragment on private prefixes (`/admin`, `/account`, `/auth`, `/oauth`, `/login`, `/register`) so one-time codes, OAuth state or invitation tokens never leave the app; keep new private routes in that list. The package is ESM: unit-test the pure redaction module, not the component.
 - Install dependencies: `npm install`
 - Start dev server: `npm run dev`
 - Production build: `npm run build`
