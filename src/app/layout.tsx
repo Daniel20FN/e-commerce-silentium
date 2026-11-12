@@ -1,3 +1,4 @@
+import { SiteAnalytics } from "@/components/site_analytics";
 import { getDictionary } from "@/dictionary/services/get-dictionary";
 import {
   NO_INDEX,
@@ -45,6 +46,7 @@ export default async function RootLayout({
             {children}
           </Providers>
         </AppRouterCacheProvider>
+        <SiteAnalytics />
       </body>
     </html>
   );
